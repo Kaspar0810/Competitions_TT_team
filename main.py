@@ -407,6 +407,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         view_Menu.addAction(self.view_winners_list_Action)
         view_Menu.addAction(self.view_list_Action)
         view_Menu.addAction(self.view_list_double_Action)
+        view_Menu.addAction(self.view_list_team_Action)
         view_Menu.addSeparator()
         view_Menu.addAction(self.view_gr_Action)
         pf_view_Menu = view_Menu.addMenu("Полуфиналы")
@@ -479,6 +480,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_winners_list_Action = QAction("Список победителей")
         self.view_list_Action = QAction("Список участников")
         self.view_list_double_Action = QAction("Список парного разряда")
+        self.view_list_team_Action = QAction("Список команд")
         self.view_gr_Action = QAction("Группы")
         self.view_pf1_Action = QAction("1-й полуфинал")
         self.view_pf2_Action = QAction("2-й полуфинал")
@@ -540,6 +542,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_man_double_Action.setEnabled(False)
         self.view_woman_double_Action.setEnabled(False)
         self.view_mix_double_Action.setEnabled(False)
+        self.view_list_team_Action.setEnabled(False)
+
         # пункты меню редактирование жеребьевки
         self.ed_one_table_Action.setEnabled(False)  # делает пункт меню не видимым
         self.ed_etap_Action.setEnabled(False)  # делает пункт меню не видимым
@@ -571,6 +575,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_winners_list_Action.triggered.connect(self.view)
         self.view_list_Action.triggered.connect(self.view)
         self.view_list_double_Action.triggered.connect(self.view)
+        self.view_list_team_Action.triggered.connect(self.view)
         self.view_one_table_Action.triggered.connect(self.view)
         self.view_gr_Action.triggered.connect(self.view)
         self.view_pf1_Action.triggered.connect(self.view)
@@ -3499,7 +3504,6 @@ def add_player():
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
     # есть ли необходимость в написании отчества
-    # titles = Title.get(Title.id == title_id())
     flag_otc = titles.otchestvo
     if flag_otc == 1: # список с отчеством
         player_data_list = [pl, bd, rn, ct, rg, rz, ch, otc]
@@ -3568,7 +3572,6 @@ def add_player():
         Players_full.update(bday=bd_new, city=ct, region=rg, razryad=rz, coach_id=idc, patronymic_id=idp).where(Players_full.id == flag_player_full[0]).execute()
 
     # ==== определяет завявка предварительная или нет
-    # title = Title.select().where(Title.id == title_id()).get()
     data_start = titles.data_start
     date_current = date.today()
     zayavka = "предварительная" if date_current < data_start else "основная"
@@ -4435,6 +4438,9 @@ def page():
             my_win.tabWidget_player.resize(456, 50)
             my_win.tabWidget_player.setCurrentIndex(0)
             my_win.tabWidget_filter_players.setCurrentIndex(0)
+            teams = Team.select().where(Team.title_id == title_id())
+            count = len(teams)
+            my_win.label_114.setText(f"Всего: {count} команд")
         else:
             my_win.tabWidget_player.setCurrentIndex(1)
             my_win.tabWidget_filter_players.setCurrentIndex(1)
@@ -4448,11 +4454,9 @@ def page():
         load_coach_to_combo()
         load_comboBox_filter()
         region()
-        # titles = Title.select().where(Title.id == title_id()).get()
         otc = titles.otchestvo
         if otc == 1:
             my_win.lineEdit_otchestvo.setVisible(True)
-            # my_win.label_28.setVisible(True)
         else:
             my_win.lineEdit_otchestvo.setVisible(False)
             my_win.label_28.setVisible(False)
@@ -7692,10 +7696,12 @@ def filter_player_team_list():
     elif sender == my_win.checkBox_16: # отмечен чекбокс предзаявка
         if my_win.checkBox_16.isChecked():
             if team == "команды":
-                player_list = player.select().where(Player.title_id == title_id()) # фильтр по списку 
+                player_list = player.select().where((Player.title_id == title_id()) & (Player.application == 'Предварительная')) # фильтр по списку 
             else:
                 teams = Team.select().where((Team.title_id == title_id()) & (Team.team_name == team)).get()
                 player_list = player.select().where(Player.id.in_(players_id)) # фильтр по списку
+        else:
+            player_list = player.select().where(Player.title_id == title_id())
     fill_table(player_list)
 
 def get_players_ids_by_team_name():
@@ -7715,7 +7721,7 @@ def get_players_ids_by_team_name():
         
         return players_ids
     except Team.DoesNotExist:
-        print(f"Команда '{team_name}' не найдена")
+        # print(f"Команда '{team_name}' не найдена")
         return []
 
 def find_in_player_list():
@@ -14190,24 +14196,41 @@ def change_player_between_group_after_draw():
 
 def choice_tbl_made():
     """создание таблицы жеребьевка, заполняет db списком участников для жеребьевки"""
-    players = Player.select().order_by(Player.rank.desc()).where((Player.title_id == title_id()) & (Player.bday != '0000-00-00'))
+    titles = Title.select().where(Title.id == title_id()).get()
+    vid_turnira = titles.vid_turnira
     choice = Choice.select().where(Choice.title_id == title_id())
-    if len(choice) != 0:
-        for i in choice:
-            ch_d = Choice.get(Choice.id == i)
-            ch_d.delete_instance()
-    for i in players:
-        family_shot = i.player
-        patronymics = Patronymic.select().where(Patronymic.id == i.patronymic_id).get()
-        otc = patronymics.patronymic
-        family = f"{family_shot} {otc}"
-        region = i.region
-        rank = i.rank
-        coach_id = i.coach_id
-        coachs =Coach.select().where(Coach.id == coach_id).get()
-        coach = coachs.coach
-        chc = Choice(player_choice=i, family=family, region=region, coach=coach, rank=rank,
-                    title_id=title_id()).save()
+    if vid_turnira == "личные":
+        players = Player.select().order_by(Player.rank.desc()).where((Player.title_id == title_id()) & (Player.bday != '0000-00-00')) 
+        if len(choice) != 0:
+            for i in choice:
+                ch_d = Choice.get(Choice.id == i)
+                ch_d.delete_instance()
+        for i in players:
+            family_shot = i.player
+            patronymics = Patronymic.select().where(Patronymic.id == i.patronymic_id).get()
+            otc = patronymics.patronymic
+            family = f"{family_shot} {otc}"
+            region = i.region
+            rank = i.rank
+            coach_id = i.coach_id
+            coachs =Coach.select().where(Coach.id == coach_id).get()
+            coach = coachs.coach
+            chc = Choice(player_choice=i, family=family, region=region, coach=coach, rank=rank,
+                        title_id=title_id()).save()       
+    else:
+        teams = Team.select().where(Team.title_id == title_id())
+        if len(choice) != 0:
+            for i in choice:
+                ch_d = Choice.get(Choice.id == i)
+                ch_d.delete_instance()
+        for i in teams:
+            id_team = i.id
+            team_name = i.team_name
+            region = i.region            
+            coach_team = i.coach_team
+            rank = i.r_sum
+            chc = Choice(player_choice=id_team, family=team_name, region=region, coach=coach_team, rank=rank,
+                        title_id=title_id()).save()
 
 
 def filter_player_on_system():

@@ -1,0 +1,89 @@
+2026-04-09 15:52:49,555 - ERROR - Необработанное исключение: IntegrityError: (1452, 'Cannot add or update a child row: a foreign key constraint fails (`mysql_db`.`choices`, CONSTRAINT `choices_ibfk_1` FOREIGN KEY (`player_choice_id`) REFERENCES `players` (`id`))')
+2026-04-09 15:52:49,557 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 3322, in execute_sql
+    cursor.execute(sql, params or ())
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+    ~~~~~~~~~~^^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 575, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 826, in _read_query_result
+    result.read()
+    ~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 1203, in read
+    first_packet = self.connection._read_packet()
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 782, in _read_packet
+    packet.raise_for_error()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.IntegrityError: (1452, 'Cannot add or update a child row: a foreign key constraint fails (`mysql_db`.`choices`, CONSTRAINT `choices_ibfk_1` FOREIGN KEY (`player_choice_id`) REFERENCES `players` (`id`))')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 1176, in system_made
+    system_competition()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 5865, in system_competition
+    choice_tbl_made()  # заполняет db жеребьевка
+    ~~~~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 14233, in choice_tbl_made
+    title_id=title_id()).save()
+                         ~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 6958, in save
+    pk = self.insert(**field_dict).execute()
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 2036, in inner
+    return method(self, database, *args, **kwargs)
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 2107, in execute
+    return self._execute(database)
+           ~~~~~~~~~~~~~^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 2912, in _execute
+    return super(Insert, self)._execute(database)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 2625, in _execute
+    cursor = database.execute(self)
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 3330, in execute
+    return self.execute_sql(sql, params)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 3320, in execute_sql
+    with __exception_wrapper__:
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 3088, in __exit__
+    reraise(new_type, new_type(exc_value, *exc_args), traceback)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 196, in reraise
+    raise value.with_traceback(tb)
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 3322, in execute_sql
+    cursor.execute(sql, params or ())
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+    ~~~~~~~~~~^^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 575, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 826, in _read_query_result
+    result.read()
+    ~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 1203, in read
+    first_packet = self.connection._read_packet()
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 782, in _read_packet
+    packet.raise_for_error()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+peewee.IntegrityError: (1452, 'Cannot add or update a child row: a foreign key constraint fails (`mysql_db`.`choices`, CONSTRAINT `choices_ibfk_1` FOREIGN KEY (`player_choice_id`) REFERENCES `players` (`id`))')
