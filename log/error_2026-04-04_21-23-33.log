@@ -1,0 +1,9 @@
+2026-04-04 21:23:34,594 - ERROR - Необработанное исключение: AttributeError: 'QListWidgetItem' object has no attribute 'hide'
+2026-04-04 21:23:34,611 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1916, in <module>
+    fir_window = StartWindow()  # Создаём объект класса ExampleApp
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1371, in __init__
+    self.listWidget_comp.hide()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'QListWidgetItem' object has no attribute 'hide'

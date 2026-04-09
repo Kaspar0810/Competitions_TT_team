@@ -1,0 +1,25 @@
+2026-04-07 16:39:00,895 - ERROR - Необработанное исключение: TeamDoesNotExist: <Model: Team> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`team_name`, `t1`.`region`, `t1`.`coach_team`, `t1`.`r_sum`, `t1`.`title_id`, `t1`.`id_pl1_id`, `t1`.`r_pl1`, `t1`.`id_pl2_id`, `t1`.`r_pl2`, `t1`.`id_pl3_id`, `t1`.`r_pl3`, `t1`.`id_pl4_id`, `t1`.`r_pl4`, `t1`.`id_pl5_id`, `t1`.`r_pl5` FROM `teams` AS `t1` WHERE ((`t1`.`title_id` = %s) AND `t1`.`team_name`) LIMIT %s OFFSET %s
+Params: [72, 1, 0]
+2026-04-07 16:39:00,896 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 7297, in get
+    return clone.execute(database)[0]
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 4583, in __getitem__
+    return self.row_cache[item]
+           ~~~~~~~~~~~~~~^^^^^^
+IndexError: list index out of range
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 7821, in filter_player_team_list
+    teams = Team.select().where((Team.title_id == title_id()) & (Team.team_name)).get()
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 7300, in get
+    raise self.model.DoesNotExist('%s instance matching query does '
+                                  'not exist:\nSQL: %s\nParams: %s' %
+                                  (clone.model, sql, params))
+models.TeamDoesNotExist: <Model: Team> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`team_name`, `t1`.`region`, `t1`.`coach_team`, `t1`.`r_sum`, `t1`.`title_id`, `t1`.`id_pl1_id`, `t1`.`r_pl1`, `t1`.`id_pl2_id`, `t1`.`r_pl2`, `t1`.`id_pl3_id`, `t1`.`r_pl3`, `t1`.`id_pl4_id`, `t1`.`r_pl4`, `t1`.`id_pl5_id`, `t1`.`r_pl5` FROM `teams` AS `t1` WHERE ((`t1`.`title_id` = %s) AND `t1`.`team_name`) LIMIT %s OFFSET %s
+Params: [72, 1, 0]

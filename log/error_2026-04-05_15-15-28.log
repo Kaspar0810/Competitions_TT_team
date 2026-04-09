@@ -1,0 +1,10 @@
+2026-04-05 15:16:53,679 - ERROR - Необработанное исключение: AttributeError: 'list' object has no attribute 'find'
+2026-04-05 15:16:53,682 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1536, in open
+    go_to()
+    ~~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 2452, in go_to
+    mark = full_name_with_age.find("до")
+           ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'find'

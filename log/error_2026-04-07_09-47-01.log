@@ -1,0 +1,10 @@
+2026-04-07 09:47:12,207 - ERROR - Необработанное исключение: AttributeError: type object 'datetime.datetime' has no attribute 'date_start_comp'
+2026-04-07 09:47:12,212 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1538, in last_comp_open
+    control_date_R_list()
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1937, in control_date_R_list
+    year_start = (datetime.date_start_comp.strftime("%Y"))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'datetime.datetime' has no attribute 'date_start_comp'

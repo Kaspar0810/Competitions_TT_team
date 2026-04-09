@@ -1,0 +1,124 @@
+2026-04-08 11:23:35,639 - ERROR - Необработанное исключение: TitleDoesNotExist: <Model: Title> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`name`, `t1`.`sredi`, `t1`.`vozrast`, `t1`.`data_start`, `t1`.`data_end`, `t1`.`mesto`, `t1`.`referee`, `t1`.`kat_ref`, `t1`.`secretary`, `t1`.`kat_sec`, `t1`.`gamer`, `t1`.`full_name_comp`, `t1`.`pdf_comp`, `t1`.`short_name_comp`, `t1`.`tab_enabled`, `t1`.`multiregion`, `t1`.`perenos`, `t1`.`otchestvo`, `t1`.`r_date`, `t1`.`vid_turnira` FROM `titles` AS `t1` WHERE (((`t1`.`name` = %s) AND (`t1`.`gamer` = %s)) AND ((`t1`.`data_start` = %s) AND (`t1`.`vozrast` = %s))) LIMIT %s OFFSET %s
+Params: ['Командные соревнования ПФО', 'Юноши', datetime.date(2026, 3, 15), 'до 20 лет', 1, 0]
+2026-04-08 11:23:35,642 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 7297, in get
+    return clone.execute(database)[0]
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 4583, in __getitem__
+    return self.row_cache[item]
+           ~~~~~~~~~~~~~~^^^^^^
+IndexError: list index out of range
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 4403, in tool_page
+    page()
+    ~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 4410, in page
+    sf = System.select().where(System.title_id == title_id())
+                                                  ~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 15654, in title_id
+    titles = titles_data.select().where((Title.data_start == data) & (Title.vozrast == age)).get()
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 7300, in get
+    raise self.model.DoesNotExist('%s instance matching query does '
+                                  'not exist:\nSQL: %s\nParams: %s' %
+                                  (clone.model, sql, params))
+models.TitleDoesNotExist: <Model: Title> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`name`, `t1`.`sredi`, `t1`.`vozrast`, `t1`.`data_start`, `t1`.`data_end`, `t1`.`mesto`, `t1`.`referee`, `t1`.`kat_ref`, `t1`.`secretary`, `t1`.`kat_sec`, `t1`.`gamer`, `t1`.`full_name_comp`, `t1`.`pdf_comp`, `t1`.`short_name_comp`, `t1`.`tab_enabled`, `t1`.`multiregion`, `t1`.`perenos`, `t1`.`otchestvo`, `t1`.`r_date`, `t1`.`vid_turnira` FROM `titles` AS `t1` WHERE (((`t1`.`name` = %s) AND (`t1`.`gamer` = %s)) AND ((`t1`.`data_start` = %s) AND (`t1`.`vozrast` = %s))) LIMIT %s OFFSET %s
+Params: ['Командные соревнования ПФО', 'Юноши', datetime.date(2026, 3, 15), 'до 20 лет', 1, 0]
+2026-04-08 11:23:37,623 - ERROR - Необработанное исключение: TitleDoesNotExist: <Model: Title> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`name`, `t1`.`sredi`, `t1`.`vozrast`, `t1`.`data_start`, `t1`.`data_end`, `t1`.`mesto`, `t1`.`referee`, `t1`.`kat_ref`, `t1`.`secretary`, `t1`.`kat_sec`, `t1`.`gamer`, `t1`.`full_name_comp`, `t1`.`pdf_comp`, `t1`.`short_name_comp`, `t1`.`tab_enabled`, `t1`.`multiregion`, `t1`.`perenos`, `t1`.`otchestvo`, `t1`.`r_date`, `t1`.`vid_turnira` FROM `titles` AS `t1` WHERE (((`t1`.`name` = %s) AND (`t1`.`gamer` = %s)) AND ((`t1`.`data_start` = %s) AND (`t1`.`vozrast` = %s))) LIMIT %s OFFSET %s
+Params: ['Командные соревнования ПФО', 'Юноши', datetime.date(2026, 3, 15), 'до 20 лет', 1, 0]
+2026-04-08 11:23:37,625 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 7297, in get
+    return clone.execute(database)[0]
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 4583, in __getitem__
+    return self.row_cache[item]
+           ~~~~~~~~~~~~~~^^^^^^
+IndexError: list index out of range
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 4403, in tool_page
+    page()
+    ~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 4410, in page
+    sf = System.select().where(System.title_id == title_id())
+                                                  ~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 15654, in title_id
+    titles = titles_data.select().where((Title.data_start == data) & (Title.vozrast == age)).get()
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 7300, in get
+    raise self.model.DoesNotExist('%s instance matching query does '
+                                  'not exist:\nSQL: %s\nParams: %s' %
+                                  (clone.model, sql, params))
+models.TitleDoesNotExist: <Model: Title> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`name`, `t1`.`sredi`, `t1`.`vozrast`, `t1`.`data_start`, `t1`.`data_end`, `t1`.`mesto`, `t1`.`referee`, `t1`.`kat_ref`, `t1`.`secretary`, `t1`.`kat_sec`, `t1`.`gamer`, `t1`.`full_name_comp`, `t1`.`pdf_comp`, `t1`.`short_name_comp`, `t1`.`tab_enabled`, `t1`.`multiregion`, `t1`.`perenos`, `t1`.`otchestvo`, `t1`.`r_date`, `t1`.`vid_turnira` FROM `titles` AS `t1` WHERE (((`t1`.`name` = %s) AND (`t1`.`gamer` = %s)) AND ((`t1`.`data_start` = %s) AND (`t1`.`vozrast` = %s))) LIMIT %s OFFSET %s
+Params: ['Командные соревнования ПФО', 'Юноши', datetime.date(2026, 3, 15), 'до 20 лет', 1, 0]
+2026-04-08 11:23:40,911 - ERROR - Необработанное исключение: TitleDoesNotExist: <Model: Title> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`name`, `t1`.`sredi`, `t1`.`vozrast`, `t1`.`data_start`, `t1`.`data_end`, `t1`.`mesto`, `t1`.`referee`, `t1`.`kat_ref`, `t1`.`secretary`, `t1`.`kat_sec`, `t1`.`gamer`, `t1`.`full_name_comp`, `t1`.`pdf_comp`, `t1`.`short_name_comp`, `t1`.`tab_enabled`, `t1`.`multiregion`, `t1`.`perenos`, `t1`.`otchestvo`, `t1`.`r_date`, `t1`.`vid_turnira` FROM `titles` AS `t1` WHERE (((`t1`.`name` = %s) AND (`t1`.`gamer` = %s)) AND ((`t1`.`data_start` = %s) AND (`t1`.`vozrast` = %s))) LIMIT %s OFFSET %s
+Params: ['Командные соревнования ПФО', 'Юноши', datetime.date(2026, 3, 15), 'до 20 лет', 1, 0]
+2026-04-08 11:23:40,912 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 7297, in get
+    return clone.execute(database)[0]
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 4583, in __getitem__
+    return self.row_cache[item]
+           ~~~~~~~~~~~~~~^^^^^^
+IndexError: list index out of range
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 4403, in tool_page
+    page()
+    ~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 4410, in page
+    sf = System.select().where(System.title_id == title_id())
+                                                  ~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 15654, in title_id
+    titles = titles_data.select().where((Title.data_start == data) & (Title.vozrast == age)).get()
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 7300, in get
+    raise self.model.DoesNotExist('%s instance matching query does '
+                                  'not exist:\nSQL: %s\nParams: %s' %
+                                  (clone.model, sql, params))
+models.TitleDoesNotExist: <Model: Title> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`name`, `t1`.`sredi`, `t1`.`vozrast`, `t1`.`data_start`, `t1`.`data_end`, `t1`.`mesto`, `t1`.`referee`, `t1`.`kat_ref`, `t1`.`secretary`, `t1`.`kat_sec`, `t1`.`gamer`, `t1`.`full_name_comp`, `t1`.`pdf_comp`, `t1`.`short_name_comp`, `t1`.`tab_enabled`, `t1`.`multiregion`, `t1`.`perenos`, `t1`.`otchestvo`, `t1`.`r_date`, `t1`.`vid_turnira` FROM `titles` AS `t1` WHERE (((`t1`.`name` = %s) AND (`t1`.`gamer` = %s)) AND ((`t1`.`data_start` = %s) AND (`t1`.`vozrast` = %s))) LIMIT %s OFFSET %s
+Params: ['Командные соревнования ПФО', 'Юноши', datetime.date(2026, 3, 15), 'до 20 лет', 1, 0]
+2026-04-08 11:40:40,968 - ERROR - Необработанное исключение: TitleDoesNotExist: <Model: Title> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`name`, `t1`.`sredi`, `t1`.`vozrast`, `t1`.`data_start`, `t1`.`data_end`, `t1`.`mesto`, `t1`.`referee`, `t1`.`kat_ref`, `t1`.`secretary`, `t1`.`kat_sec`, `t1`.`gamer`, `t1`.`full_name_comp`, `t1`.`pdf_comp`, `t1`.`short_name_comp`, `t1`.`tab_enabled`, `t1`.`multiregion`, `t1`.`perenos`, `t1`.`otchestvo`, `t1`.`r_date`, `t1`.`vid_turnira` FROM `titles` AS `t1` WHERE (((`t1`.`name` = %s) AND (`t1`.`gamer` = %s)) AND ((`t1`.`data_start` = %s) AND (`t1`.`vozrast` = %s))) LIMIT %s OFFSET %s
+Params: ['Командные соревнования ПФО', 'Юноши', datetime.date(2026, 3, 15), 'до 20 лет', 1, 0]
+2026-04-08 11:40:40,970 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 7297, in get
+    return clone.execute(database)[0]
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 4583, in __getitem__
+    return self.row_cache[item]
+           ~~~~~~~~~~~~~~^^^^^^
+IndexError: list index out of range
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1239, in last
+    go_to()
+    ~~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 2422, in go_to
+    t = Title.select().where(Title.id == title_id()).get()
+                                         ~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 15654, in title_id
+    titles = titles_data.select().where((Title.data_start == data) & (Title.vozrast == age)).get()
+  File "C:\Users\Alex\Competitions_TT\venv\Lib\site-packages\peewee.py", line 7300, in get
+    raise self.model.DoesNotExist('%s instance matching query does '
+                                  'not exist:\nSQL: %s\nParams: %s' %
+                                  (clone.model, sql, params))
+models.TitleDoesNotExist: <Model: Title> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`name`, `t1`.`sredi`, `t1`.`vozrast`, `t1`.`data_start`, `t1`.`data_end`, `t1`.`mesto`, `t1`.`referee`, `t1`.`kat_ref`, `t1`.`secretary`, `t1`.`kat_sec`, `t1`.`gamer`, `t1`.`full_name_comp`, `t1`.`pdf_comp`, `t1`.`short_name_comp`, `t1`.`tab_enabled`, `t1`.`multiregion`, `t1`.`perenos`, `t1`.`otchestvo`, `t1`.`r_date`, `t1`.`vid_turnira` FROM `titles` AS `t1` WHERE (((`t1`.`name` = %s) AND (`t1`.`gamer` = %s)) AND ((`t1`.`data_start` = %s) AND (`t1`.`vozrast` = %s))) LIMIT %s OFFSET %s
+Params: ['Командные соревнования ПФО', 'Юноши', datetime.date(2026, 3, 15), 'до 20 лет', 1, 0]

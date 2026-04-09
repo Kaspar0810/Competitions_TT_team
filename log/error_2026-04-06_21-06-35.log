@@ -1,0 +1,14 @@
+2026-04-06 21:06:47,616 - ERROR - Необработанное исключение: AttributeError: 'NoneType' object has no attribute 'setSelection'
+2026-04-06 21:06:47,616 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 23545, in referee
+    my_win.comboBox_referee.lineEdit().setSelection(len(text), len(my_win.comboBox_referee.currentText()))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'setSelection'
+2026-04-06 21:06:47,635 - ERROR - Необработанное исключение: AttributeError: 'NoneType' object has no attribute 'setSelection'
+2026-04-06 21:06:47,636 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 23553, in referee
+    my_win.comboBox_secretary.lineEdit().setSelection(len(text), len(my_win.comboBox_secretary.currentText()))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'setSelection'

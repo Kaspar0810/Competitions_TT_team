@@ -1,0 +1,7 @@
+2026-04-05 12:04:20,358 - ERROR - Необработанное исключение: AttributeError: 'StartWindow' object has no attribute 'choice_competition'
+2026-04-05 12:04:20,395 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1537, in open
+    self.choice_competition()
+    ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'StartWindow' object has no attribute 'choice_competition'. Did you mean: '_choice_competition'?

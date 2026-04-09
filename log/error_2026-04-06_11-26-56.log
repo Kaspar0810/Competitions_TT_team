@@ -1,0 +1,7 @@
+2026-04-06 11:30:57,237 - ERROR - Необработанное исключение: NameError: name 'current_row' is not defined
+2026-04-06 11:30:57,243 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1496, in on_event_selected
+    current_item = fir_window.listWidget_comp.item(current_row)
+                                                   ^^^^^^^^^^^
+NameError: name 'current_row' is not defined

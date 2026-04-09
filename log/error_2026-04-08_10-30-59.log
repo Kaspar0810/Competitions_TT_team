@@ -1,0 +1,15 @@
+2026-04-08 10:31:58,811 - ERROR - Необработанное исключение: AttributeError: 'ModelSelect' object has no attribute 'team_name'
+2026-04-08 10:31:58,817 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 4562, in tool_page
+    page()
+    ~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 4644, in page
+    fill_table(player_list)  # заполняет TableWidget списком игроков
+    ~~~~~~~~~~^^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 3105, in fill_table
+    name_team = find_team_by_player(item_1)
+  File "c:\Users\Alex\Competitions_TT\main.py", line 3188, in find_team_by_player
+    return query.team_name.get()
+           ^^^^^^^^^^^^^^^
+AttributeError: 'ModelSelect' object has no attribute 'team_name'

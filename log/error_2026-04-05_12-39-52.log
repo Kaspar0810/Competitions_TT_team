@@ -1,0 +1,10 @@
+2026-04-05 12:40:15,633 - ERROR - Необработанное исключение: AttributeError: 'QModelIndex' object has no attribute 'text'
+2026-04-05 12:40:15,635 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1536, in open
+    go_to()
+    ~~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 2415, in go_to
+    full_name_with_age = fir_window.listWidget_comp.currentIndex().text()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'QModelIndex' object has no attribute 'text'

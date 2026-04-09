@@ -1,0 +1,12 @@
+2026-04-05 09:53:29,164 - ERROR - Необработанное исключение: AttributeError: 'StartWindow' object has no attribute 'calendarWidget'
+2026-04-05 09:53:29,165 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 2039, in <module>
+    fir_window = StartWindow()  # Создаём объект класса ExampleApp
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1388, in __init__
+    self.setup_calendar()
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1439, in setup_calendar
+    self.calendarWidget.setMinimumDate(QDate(2023, 1, 1))
+    ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'StartWindow' object has no attribute 'calendarWidget'. Did you mean: 'centralWidget'?

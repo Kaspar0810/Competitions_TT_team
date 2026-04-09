@@ -1,0 +1,12 @@
+2026-04-05 09:08:31,004 - ERROR - Необработанное исключение: TypeError: isGridVisible(self): too many arguments
+2026-04-05 09:08:31,027 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1945, in <module>
+    fir_window = StartWindow()  # Создаём объект класса ExampleApp
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1387, in __init__
+    self.setup_calendar()
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 1431, in setup_calendar
+    self.calendar.isGridVisible(True)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+TypeError: isGridVisible(self): too many arguments

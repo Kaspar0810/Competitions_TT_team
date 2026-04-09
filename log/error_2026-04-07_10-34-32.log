@@ -1,0 +1,7 @@
+2026-04-07 10:36:11,300 - ERROR - Необработанное исключение: UnboundLocalError: cannot access local variable 'add_players_to_team' where it is not associated with a value
+2026-04-07 10:36:11,303 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 3799, in add_player
+    add_players_to_team(pl_id, team, coach_team) # записывает в DB игроков команды
+    ^^^^^^^^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'add_players_to_team' where it is not associated with a value

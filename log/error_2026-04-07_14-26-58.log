@@ -1,0 +1,10 @@
+2026-04-07 14:29:30,529 - ERROR - Необработанное исключение: AttributeError: 'Team' object has no attribute 'name'
+2026-04-07 14:29:30,532 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 3800, in add_player
+    add_players_to_team(pl_id, team, coach_team, player_rating) # записывает в DB игроков команды
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT\main.py", line 3876, in add_players_to_team
+    teams_name = t.name
+                 ^^^^^^
+AttributeError: 'Team' object has no attribute 'name'

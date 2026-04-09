@@ -1,0 +1,14 @@
+2026-04-07 11:58:41,083 - ERROR - Необработанное исключение: AttributeError: 'MainWindow' object has no attribute 'comboBox_filter_schedule_tour'
+2026-04-07 11:58:41,150 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 24213, in load_combo_schedule_tours
+    my_win.comboBox_filter_schedule_tour.clear()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MainWindow' object has no attribute 'comboBox_filter_schedule_tour'
+2026-04-07 11:58:45,809 - ERROR - Необработанное исключение: AttributeError: 'MySQLMigrator' object has no attribute 'set_null'
+2026-04-07 11:58:45,810 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT\main.py", line 24954, in proba
+    migrate(migrator.set_null('teams', 'id_pl1', True))
+            ^^^^^^^^^^^^^^^^^
+AttributeError: 'MySQLMigrator' object has no attribute 'set_null'
