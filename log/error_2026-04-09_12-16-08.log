@@ -1,0 +1,10 @@
+2026-04-09 12:16:26,830 - ERROR - Необработанное исключение: UnboundLocalError: cannot access local variable 'text_value' where it is not associated with a value
+2026-04-09 12:16:26,831 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 1558, in open
+    go_to()
+    ~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 2430, in go_to
+    znak1 = text_value.find(".")
+            ^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'text_value' where it is not associated with a value

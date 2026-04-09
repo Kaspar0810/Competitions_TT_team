@@ -5256,7 +5256,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_team">
        <attribute name="title">
@@ -5330,7 +5330,7 @@
          <string>Удалить</string>
         </property>
        </widget>
-       <widget class="QLabel" name="label_predzayavka_2">
+       <widget class="QLabel" name="label_predzayavka_team">
         <property name="geometry">
          <rect>
           <x>3</x>
@@ -5349,7 +5349,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Игроков по предзаяке:</string>
+         <string>Команд по предзаяке:</string>
         </property>
        </widget>
        <widget class="QGroupBox" name="groupBox_11">
@@ -5662,7 +5662,7 @@
           <bool>true</bool>
          </property>
         </widget>
-        <widget class="QPushButton" name="Button_clear_del_2">
+        <widget class="QPushButton" name="Button_clear_del_team">
          <property name="geometry">
           <rect>
            <x>128</x>
@@ -5706,7 +5706,7 @@
           <bool>true</bool>
          </property>
         </widget>
-        <widget class="QPushButton" name="Button_app_2">
+        <widget class="QPushButton" name="Button_app_team">
          <property name="geometry">
           <rect>
            <x>128</x>
@@ -5749,7 +5749,7 @@
           <bool>true</bool>
          </property>
         </widget>
-        <widget class="QPushButton" name="Button_pay_R_2">
+        <widget class="QPushButton" name="Button_pay_R_team">
          <property name="geometry">
           <rect>
            <x>128</x>

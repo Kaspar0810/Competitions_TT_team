@@ -1466,8 +1466,6 @@ class StartWindow(QMainWindow, Ui_Form):
     
     def on_date_clicked(self, date):
         """Обрабатывает нажатие на дату в календаре"""
-        # print(f"Выбрана дата: {date.toString('yyyy-MM-dd')}")
-        self.Button_open.setEnabled(True) 
         self.last_competition()
         # Здесь вы можете сделать запрос в базу, чтобы показать события за этот день
         try:
@@ -1483,7 +1481,6 @@ class StartWindow(QMainWindow, Ui_Form):
             else:
                 self.listWidget_comp.clear()
                 self.listWidget_comp.addItem("Нет событий на эту дату")
-
         except Exception as e:
             print(f"Ошибка при получении событий: {e}")
     
@@ -1493,7 +1490,6 @@ class StartWindow(QMainWindow, Ui_Form):
  
         selected_date = fir_window.calendar.selectedDate()
         date_str = selected_date.toString('yyyy-MM-dd')
-        # name_comp = fir_window.listWidget_comp.selectedItems()
         current_row = fir_window.listWidget_comp.currentRow()
         if current_row >= 0:
             current_item = fir_window.listWidget_comp.item(current_row)
@@ -1505,7 +1501,6 @@ class StartWindow(QMainWindow, Ui_Form):
         name = text_value[:znak1]
         znak2 = text_value.rfind(".")
         gamer = text_value[znak2 + 1:]
-        # vozrast = text_value[znak1 + 1:znak2]
         titles_pdf = Title.select().where((Title.name == name) & (Title.gamer == gamer) & (Title.data_start == date_str))
         for t in titles_pdf:
             pdf_comp = t.pdf_comp
@@ -1513,7 +1508,7 @@ class StartWindow(QMainWindow, Ui_Form):
         if selected_items:
             # Если событие выбрано, меняем текст кнопки
             # self.Button_open.setText("Открыть")
-            # self.Button_open.setEnabled(True)
+            self.Button_open.setEnabled(True)
             if pdf_comp:
                 self.Button_view_pdf.setEnabled(True)
             else:
@@ -1523,6 +1518,7 @@ class StartWindow(QMainWindow, Ui_Form):
             # Если ничего не выбрано
             selected_date = self.calendar.selectedDate()
             events_count = len(self.events_by_date.get(selected_date, []))
+            self.Button_open.setEnabled(False)
             # self.btn_edit.setText(f"✏️ Редактировать ({events_count})")
             # self.btn_delete.setText("🗑️ Удалить событие")
     # ===============================
@@ -2416,7 +2412,7 @@ def go_to():
     if sender == fir_window.Button_open:
         selected_date = fir_window.calendar.selectedDate()
         date_str = selected_date.toString('yyyy-MM-dd')
-        # name_comp = fir_window.listWidget_comp.selectedItems()
+
         current_row = fir_window.listWidget_comp.currentRow()
         if current_row >= 0:
             current_item = fir_window.listWidget_comp.item(current_row)
@@ -3053,7 +3049,7 @@ def fill_table(player_list):
             model.setHorizontalHeaderLabels(['id','Этап', 'Игрок-1', 'Игрок-2', 'Победитель', 'Тренер', ''])
     
     if tb == 1:
-        if my_win.checkBox_15.isChecked():
+        if my_win.checkBox_15.isChecked() or my_win.checkBox_16.isChecked():
             my_win.tableView.setSelectionMode(QAbstractItemView.MultiSelection) # выделение несколких строк по клику мышью
         else:
             my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
@@ -7676,22 +7672,30 @@ def filter_player_list(sender):
 
 def filter_player_team_list():
     """фильтрация списка участников команд по областям, тренерам, городам"""
-
+    sender = my_win.sender()
     player = Player.select().where(Player.title_id == title_id())
     players_id = get_players_ids_by_team_name()
     team = my_win.comboBox_fltr_team.currentText()
-    if team == "команды":
-    #    teams = Team.select().where(Team.title_id == title_id()).get()
-       player_list = player.select().where(Player.title_id == title_id()) # фильтр по списку 
-    else:
-        teams = Team.select().where((Team.title_id == title_id()) & (Team.team_name == team)).get()
-        coach_team = teams.coach_team
-        r_sum = str(teams.r_sum)
-        my_win.lineEdit_coach_team.setText(coach_team)
-        my_win.lineEdit_team.setText(team)
-        my_win.lineEdit_team_r.setText(r_sum)   
-        player_list = player.select().where(Player.id.in_(players_id)) # фильтр по списку
 
+    if sender == my_win.Button_fltr_list_team: # кнопка применить 
+        if team == "команды":
+            player_list = player.select().where(Player.title_id == title_id()) # фильтр по списку 
+        else:
+            teams = Team.select().where((Team.title_id == title_id()) & (Team.team_name == team)).get()
+            coach_team = teams.coach_team
+            r_sum = str(teams.r_sum)
+            my_win.lineEdit_coach_team.setText(coach_team)
+            my_win.lineEdit_team.setText(team)
+            my_win.lineEdit_team_r.setText(r_sum)   
+            player_list = player.select().where(Player.id.in_(players_id)) # фильтр по списку
+
+    elif sender == my_win.checkBox_16: # отмечен чекбокс предзаявка
+        if my_win.checkBox_16.isChecked():
+            if team == "команды":
+                player_list = player.select().where(Player.title_id == title_id()) # фильтр по списку 
+            else:
+                teams = Team.select().where((Team.title_id == title_id()) & (Team.team_name == team)).get()
+                player_list = player.select().where(Player.id.in_(players_id)) # фильтр по списку
     fill_table(player_list)
 
 def get_players_ids_by_team_name():
@@ -25032,6 +25036,7 @@ my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по не
 
 my_win.checkBox_11.stateChanged.connect(debitor_R) # должники рейтинга оплаты
 my_win.checkBox_15.stateChanged.connect(filter_player_list)
+my_win.checkBox_16.stateChanged.connect(filter_player_team_list)
 my_win.checkBox_find_player.stateChanged.connect(find_player)
 my_win.checkBox_double.stateChanged.connect(page_double)
 my_win.checkBox_no_play_3.stateChanged.connect(mesto_3_no_play)
@@ -25050,6 +25055,7 @@ my_win.Button_filter_fin.clicked.connect(filter_fin)
 my_win.Button_filter_sf.clicked.connect(filter_sf)
 my_win.Button_filter_gr.clicked.connect(filter_gr)
 my_win.Button_app.clicked.connect(check_real_player) # отмечает что игрок по заявке
+my_win.Button_app_team.clicked.connect(check_real_player) # отмечает что игрок в команде по заявке
 
 my_win.Button_etap_made.clicked.connect(etap_made) # кнопка создание этапов системы
 my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет игроков в список и базу
