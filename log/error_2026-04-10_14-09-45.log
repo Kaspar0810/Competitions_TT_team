@@ -1,0 +1,7 @@
+2026-04-10 14:10:30,681 - ERROR - Необработанное исключение: AttributeError: 'ModelSelect' object has no attribute 'vid_turnira'
+2026-04-10 14:10:30,683 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 15459, in kol_player_in_final
+    vid_turnira = titles.vid_turnira
+                  ^^^^^^^^^^^^^^^^^^
+AttributeError: 'ModelSelect' object has no attribute 'vid_turnira'

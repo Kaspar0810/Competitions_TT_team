@@ -316,7 +316,24 @@ class Team(BaseModel):
         (('id_pl5',), False),
     )
 
-        
+class Choice_Team(BaseModel):
+    team_choice = ForeignKeyField(Team)
+    team_name = CharField()
+    team_region = CharField()
+    team_coach = CharField()
+    rank = IntegerField()
+    basic = CharField(null=True)
+    group = CharField(null=True)
+    posev_group = IntegerField(null=True)
+    mesto_group = IntegerField(null=True)
+    final = CharField(null=True)
+    posev_final = IntegerField(null=True)
+    mesto_final = IntegerField(null=True)
+    title_id = ForeignKeyField(Title)
+
+    class Meta:
+        db_table = "choice_teams"
+    
 
 
 

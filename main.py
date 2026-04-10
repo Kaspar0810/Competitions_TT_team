@@ -4522,6 +4522,8 @@ def page():
     elif tb == 2:  # -система-
         my_win.tabWidget_player.tabBar().hide()
         # включает вкладку -команды-
+        titles = Title.select().where(Title.id == title_id()).get()
+        vid_turnira = titles.vid_turnira
         my_win.checkBox_double.setEnabled(False)# временно выключил
         my_win.checkBox_team.setEnabled(False)
         my_win.tabWidget_2.setCurrentIndex(0)
@@ -4532,14 +4534,20 @@ def page():
         my_win.checkBox_repeat_regions.setChecked(False)
     
         my_win.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers) # запрет редактирования таблицы
+        
         result = Result.select().where(Result.title_id == title_id())
         result_played = result.select().where(Result.winner != "")
         count_result = len(result_played)
-
-        player_list_main = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
-        count = len(player_list_main)
-        my_win.label_8.setText(f"Всего участников: {str(count)} человек")
-        my_win.label_52.setText(f"Всего сыграно: {count_result} игр.")
+        if vid_turnira == "личные":
+            player_list_main = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
+            count = len(player_list_main)
+            my_win.label_8.setText(f"Всего участников: {str(count)} человек")
+            my_win.label_52.setText(f"Всего сыграно: {count_result} игр.")
+        else:
+            player_list_main = Team.select().where(Team.title_id == title_id())
+            count = len(player_list_main)
+            my_win.label_8.setText(f"Всего: {str(count)} команд")
+            my_win.label_52.setText(f"Всего сыграно: {count_result} матчей.")
         label_playing_count() # пишет сколько игр сыграно в каждом этапе
         my_win.comboBox_filter_number_group_final.setEnabled(False)
         for k in sf:
@@ -5785,6 +5793,7 @@ def system_competition():
     fin_etap_list = ["1-й финал", "2-й финал", "3-й финал", "4-й финал",
                             "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал", "Суперфинал"]
     tit = Title.get(Title.id == title_id())
+    vid_turnira = tit.vid_turnira
     systems = System.select().where(System.title_id == title_id())
     for p in systems:
         etap = p.stage
@@ -5943,8 +5952,13 @@ def system_competition():
             my_win.label_10.setText("1-й этап")
             my_win.Button_etap_made.setEnabled(False)
             my_win.comboBox_page_vid.setEnabled(True)
-            player = Player.select().where((Player.title_id == title_id()) & (Player.bday != '0000-00-00'))
-            count = len(player)
+            count = 0
+            if vid_turnira == "личные":
+                player = Player.select().where((Player.title_id == title_id()) & (Player.bday != '0000-00-00'))
+                count = len(player)
+            else:
+                teams = Team.select().where(Team.title_id == title_id())
+                count = len(teams)
             if count != 0:
                 my_win.tabWidget.setCurrentIndex(2)
             else:
@@ -6000,8 +6014,16 @@ def system_clear():
 def one_table(fin, group):
     """система соревнований из одной таблицы запись в System, Game_list, Result"""
     msgBox = QMessageBox()
-    ch = Choice.select().where(Choice.title_id == title_id())
-    count = len(Player.select().where(Player.title_id == title_id()))
+    
+    # определяем вид соревнований
+    titles = Title.select().where(Title.id == title_id()).get()
+    vid_turnira = titles.vid_turnira
+    if vid_turnira == "личные":
+        ch = Choice.select().where(Choice.title_id == title_id())
+        count = len(Player.select().where(Player.title_id == title_id()))
+    else:
+        ch = Choice_Team.select().where(Choice_Team.title_id == title_id())
+        count = len(Team.select().where(Team.title_id == title_id()))
     visible_game = 1 if my_win.checkBox_visible_game.isChecked() else 0
     # в зависмости сетка или круг
     cur_index = my_win.comboBox_table_1.currentIndex()
@@ -11937,7 +11959,12 @@ def choice_setka_automat(fin, flag, count_exit): # вариант жеребье
     #===================================
     id_system = system_id(stage=fin)
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()
-    choice = Choice.select().where(Choice.title_id == title_id())
+    titles = Title.select().where(Title.id == title_id())
+    vid_turnira = titles.vid_turnira
+    if vid_turnira == "личные":
+        choice = Choice.select().where(Choice.title_id == title_id())
+    else:
+        choice = Choice_Team.select().where(Choice_Team.title_id == title_id())
 
     max_player = system.max_player
     stage_exit = system.stage_exit
@@ -14239,10 +14266,11 @@ def choice_tbl_made():
             chc = Choice(player_choice=i, family=family, region=region, coach=coach, rank=rank,
                         title_id=title_id()).save()       
     else:
+        choices_team = Choice_Team.select().where(Choice_Team.title_id == title_id())
         teams = Team.select().where(Team.title_id == title_id())
-        if len(choice) != 0:
-            for i in choice:
-                ch_d = Choice.get(Choice.id == i)
+        if len(choices_team) != 0:
+            for i in choices_team:
+                ch_d = Choice_Team.get(Choice_Team.id == i)
                 ch_d.delete_instance()
         for i in teams:
             id_team = i.id
@@ -14250,7 +14278,7 @@ def choice_tbl_made():
             region = i.region            
             coach_team = i.coach_team
             rank = i.r_sum
-            chc = Choice(player_choice=id_team, family=team_name, region=region, coach=coach_team, rank=rank,
+            chc = Choice_Team(team_choice=id_team, team_name=team_name, team_region=region, team_coach=coach_team, rank=rank,
                         title_id=title_id()).save()
 
 
@@ -15440,10 +15468,16 @@ def number_final(last_etap):
 def kol_player_in_final():
     """после выбора из комбобокс системы финала подсчитывает сколько игр в финале"""
     sender = my_win.sender()
+    titles = Title.select().where(Title.id == title_id()).get()
+    vid_turnira = titles.vid_turnira
     pv = my_win.comboBox_page_vid.currentText()
     etap = my_win.comboBox_etap.currentText()
-    player = Player.select().where(Player.title_id == title_id())
-    count = len(player)
+    if vid_turnira == "личные":
+        player = Player.select().where(Player.title_id == title_id())
+        count = len(player)
+    else:
+        teams = Team.select().where(Team.title_id == title_id())
+        count = len(teams)
     fin = ""
     exit_stage = ""
     label_text = my_win.label_10.text()
@@ -15475,7 +15509,10 @@ def kol_player_in_final():
                 my_win.label_19.show()
                 my_win.label_19.setText(f"{total_game} игр.")
                 my_win.label_33.setText(f"Всего: {total_game} игр.")
-                my_win.label_etap_1.setText(f"{count} человек в сетке.")
+                if vid_turnira == "личные":
+                    my_win.label_etap_1.setText(f"{count} человек в сетке.")
+                else:
+                    my_win.label_etap_1.setText(f"{count} команд в сетке.")
                 my_win.comboBox_table_1.hide()
             flag_one_table = True
         else:
@@ -24859,43 +24896,31 @@ def schedule_reset():
 #     #     Player.update(region=reg).execute()
 #     print("Все записи обновлены")
 # =======        
-def proba(): 
-    # ======================
-    myconn = pymysql.connect(host = "localhost", user = "root", password = "db_pass", database = "mysql_db") 
-    # ========== создать таблицу    
+# def proba(): 
+#     # ======================
+#     myconn = pymysql.connect(host = "localhost", user = "root", password = "db_pass", database = "mysql_db") 
+#     # ========== создать таблицу    
 
-    class Team(BaseModel):
-        team_name = CharField(70)    
-        region = CharField(null=True)
-        coach_team = CharField(null=True)
-        r_sum = IntegerField(default=0)
-        
-        # Для внешних ключей явно указываем column_name
-        title_id = ForeignKeyField(Title, column_name='title_id', null=True)
-        id_pl1 = ForeignKeyField(Player, column_name='id_pl1', null=True)
-        r_pl1 = IntegerField(default=0)
-        id_pl2 = ForeignKeyField(Player, column_name='id_pl2', null=True)
-        r_pl2 = IntegerField(default=0)
-        id_pl3 = ForeignKeyField(Player, column_name='id_pl3', null=True)
-        r_pl3 = IntegerField(default=0)
-        id_pl4 = ForeignKeyField(Player, column_name='id_pl4', null=True)
-        r_pl4 = IntegerField(default=0)
-        id_pl5 = ForeignKeyField(Player, column_name='id_pl5', null=True)
-        r_pl5 = IntegerField(default=0)
+#     class Choice_Team(BaseModel):
+#         team_choice = ForeignKeyField(Team)
+#         team_name = CharField()
+#         team_region = CharField()
+#         team_coach = CharField()
+#         rank = IntegerField()
+#         basic = CharField(null=True)
+#         group = CharField(null=True)
+#         posev_group = IntegerField(null=True)
+#         mesto_group = IntegerField(null=True)
+#         final = CharField(null=True)
+#         posev_final = IntegerField(null=True)
+#         mesto_final = IntegerField(null=True)
+#         title_id = ForeignKeyField(Title)
 
-        class Meta:
-            db_table = "teams"
-            order_by = "r_sum"
-            indexes = (
-            (('id_pl1',), False),  # обычный индекс
-            (('id_pl2',), False),
-            (('id_pl3',), False),
-            (('id_pl4',), False),
-            (('id_pl5',), False),
-        )
+#         class Meta:
+#             db_table = "choice_teams"
 
-    db.create_tables([Team])
-    db.close()
+#     db.create_tables([Choice_Team])
+#     db.close()
     # ============ импорт новых данных в mysql (вариант перевод данных из соревновательной базы на EXCEL для работы в программе)=========
     # import glob
     # fname = QFileDialog.getOpenFileName(
@@ -24941,7 +24966,7 @@ def proba():
 #         # Добавляем возможность NULL для поля title_id
 #         migrate(migrator.set_null('teams', 'id_pl1', True))
 #     db.close()
-my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.btn_select_range.clicked.connect(select_rows_with_options)
 my_win.btn_number_table.clicked.connect(select_numbers_tables)
