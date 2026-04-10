@@ -4435,9 +4435,29 @@ def page():
         vid_comp = titles.vid_turnira
         if vid_comp == "командные":
             my_win.tabWidget_player.show()
-            my_win.tabWidget_player.resize(456, 50)
+            my_win.tabWidget_player.setGeometry(QtCore.QRect(2, 2, 452, 60))
             my_win.tabWidget_player.setCurrentIndex(0)
             my_win.tabWidget_filter_players.setCurrentIndex(0)
+            # my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 430))
+            # QFrame {
+            #     background-color: #f5f5f5;
+            #     border: 1px solid #ccc;
+            #     border-radius: 5px;
+            #     }
+
+            # QLineEdit, QComboBox {
+            #     padding: 3px;
+            #     border: 1px solid #aaa;
+            #     border-radius: 3px;
+            #     }
+
+            # QLineEdit:focus, QComboBox:focus {
+            #     border: 1px solid #4a9eff;
+            #     }
+
+            # QLabel {
+            #     font-weight: bold;
+            #     }
             teams = Team.select().where(Team.title_id == title_id())
             count = len(teams)
             my_win.label_114.setText(f"Всего: {count} команд")
@@ -7688,9 +7708,11 @@ def filter_player_team_list():
             teams = Team.select().where((Team.title_id == title_id()) & (Team.team_name == team)).get()
             coach_team = teams.coach_team
             r_sum = str(teams.r_sum)
+            region_team = teams.region
             my_win.lineEdit_coach_team.setText(coach_team)
             my_win.lineEdit_team.setText(team)
-            my_win.lineEdit_team_r.setText(r_sum)   
+            my_win.lineEdit_team_r.setText(r_sum) 
+            my_win.lineEdit_team_region.setText(region_team)  
             player_list = player.select().where(Player.id.in_(players_id)) # фильтр по списку
 
     elif sender == my_win.checkBox_16: # отмечен чекбокс предзаявка
@@ -7721,7 +7743,6 @@ def get_players_ids_by_team_name():
         
         return players_ids
     except Team.DoesNotExist:
-        # print(f"Команда '{team_name}' не найдена")
         return []
 
 def find_in_player_list():

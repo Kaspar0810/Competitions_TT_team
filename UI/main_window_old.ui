@@ -877,441 +877,377 @@
        <string>Рейтинг</string>
       </property>
      </widget>
-     <widget class="QFrame" name="frame_5">
+     <widget class="QTabWidget" name="tabWidget_player">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>1</y>
-        <width>458</width>
-        <height>196</height>
+        <x>4</x>
+        <y>0</y>
+        <width>456</width>
+        <height>27</height>
        </rect>
       </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+      <property name="currentIndex">
+       <number>0</number>
       </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <widget class="QLabel" name="label_37">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>82</y>
-         <width>32</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>10</pointsize>
-         <weight>75</weight>
-         <italic>true</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>ФИО:</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_43">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>109</y>
-         <width>66</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>10</pointsize>
-         <weight>75</weight>
-         <italic>true</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Отчество</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_otchestvo">
-       <property name="geometry">
-        <rect>
-         <x>78</x>
-         <y>109</y>
-         <width>150</width>
-         <height>23</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_98">
-       <property name="geometry">
-        <rect>
-         <x>251</x>
-         <y>109</y>
-         <width>82</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>10</pointsize>
-         <weight>75</weight>
-         <italic>true</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Дата рожд.:</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_bday">
-       <property name="geometry">
-        <rect>
-         <x>345</x>
-         <y>109</y>
-         <width>105</width>
-         <height>23</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_99">
-       <property name="geometry">
-        <rect>
-         <x>220</x>
-         <y>136</y>
-         <width>40</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>10</pointsize>
-         <weight>75</weight>
-         <italic>true</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Регион</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="comboBox_region">
-       <property name="geometry">
-        <rect>
-         <x>269</x>
-         <y>136</y>
-         <width>180</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_97">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>136</y>
-         <width>37</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>10</pointsize>
-         <weight>75</weight>
-         <italic>true</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Город</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_city_list">
-       <property name="geometry">
-        <rect>
-         <x>62</x>
-         <y>136</y>
-         <width>145</width>
-         <height>23</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_113">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>163</y>
-         <width>40</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>10</pointsize>
-         <weight>75</weight>
-         <italic>true</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Разряд</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="comboBox_razryad">
-       <property name="geometry">
-        <rect>
-         <x>375</x>
-         <y>163</y>
-         <width>75</width>
-         <height>23</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_100">
-       <property name="geometry">
-        <rect>
-         <x>327</x>
-         <y>82</y>
-         <width>16</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>10</pointsize>
-         <weight>75</weight>
-         <italic>true</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>R</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_R">
-       <property name="geometry">
-        <rect>
-         <x>350</x>
-         <y>82</y>
-         <width>45</width>
-         <height>23</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_39">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>163</y>
-         <width>58</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>10</pointsize>
-         <weight>75</weight>
-         <italic>true</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Тренер(ы)</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_coach">
-       <property name="geometry">
-        <rect>
-         <x>74</x>
-         <y>163</y>
-         <width>251</width>
-         <height>23</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_Family_name">
-       <property name="geometry">
-        <rect>
-         <x>48</x>
-         <y>82</y>
-         <width>265</width>
-         <height>23</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_id">
-       <property name="geometry">
-        <rect>
-         <x>400</x>
-         <y>82</y>
-         <width>50</width>
-         <height>23</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QTabWidget" name="tabWidget_player">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>-2</y>
-         <width>464</width>
-         <height>81</height>
-        </rect>
-       </property>
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QWidget" name="tab_team">
-        <attribute name="title">
-         <string/>
-        </attribute>
-        <widget class="QLineEdit" name="lineEdit_team">
-         <property name="geometry">
-          <rect>
-           <x>60</x>
-           <y>0</y>
-           <width>170</width>
-           <height>23</height>
-          </rect>
-         </property>
-        </widget>
-        <widget class="QLineEdit" name="lineEdit_coach_team">
-         <property name="geometry">
-          <rect>
-           <x>105</x>
-           <y>27</y>
-           <width>240</width>
-           <height>23</height>
-          </rect>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_14">
-         <property name="geometry">
-          <rect>
-           <x>5</x>
-           <y>0</y>
-           <width>52</width>
-           <height>23</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <italic>true</italic>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Команда</string>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_36">
-         <property name="geometry">
-          <rect>
-           <x>5</x>
-           <y>27</y>
-           <width>94</width>
-           <height>23</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <italic>true</italic>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Представитель</string>
-         </property>
-        </widget>
-        <widget class="QLineEdit" name="lineEdit_team_r">
-         <property name="geometry">
-          <rect>
-           <x>393</x>
-           <y>27</y>
-           <width>50</width>
-           <height>23</height>
-          </rect>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_28">
-         <property name="geometry">
-          <rect>
-           <x>350</x>
-           <y>27</y>
-           <width>36</width>
-           <height>23</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <italic>true</italic>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>R общ</string>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_118">
-         <property name="geometry">
-          <rect>
-           <x>238</x>
-           <y>0</y>
-           <width>40</width>
-           <height>23</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <italic>true</italic>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Регион</string>
-         </property>
-        </widget>
-        <widget class="QLineEdit" name="lineEdit_team_region">
-         <property name="geometry">
-          <rect>
-           <x>285</x>
-           <y>0</y>
-           <width>160</width>
-           <height>23</height>
-          </rect>
-         </property>
-        </widget>
+      <widget class="QWidget" name="tab_team">
+       <attribute name="title">
+        <string/>
+       </attribute>
+       <widget class="QLineEdit" name="lineEdit_team">
+        <property name="geometry">
+         <rect>
+          <x>2</x>
+          <y>17</y>
+          <width>191</width>
+          <height>20</height>
+         </rect>
+        </property>
        </widget>
-       <widget class="QWidget" name="tab_persons">
-        <attribute name="title">
-         <string/>
-        </attribute>
+       <widget class="QLineEdit" name="lineEdit_coach_team">
+        <property name="geometry">
+         <rect>
+          <x>255</x>
+          <y>17</y>
+          <width>190</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_14">
+        <property name="geometry">
+         <rect>
+          <x>60</x>
+          <y>0</y>
+          <width>101</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <italic>true</italic>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Команда</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_36">
+        <property name="geometry">
+         <rect>
+          <x>267</x>
+          <y>0</y>
+          <width>171</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <italic>true</italic>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Тренер-представитель</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_team_r">
+        <property name="geometry">
+         <rect>
+          <x>198</x>
+          <y>17</y>
+          <width>51</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_28">
+        <property name="geometry">
+         <rect>
+          <x>201</x>
+          <y>-2</y>
+          <width>50</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <italic>true</italic>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>R общ</string>
+        </property>
        </widget>
       </widget>
+      <widget class="QWidget" name="tab_persons">
+       <attribute name="title">
+        <string/>
+       </attribute>
+      </widget>
+     </widget>
+     <widget class="QLabel" name="label_39">
+      <property name="geometry">
+       <rect>
+        <x>167</x>
+        <y>149</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>Тренер(ы)</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_otchestvo">
+      <property name="geometry">
+       <rect>
+        <x>189</x>
+        <y>85</y>
+        <width>113</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_37">
+      <property name="geometry">
+       <rect>
+        <x>58</x>
+        <y>60</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>Фамилия, Имя</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_43">
+      <property name="geometry">
+       <rect>
+        <x>198</x>
+        <y>60</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>Отчество</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_R">
+      <property name="geometry">
+       <rect>
+        <x>405</x>
+        <y>85</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_99">
+      <property name="geometry">
+       <rect>
+        <x>228</x>
+        <y>107</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>Регион</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_113">
+      <property name="geometry">
+       <rect>
+        <x>388</x>
+        <y>107</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>Разряд</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_id">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>60</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_razryad">
+      <property name="geometry">
+       <rect>
+        <x>382</x>
+        <y>125</y>
+        <width>67</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_Family_name">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>85</y>
+        <width>178</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_100">
+      <property name="geometry">
+       <rect>
+        <x>428</x>
+        <y>60</y>
+        <width>21</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>R</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_region">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>125</y>
+        <width>203</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_coach">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>166</y>
+        <width>445</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_98">
+      <property name="geometry">
+       <rect>
+        <x>298</x>
+        <y>60</y>
+        <width>111</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>Дата рождения</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_97">
+      <property name="geometry">
+       <rect>
+        <x>48</x>
+        <y>107</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>Город</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_bday">
+      <property name="geometry">
+       <rect>
+        <x>308</x>
+        <y>85</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_city_list">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>125</y>
+        <width>157</width>
+        <height>21</height>
+       </rect>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
@@ -3307,7 +3243,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Два
+       <string>Два 
 3 места</string>
       </property>
      </widget>
@@ -4632,7 +4568,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Список
+          <string>Список 
 для взносов</string>
          </property>
         </widget>
@@ -8697,13 +8633,13 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>289</y>
+      <y>310</y>
       <width>831</width>
-      <height>401</height>
+      <height>351</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tabWidgetPage1">
      <attribute name="title">
@@ -8994,8 +8930,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>829</width>
-        <height>371</height>
+        <width>831</width>
+        <height>351</height>
        </rect>
       </property>
      </widget>
