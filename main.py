@@ -11723,9 +11723,9 @@ def choice_setka_automat(fin, flag, count_exit): # вариант жеребье
         if flag == 1: # жеребьевка автомат
             num_id_player = choice_net_automat(full_posev, count_exit, free_num, posevs_num, nums) 
         else: # ручнаяя жеребьевка
-            my_win.hide()
-            num_id_player = manual_choice.choice_manual(full_posev, count_exit, free_num, posevs_num, nums)
-            # num_id_player = manual_choice.choice_net_manual(full_posev, count_exit, free_num, posevs_num, nums)
+            # my_win.hide()
+            # num_id_player = manual_choice.choice_manual(full_posev, count_exit, free_num, posevs_num, nums)
+            num_id_player = manual_choice.choice_net_manual(full_posev, count_exit, free_num, posevs_num, nums)
             my_win.show()
 
         for i in num_id_player.keys():

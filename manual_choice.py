@@ -50,9 +50,9 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
         def get_grid_size(self):
             """Определение размера сетки на основе posevs_num"""
             max_num = 0
-            max_num = self.posevs_num[0]
-            # for group in self.posevs_num:
-            #     max_num = max(max_num, max(group))
+            # max_num = self.posevs_num[0]
+            for group in self.posevs_num:
+                max_num = max(max_num, max(group))
             return max_num
             
         def get_available_slots(self):
@@ -497,36 +497,36 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
     window = ManualChoiceWindow()
     window.show()
     
+    
     # Запускаем цикл событий
     app.exec_()
     
     # Возвращаем результат
     return window.result if hasattr(window, 'result') else {}
 
-# # Пример использования
-# if __name__ == "__main__":
-#     # Пример данных
-#     sorted_sportsmen = [
-#         [1, "Команда А", "Москва", 100],
-#         [2, "Команда Б", "СПб", 95],
-#         [3, "Команда В", "Казань", 90],
-#         [4, "Команда Г", "Нск", 85],
-#         [5, "Команда Д", "Екб", 80],
-#         [6, "Команда Е", "НН", 75],
-#         [7, "Команда Ж", "Самара", 70],
-#         [8, "Команда З", "Ростов", 65]
-#     ]
+# Пример использования
+if __name__ == "__main__":
+    # Пример данных
+    sorted_sportsmen = [
+        [1, "Команда А", "Москва", 100],
+        [2, "Команда Б", "СПб", 95],
+        [3, "Команда В", "Казань", 90],
+        [4, "Команда Г", "Нск", 85],
+        [5, "Команда Д", "Екб", 80],
+        [6, "Команда Е", "НН", 75],
+        [7, "Команда Ж", "Самара", 70],
+        [8, "Команда З", "Ростов", 65]
+    ]
     
-#     count_exit = 2
-#     free_num = []
-#     posevs_num = [[1, 8], [4, 5], [2, 3, 6, 7]]
-#     nums = [1]
-def choice_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):    
+    count_exit = 2
+    free_num = []
+    posevs_num = [[1, 8], [4, 5], [2, 3, 6, 7]]
+    nums = [1]
+    
     result = choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums)
-    return result
-#     print("\nРезультат жеребьевки:")
-#     if result:
-#         for slot, team in sorted(result.items()):
-#             print(f"Номер {slot}: {team[0]} ({team[1]}) - Рейтинг: {team[2]}")
-#     else:
-#         print("Жеребьевка не была завершена")
+    print("\nРезультат жеребьевки:")
+    if result:
+        for slot, team in sorted(result.items()):
+            print(f"Номер {slot}: {team[0]} ({team[1]}) - Рейтинг: {team[2]}")
+    else:
+        print("Жеребьевка не была завершена")
