@@ -8,7 +8,6 @@ import os
 import logging
 from datetime import datetime
 
-# import proba_pf
  
 def setup_logging(log_directory="log"):
     """Настройка системы логирования"""
@@ -104,8 +103,6 @@ import sys
 
 import pymysql
 import subprocess
-
-
 #=============
 import pathlib
 from dateutil.relativedelta import relativedelta
@@ -119,6 +116,7 @@ from collections import defaultdict
 from playhouse.migrate import * # для удаления, редактирования таблиц DB  
 
 import begunok_full
+import manual_choice
 
 os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
 # WindowsArguments = dpiawareness = 1
@@ -6099,22 +6097,17 @@ def one_table(fin, group):
 
 def selection_of_the_draw_mode():
     """Выбор режима жеребьевки сетки -автомат- или -ручной-"""
-    vid = ["Автоматическая", "Полуавтоматическая", "Ручная"]
+    vid = ["Автоматическая", "Ручная"]
     vid, ok = QInputDialog.getItem(
                     my_win, "Жеребьевка", "Выберите режим жеребьевки сетки.", vid, 0, False)
     if vid == "Автоматическая":
         flag = 1
         my_win.tableView_net.hide()
-    elif vid == "Полуавтоматическая":
-        flag = 2
-        my_win.resize(1440, 804)
-        my_win.tableView_net.show()
-        my_win.tableView_net.setGeometry(QtCore.QRect(1110, 9, 321, 749)) # от лев края, от вверха, ширина и высота)
     elif vid == "Ручная":
         flag = 3
-        my_win.resize(1440, 804)
-        my_win.tableView_net.show()
-        my_win.tableView_net.setGeometry(QtCore.QRect(1110, 9, 321, 749)) # от лев края, от вверха, ширина и высота)
+        # my_win.resize(1440, 804)
+        # my_win.tableView_net.show()
+        # my_win.tableView_net.setGeometry(QtCore.QRect(1110, 9, 321, 749)) # от лев края, от вверха, ширина и высота)
     return flag
     
               
@@ -9368,7 +9361,6 @@ def reset_filter():
         filter_fin()
     load_combo()
 
-
 def _choice_semifinal_automat(stage):
     """жеребьевка полуфиналов"""
     mesto_first = 0
@@ -9460,291 +9452,6 @@ def get_players_by_group_and_place(group_num, places):
         if player:
             players.append(player)
     return players
-
-def __create_semi_final_1(mesto_first, total_group):
-    """жеребьевка 1-ого пф с разведением 1-х мест по регионам"""
-    # Создаем 16 групп для второго полуфинала
-    group_1_16 = []
-    mesto_first = 1
-    total_group = 32
-    count_gr_sf = total_group // 2
-
-    for i in range(count_gr_sf, 0, -1):
-        group_1_16.append({
-            'sf_group_num': i,
-            'players': [],
-            'from_groups': []
-        })    
-    # 1-й ЭТАП: Добавляем игроков с 1-2 мест из групп 1-16
-    for group_num in range(1, count_gr_sf + 1):
-        players = get_players_by_group_and_place(group_num, [mesto_first, mesto_first + 1])
-        if players:
-            # Находим соответствующую группу полуфинала (такой же номер)
-            for g in group_1_16:
-                if g['sf_group_num'] == group_num:
-                    g['players'].extend(players)
-                    g['from_groups'].append(group_num)
-                    break
-    
-    # Собираем игроков с 3-4 мест из групп 17-32
-    group_17_32 = []
-    for group_num in range(count_gr_sf + 1, total_group + 1):
-        players = get_players_by_group_and_place(group_num, [mesto_first, mesto_first + 1])
-        if players:
-            group_17_32.append({
-                'sf_group_num': group_num,
-                'players': players
-            })
-            
-    # Создаем список для отслеживания еще не обработанных групп
-    # Начинаем с группы 17
-    pending_groups = group_17_32.copy()
-    processed_groups = set()
-    group_num_list_1_16 = [p for p in range(1, count_gr_sf + 1)] # генератор списка групп
-    group_num_list_1_16.sort(reverse=True)
-    group_num_list_17_32 = [p for p in range(count_gr_sf + 1, total_group + 1)] # генератор списка групп
-    # Продолжаем, пока есть необработанные группы
-    k = 0
-    while pending_groups:
-        # Берем первую необработанную группу
-        source_group = pending_groups.pop(0)
-        source_group_num = source_group['sf_group_num']
-
-        target_group = None
-        # target_group_num - номер группы полуфинала
-        # source_group_num -номер группы предварительно этапа
-        for l in range(16):
-            if k == len(group_num_list_1_16): 
-                # смена групп если в последней совпали регионы               
-                gr_num = 2
-                print(f"Проба заменить игроков из {source_group_num} в {gr_num}")
-                ind = find_index_by_group(group_1_16, 2)
-                gr_1_16 = group_1_16[ind]    
-                target_group_num = 2
-                target_group = gr_1_16
-                gr_1_16_region = gr_1_16['players'][0].region
-                ind = find_index_by_group(group_17_32, source_group_num)
-                gr_17_32 = group_17_32[ind] 
-                gr_17_32_region = gr_17_32['players'][0].region
-                if gr_1_16_region != gr_17_32_region:
-                    print(f"После проверки, регионы {source_group_num} и {gr_num} не совпадает\n проверяем дальше")
-                    ind = find_index_by_group(group_1_16, 1)
-                    gr_1_16 = group_1_16[ind]    
-                    target_group_num = 1
-                    gr_1_16_region = gr_1_16['players'][0].region
-                    old_group = source_group_num - 1
-                    ind = find_index_by_group(group_17_32, old_group)
-                    gr_17_32 = group_17_32[ind] 
-                    gr_17_32_region = gr_17_32['players'][0].region
-                    if gr_1_16_region != gr_17_32_region:
-                        print(f"После проверки, регионы {old_group} и {target_group_num} не совпадают\n меняем местами")
-                        target_group['players'].pop()
-                        target_group['players'].pop()
-                        target_group['players'].extend(source_group['players'])
-                        gr_change = target_group['from_groups'].pop()
-                        target_group['from_groups'].append(source_group_num)
-                        target_group_num = 1
-                        target_group = gr_1_16
-                        ind = find_index_by_group(group_17_32, gr_change)
-                        gr_17_32 = group_17_32[ind]
-                        target_group['players'].extend(gr_change['players'])
-                        target_group['from_groups'].append(gr_change)
-                k = 0
-
-            gr_num = group_num_list_1_16[k]
-            ind = find_index_by_group(group_1_16, gr_num)
-            gr_1_16 = group_1_16[ind]    
-            target_group_num = group_num_list_1_16[k]
-            target_group = gr_1_16
-            gr_1_16_region = gr_1_16['players'][0].region
-
-            ind = find_index_by_group(group_17_32, source_group_num)
-            gr_17_32 = group_17_32[ind] 
-            gr_17_32_region = gr_17_32['players'][0].region
- 
-            # Проверяем регионы первых мест (игроки, которые будут на 1 и 3 позициях)            
-            if gr_1_16_region != gr_17_32_region:
-                target_group['players'].extend(source_group['players'])
-                target_group['from_groups'].append(source_group_num)
-                processed_groups.add(source_group_num)
-
-                group_num_list_1_16.remove(target_group_num)
-                group_num_list_17_32.remove(source_group_num)
-                k = 0
-                break
-            else:
-                k += 1
-    # Заполняем данные в таблице Choice
-    for sf_group in group_1_16:
-        sf_group_num = sf_group['sf_group_num']
-        players = sf_group['players']
-        
-        # Порядковый номер в группе: 1-4
-        for idx, player in enumerate(players, 1):
-            player.semi_final = 1
-            player.posev_sf = idx
-            player.sf_group = f"{sf_group_num} группа"
-            player.save()
-    
-    return group_1_16
-
-
-def ____create_semi_final_1(mesto_first, total_group):
-    """жеребьевка 1-ого пф с разведением 1-х мест по регионам"""
-    # Создаем 16 групп для второго полуфинала
-    group_1_16 = []
-
-    count_gr_sf = total_group // 2
-
-    for i in range(count_gr_sf, 0, -1):
-        group_1_16.append({
-            'sf_group_num': i,
-            'players': [],
-            'from_groups': []
-        })    
-    # 1-й ЭТАП: Добавляем игроков с 1-2 мест из групп 1-16
-    for group_num in range(1, count_gr_sf + 1):
-        players = get_players_by_group_and_place(group_num, [mesto_first, mesto_first + 1])
-        if players:
-            # Находим соответствующую группу полуфинала (такой же номер)
-            for g in group_1_16:
-                if g['sf_group_num'] == group_num:
-                    g['players'].extend(players)
-                    g['from_groups'].append(group_num)
-                    break
-    
-    # Собираем игроков с 3-4 мест из групп 17-32
-    group_17_32 = []
-    for group_num in range(count_gr_sf + 1, total_group + 1):
-        players = get_players_by_group_and_place(group_num, [mesto_first, mesto_first + 1])
-        if players:
-            group_17_32.append({
-                'sf_group_num': group_num,
-                'players': players
-            })
-            
-    # Создаем список для отслеживания еще не обработанных групп
-    # Начинаем с группы 17
-    pending_groups = group_17_32.copy()
-    processed_groups = set()
-    group_num_list_1_16 = [p for p in range(1, count_gr_sf + 1)] # генератор списка групп
-    group_num_list_1_16.sort(reverse=True)
-    group_num_list_17_32 = [p for p in range(count_gr_sf + 1, total_group + 1)] # генератор списка групп
-    
-    # Флаг для отслеживания конфликта регионов
-    region_conflict = False
-    conflict_groups = []
-    
-    # Продолжаем, пока есть необработанные группы
-    k = 0
-    while pending_groups:
-        # Берем первую необработанную группу
-        source_group = pending_groups.pop(0)
-        source_group_num = source_group['sf_group_num']
-
-        target_group = None
-        # target_group_num - номер группы полуфинала
-        # source_group_num -номер группы предварительно этапа
-        for l in range(16):
-            if k == len(group_num_list_1_16): 
-                # Проверка и замена групп при конфликте
-                if region_conflict:
-                    # Пытаемся поменять местами группы 32 и 31
-                    if total_group in group_num_list_17_32:
-                        
-                        # Если обе группы найдены, меняем их местами
-                        # if group_32_index is not None and group_31_index is not None:
-                        # Меняем местами в pending_groups
-                        # pending_groups[group_32_index], pending_groups[group_31_index] = \
-                        # pending_groups[group_31_index], pending_groups[group_32_index]
-
-                        # === проверяем вариант 2-я группа и 32 группа
-                        region = conflict_groups[0]['target_region']
-                        print(f"Проверяем группы 2 и {source_group_num}")
-                        if gr_17_32_region != region:
-                            # === проверяем вариант 1-я группа и группа, которая была посяна со 2-ой
-                            region = conflict_groups[0]['source_region']
-                            gr_source_num = conflict_groups[0]['source']
- 
-                            idx = find_index_by_group(group_17_32, source_group_num)
-                            gr_17_32 = group_17_32[idx]
-                            gr_17_32_region = gr_17_32['players'][0].region
-
-                            if gr_17_32_region == region:
-                                gr31_idx = find_index_by_group(group_17_32, gr_source_num)
-                                gr32_idx = find_index_by_group(group_17_32, source_group_num)
-
-                                group_17_32[gr32_idx], group_17_32[gr31_idx] = \
-                                group_17_32[gr31_idx], group_17_32[gr32_idx]
-
-                
-                            region_conflict = False
-                        conflict_groups = []
-                        # Выводим сообщение о конфликте для ручной замены
-                        print(f"ВНИМАНИЕ! Конфликт регионов при соединении групп:")
-                        for conf in conflict_groups:
-                            print(f"  - Группа полуфинала {conf['target']} и группа предварительного этапа {conf['source']}")
-                        
-                        # Сбрасываем конфликт и продолжаем с исходным порядком
-                        region_conflict = False
-                        # Восстанавливаем исходный порядок в group_num_list_1_16
-                        group_num_list_1_16 = [p for p in range(1, count_gr_sf + 1)]
-                        group_num_list_1_16.sort(reverse=True)
-                
-                k = 0
-                if not region_conflict:
-                    break
-                
-            gr_num = group_num_list_1_16[k]
-            ind = find_index_by_group(group_1_16, gr_num)
-            gr_1_16 = group_1_16[ind]    
-            target_group_num = group_num_list_1_16[k]
-            target_group = gr_1_16
-            gr_1_16_region = gr_1_16['players'][0].region
-
-            ind = find_index_by_group(group_17_32, source_group_num)
-            gr_17_32 = group_17_32[ind] 
-            gr_17_32_region = gr_17_32['players'][0].region
- 
-            # Проверяем регионы первых мест (игроки, которые будут на 1 и 3 позициях)            
-            if gr_1_16_region != gr_17_32_region:
-                target_group['players'].extend(source_group['players'])
-                target_group['from_groups'].append(source_group_num)
-                processed_groups.add(source_group_num)
-
-                group_num_list_1_16.remove(target_group_num)
-                group_num_list_17_32.remove(source_group_num)
-                k = 0
-                if target_group_num <= 2:
-                    region_conflict = True
-                    conflict_groups.append({
-                    'target': target_group_num,
-                    'source': source_group_num,
-                    'target_region': gr_1_16_region,
-                    'source_region': gr_17_32_region
-                })
-                    # target_group['players'].extend(source_group['players'])
-                    # target_group['from_groups'].append(source_group_num)
-                break
-            else:
-
-                k += 1
-    
-    # Заполняем данные в таблице Choice
-    for sf_group in group_1_16:
-        sf_group_num = sf_group['sf_group_num']
-        players = sf_group['players']
-        
-        # Порядковый номер в группе: 1-4
-        for idx, player in enumerate(players, 1):
-            player.semi_final = 1
-            player.posev_sf = idx
-            player.sf_group = f"{sf_group_num} группа"
-            player.save()
-    
-    return group_1_16
-
-
 
 #==== последгий вариант AI 0304_958 ====
 def create_semi_final_1(mesto_first, total_group):
@@ -10184,7 +9891,7 @@ def choice_gr_automat():
     start = 0
     end = 1
     step = 0
-    vid = ["Автоматическая", "Полуавтоматическая", "Ручная"]
+    vid = ["Автоматическая", "Ручная"]
     vid, ok = QInputDialog.getItem(my_win, "Жеребьевка", "Выберите режим жеребьевки групп.", vid, 0, False)
     my_win.tabWidget.setCurrentIndex(3)
     my_win.tabWidget_2.setCurrentIndex(3)
@@ -10301,111 +10008,7 @@ def choice_gr_automat():
                 System.update(choice_flag=1).where(System.id == sys_id).execute() # записывает, что жеребьевка сделана
                 player_in_table_group_and_write_Game_list_Result(stage)
             group_list.clear()
-    elif vid == "Полуавтоматическая":
-        pass
-        # gr_region_dict = {}
-        # # gr_region_list = []
-        # gr_region_temp = []
-        # psv = 0
-        # for n_posev in range(0, (max_player) * 2):
-        #     psv = n_posev // 2 + 1
-        #     for player_in_group in range(0, group + 1): # внутренний посев
-        #         if player_in_group == 0:
-        #            id_fam_region_list_tmp.append(psv) 
-        #         else:
-        #             id_fam_region_list_tmp.append("-")
-                
-        #     id_fam_region_list.append(id_fam_region_list_tmp.copy()) # список списков в который помещаются игроки и регионы согласно жеребьевки
-        #     id_fam_region_list_tmp.clear()   
-        # # ==================================
-        # for np in pl_choice:
-        #     choice = np.get(Choice.id == np)
-        #     regio_n = choice.region
-        #     region = regio_n.rstrip()
-        #     family_player = np.family
-        #     # coach_player = np.coach
-        #     pl_id = choice.player_choice_id 
-        #     # full_player_str = f"{pl_id}/{family_player}/{region}/{coach_player}" 
-        #     full_player_str = f"{pl_id}/{family_player}/{region}" # полные данные спортсмены          
-        #     choice_list = [full_player_str]                                                         
-        #     player_list.append(choice_list)
-        # k = 1
-        # posev_list = []
-        # for posev in range(0, group * max_player):
-        #     if posev < total_player:
-        #         one_player = player_list[posev]
-        #         txt_tmp.append(one_player)
-        #         if posev == group * k - 1:
-        #             posev_tmp = txt_tmp.copy()
-        #             posev_list.append(posev_tmp)
-        #             txt_tmp.clear()
-        #             k += 1 
-        #     else:
-        #         posev_tmp = txt_tmp.copy()
-        #         posev_list.append(posev_tmp)
-        #         break
-        # all_player = 0      
-        # for number_posev in range(0, max_player): # полный посев
-        # # ============== вариант ручной жеребьевки ========   
-        #     if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
-        #         nums = [i for i in range(1, group + 1)] # генератор списка
-        #     else:
-        #         nums = [i for i in range(group, 0, -1)] # генератор списка    
-        #     txt_tmp.clear()
-        #     id_family_region_list.clear()
-        #     a = 0
-        #     count = len(posev_list[number_posev])
-        #     count_gr = group if number_posev < max_player - 1 else count
-        #     while a < count_gr: # создает список отдельного посева
-        #         ps = posev_list[number_posev] # список игроков одного посева
-        #         txt_temp = ps[a] # один игрок в посеве
-        #         # отделяет регион
-        #         txt_region = txt_temp[0]
-        #         mark = txt_region.rfind("/")
-        #         region_pl = txt_region[mark + 1:] # регион игрока
-        #         gr_region_temp.append(region_pl)
-        #         gr_region_dict[player_in_group + 1] = gr_region_temp.copy()
-        #         gr_region_temp.clear()
-        #         # ===============================
-        #         txt_id_str = f"{txt_temp[0]}" # ролучение id_фамилию и регион в строковой форме
-        #         id_family_region_list.append(txt_id_str)
-        #         text_str = (',\n'.join(id_family_region_list)) # список игроков посева для формы выбора номера группы
-        #         a += 1
-        # # ===============================================
-            
-        #     if number_posev == 0: # 1-й посев сразу записывает в таблицу, а остальные группы заполняет пробелами
-        #         number_group = 0
-        #         for player_in_group in range(0, group): # внутренний посев 
-        #             id_fam_region_str = id_family_region_list[player_in_group]
-        #             mark = id_fam_region_str.rfind("/")
-        #             id_family = id_fam_region_str[:mark] # id и фамилия игрока
-        #             region_pl = id_fam_region_str[mark + 1:] # регион игрока                    
-        #             id_fam_region_list[number_posev * 2][player_in_group + 1] =  id_family
-        #             id_fam_region_list[number_posev * 2 + 1][player_in_group + 1] =  region_pl
-        #             all_player += 1 # число игроков, посеянных
-        #             # создание списка регионов по группам
-        #             gr_region_temp.append(region_pl)
-        #             gr_region_dict[player_in_group + 1] = gr_region_temp.copy()
-        #             gr_region_temp.clear()
-        #         view_table_group_choice(id_fam_region_list, max_player, group) # функция реального просмотра жеребьевки 
-        #     else: # 2-й посев и следующие
-        #         # if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
-        #         #     nums = [i for i in range(1, group + 1)] # генератор списка
-        #         # else:
-        #         #     nums = [i for i in range(group, 0, -1)] # генератор списка 
-        #         for player_in_group in range(0, group):  # внутренний посев
-        #             if all_player == total_player: # если все спортсмены прожеребились  
-        #                 msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
-        #                 choice_save_manual_group(id_fam_region_list, group)
-        #                 System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
-        #                 fill_table_after_choice()
-        #                 player_in_table_group_and_write_Game_list_Result(stage)
-        #                 break
-        #             else:
-        #                 tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
-        #                 txt = (','.join(list(map(str, nums)))) # номера групп
-        #                 number_group, ok = QInputDialog.getText(my_win, f'Номера групп: {txt}', tx)
-        #                 number_group = int(number_group)     
+
     elif vid == "Ручная":
         # my_win.tabWidget.setCurrentIndex(3)
         # my_win.tabWidget_2.setCurrentIndex(3)
@@ -11950,16 +11553,14 @@ def  __choice_net_automat():
 def choice_setka_automat(fin, flag, count_exit): # вариант жеребьевки сетки автомат (на 32 участинка, выход из группы 1 или 2, полная или без 1-ого игрока)
     """автоматическая жеребьевка сетки, fin - финал, count_exit - сколько выходят в финал
     flag - флаг вида жеребьевки ручная или автомат""" 
-    # msgBox = QMessageBox 
     full_posev = []  # список полного списка участников 1-ого посева
 
     posev_data = {} # окончательные посев номер в сетке - игрок/ город
     num_id_player = {} # словарь номер сетки - id игрока
-    # flag_stop_manual_choice = 0 # флаг окончания ручной жеребьевки
     #===================================
     id_system = system_id(stage=fin)
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()
-    titles = Title.select().where(Title.id == title_id())
+    titles = Title.select().where(Title.id == title_id()).get()
     vid_turnira = titles.vid_turnira
     if vid_turnira == "личные":
         choice = Choice.select().where(Choice.title_id == title_id())
@@ -11974,15 +11575,25 @@ def choice_setka_automat(fin, flag, count_exit): # вариант жеребье
     free_num = []
     real_all_player_in_final = []
 
-    nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # получение списка номеров мест, выходящих в финал, суперфинал
+    if fin == "Одна таблица":
+        nums = []
+    else:
+        nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # получение списка номеров мест, выходящих в финал, суперфинал
 
     n = 0  
 
     end_posev = 1
     while n < end_posev:  #  ======   НАЧАЛО ПОСЕВА   =========   добавил n=0 и n+=1 стр 7098
         if system.stage == "Одна таблица":
-            real_all_player_in_final = len(choice.select().where(Choice.basic == fin))
-            choice_posev = choice.select().order_by(Choice.rank)
+            if vid_turnira == "личные":
+                real_all_player_in_final = len(choice.select().where(Choice.basic == fin))
+                choice_posev = choice.select().order_by(Choice.rank)
+            else:
+                real_all_player_in_final = len(choice.select().where(Choice_Team.basic == fin))
+                choice_posev = choice.select().order_by(Choice_Team.rank)
+
+            # real_all_player_in_final = len(choice.select().where(Choice.basic == fin))
+            # choice_posev = choice.select().order_by(Choice.rank)
             # ===
             count_exit = 1
         elif fin == "1-й финал":
@@ -12029,56 +11640,93 @@ def choice_setka_automat(fin, flag, count_exit): # вариант жеребье
         # отбор из базы данных согласно местам в группе для жеребьевки сетки
         for posevs in choice_posev: 
             psv = []
-        
-            family = posevs.family
-            if fin == "Суперфинал":
-                count_exit = 1
-                group = ""
-                group_number = 1
-                mesto_group = posevs.mesto_final
-            elif fin != "Одна таблица":
-                if stage_exit == "Предварительный":
-                    group = posevs.group
-                    mesto_group = posevs.mesto_group
-                elif stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал":
-                    group = posevs.sf_group # номер группы ПФ
-                    mesto_group = posevs.mesto_semi_final # место в группе (ПФ)
-                ind = group.find(' ')
-                group_number = int(group[:ind]) # номер группы
+            if vid_turnira == "личные":
+                family = posevs.family
+                if fin == "Суперфинал":
+                    count_exit = 1
+                    group = ""
+                    group_number = 1
+                    mesto_group = posevs.mesto_final
+                elif fin != "Одна таблица":
+                    if stage_exit == "Предварительный":
+                        group = posevs.group
+                        mesto_group = posevs.mesto_group
+                    elif stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал":
+                        group = posevs.sf_group # номер группы ПФ
+                        mesto_group = posevs.mesto_semi_final # место в группе (ПФ)
+                    ind = group.find(' ')
+                    group_number = int(group[:ind]) # номер группы
+                else:
+                    group = ""
+                    group_number = 1
+                    mesto_group = ""
+                pl_id = posevs.player_choice_id # id игрока
+                region = posevs.region
+                region = region.strip()
+                player = Player.get(Player.id == pl_id)
+                city = player.city
+                rank = player.rank
+                
             else:
-                group = ""
-                group_number = 1
-                mesto_group = ""
-            pl_id = posevs.player_choice_id # id игрока
-            region = posevs.region
-            region = region.strip()
-            player = Player.get(Player.id == pl_id)
-            city = player.city
-            rank = player.rank
-
-            psv = [pl_id, family, region, group_number, group, city, rank, mesto_group]
+                family = posevs.team_name
+                if fin == "Суперфинал":
+                    count_exit = 1
+                    group = ""
+                    group_number = 1
+                    mesto_group = posevs.mesto_final
+                elif fin != "Одна таблица":
+                    if stage_exit == "Предварительный":
+                        group = posevs.group
+                        mesto_group = posevs.mesto_group
+                    elif stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал":
+                        group = posevs.sf_group # номер группы ПФ
+                        mesto_group = posevs.mesto_semi_final # место в группе (ПФ)
+                    ind = group.find(' ')
+                    group_number = int(group[:ind]) # номер группы
+                else:
+                    group = ""
+                    group_number = 1
+                    mesto_group = ""
+                team_id = posevs.team_choice_id # id игрока
+                region = posevs.team_region
+                region = region.strip()
+                teams = Choice_Team.get(Choice_Team.team_choice_id == team_id)
+                rank = teams.rank
+            if vid_turnira == "личные":
+                psv = [pl_id, family, region, group_number, group, city, rank, mesto_group]
+            else:
+                psv = [team_id, family, region, group_number, group, rank, mesto_group]
 
             full_posev.append(psv)
 
-            # сортировка списка участников в зависимости от выхода
-            if fin == "Суперфинал":
-                full_posev.sort(key=lambda k: k[7]) # сортировка списка участников по месту в 1-ом финале
-            elif count_exit == 1 or fin == "Одна таблица":
+        # сортировка списка участников в зависимости от выхода
+        if fin == "Суперфинал":
+            full_posev.sort(key=lambda k: k[7]) # сортировка списка участников по месту в 1-ом финале
+        elif count_exit == 1 or fin == "Одна таблица":
+            if vid_turnira == "личные":
                 full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу
-            elif fin == "1-й финал":
-                if count_exit > 1:
-                    full_posev.sort(key=lambda k: (k[7], k[3])) # сортировка списка участников сначала по месту в группе а потом по группач
-                else:
-                    full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
             else:
-                if count_exit == 1:
-                    full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу
-                else:
-                    # сортировка списка участников сначала по месту в группе(возрастание) а потом по рейтингу (убывание)
-                    full_posev.sort(key=lambda k:(k[7], -k[6])) 
+                full_posev.sort(key=lambda k: k[5], reverse=True) # сортировка списка участников по рейтингу
+        elif fin == "1-й финал":
+            if count_exit > 1:
+                full_posev.sort(key=lambda k: (k[7], k[3])) # сортировка списка участников сначала по месту в группе а потом по группач
+            else:
+                full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
+        else:
+            if count_exit == 1:
+                full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу
+            else:
+                # сортировка списка участников сначала по месту в группе(возрастание) а потом по рейтингу (убывание)
+                full_posev.sort(key=lambda k:(k[7], -k[6])) 
      
         # ======== функция жеребьевки при выходе из группы или ПФ 1 чел (Интернет)
-        num_id_player = choice_net_automat(full_posev, count_exit, free_num, posevs_num, nums) 
+        if flag == 1: # жеребьевка автомат
+            num_id_player = choice_net_automat(full_posev, count_exit, free_num, posevs_num, nums) 
+        else: # ручнаяя жеребьевка
+            my_win.hide()
+            num_id_player = manual_choice.choice_manual(full_posev, count_exit, free_num, posevs_num, nums)
+            # num_id_player = manual_choice.choice_net_manual(full_posev, count_exit, free_num, posevs_num, nums)
+            my_win.show()
 
         for i in num_id_player.keys():
             tmp_list = list(num_id_player[i])
@@ -21847,8 +21495,10 @@ def player_choice_in_setka(fin):
     id_system = system_id(stage)
     systems = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()
     count_exit = systems.mesta_exit # сколько игроков выходят в финал
- 
-    flag = selection_of_the_draw_mode() # выбор ручная или автоматическая жеребьевка
+    # выбор ручная или автоматическая жеребьевка
+    flag = selection_of_the_draw_mode() 
+
+    # жеребьевка сетки
     posev = choice_setka_automat(fin, flag, count_exit)
    
     posev_data = []
