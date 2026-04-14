@@ -1,0 +1,14 @@
+2026-04-14 20:42:00,533 - ERROR - Необработанное исключение: AttributeError: 'Team' object has no attribute 'team_region'
+2026-04-14 20:42:00,534 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 996, in choice
+    player_in_setka_and_write_Game_list_and_Result(fin, posev_data)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 6391, in player_in_setka_and_write_Game_list_and_Result
+    all_list = setka_data(fin, posev_data)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 20645, in setka_data
+    name_list = full_team_id(family) # словарь {name: команда/город, id: номер игрока}, {name: фамилия, id: номер мгрока}
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 20701, in full_team_id
+    team_region = teams_id.team_region # ФИО без города
+                  ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Team' object has no attribute 'team_region'

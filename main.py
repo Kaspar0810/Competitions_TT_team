@@ -304,13 +304,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tabWidget_2.setTabVisible(4, False)
 
     # ============ ручная жеребьевка сетки ===========
-
-    # def on_draw_type_changed(self, text):
-    #     """Обработка изменения типа жеребьевки"""
-    #     if text == "ручная":
-    #         self.status_label.setText("Выбран режим ручной жеребьевки")
-    #     elif text == "автомат":
-    #         self.status_label.setText("Выбран режим автоматической жеребьевки")
             
     def start_draw(self, full_posev, count_exit, free_num, posevs_num, nums):
         """Запуск жеребьевки в зависимости от выбранного режима"""
@@ -327,16 +320,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             QMessageBox.warning(self, "Предупреждение", "Жеребьевка не была завершена!")
             self.show()  # Показываем основную форму снова
-
-        
-    # def show_result(self):
-    #     """Отображение результатов жеребьевки"""
-    #     result_text = "Результаты жеребьевки:\n\n"
-    #     for slot, team in sorted(self.result.items()):
-    #         result_text += f"Номер {slot}: {team[0]} ({team[1]}) - Рейтинг: {team[2]}\n"
-            
-    #     QMessageBox.information(self, "Результат жеребьевки", result_text)
-
     # ===============================
 
     def closeEvent(self, event):
@@ -11784,16 +11767,18 @@ def choice_setka_automat(fin, flag, count_exit): # вариант жеребье
                             choice_final.final = fin
                             choice_final.posev_final = i
                         choice_final.save()
-            else:
+            else: # команды
                 if tmp_list[0] == "X":
                     posev_data[i] = "X"
                 else:
                     id = tmp_list[0]
-                    pl_id = Player.get(Player.id == id)
-                    family_city = pl_id.fio_city
-                    posev_data[i] = family_city
+                    team_id = Team.get(Team.id == id)
+                    team_name = team_id.team_name
+                    region = team_id.region
+                    team_name_region = f"{team_name}/{region}"
+                    posev_data[i] = team_name_region
                     with db:
-                        choice_final = choice.select().where(Choice.player_choice_id == pl_id).get()
+                        choice_final = choice_posev.select().where(Choice_Team.team_choice_id == team_id).get()
                         if fin == "Суперфинал":
                             choice_final.super_final = i
                         else:
@@ -12187,10 +12172,10 @@ def manual_choice(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 next_team = self.sorted_sportsmen[self.current_team_index]
                 self.status_label.setText(f"✅ Команда {team[1]} размещена на позиции {slot_num}. Следующая команда: {next_team[1]}")
                 
-                # Подсказка для следующей команды
-                QMessageBox.information(self, "Следующая команда", 
-                                      f"Команда {team[1]} размещена на позиции {slot_num}.\n\n"
-                                      f"Теперь выберите команду {next_team[1]} из списка\nи кликните на ячейку в таблице.")
+                # # Подсказка для следующей команды
+                # QMessageBox.information(self, "Следующая команда", 
+                #                       f"Команда {team[1]} размещена на позиции {slot_num}.\n\n"
+                #                       f"Теперь выберите команду {next_team[1]} из списка\nи кликните на ячейку в таблице.")
             
         def update_grid_table(self):
             """Обновление таблицы сетки"""
@@ -12222,7 +12207,7 @@ def manual_choice(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 # Если номер занят командой
                 elif i in self.placed_teams:
                     team_data = self.placed_teams[i]
-                    team_item = QTableWidgetItem(f"✅ {team_data[0]} ({team_data[1]}) - R: {team_data[2]}")
+                    team_item = QTableWidgetItem(f"✅ {team_data[0]} {team_data[1]}/{team_data[2]} - R: {team_data[3]}")
                     team_item.setBackground(QColor(144, 238, 144))  # Светло-зеленый
                     slot_item.setBackground(QColor(144, 238, 144))
                     team_item.setFlags(team_item.flags() & ~Qt.ItemIsEditable)
@@ -20644,6 +20629,10 @@ def setka_data(fin, posev_data):
     id_system = system_id(stage)
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
 
+    # ==== командный вариант ===
+    titles = Title.select().where(Title.id == title_id()).get()
+    vid_turnira = titles.vid_turnira
+    # ==============================
     mp = system.max_player
     mp = full_net_player(player_in_final=mp)
     for i in range(1, mp * 2 + 1, 2):
@@ -20651,8 +20640,11 @@ def setka_data(fin, posev_data):
         family = posev['фамилия'] # фамилия имя / город
         if stage == "Парный разряд":
             name_list = double_full_player_id(family) # словарь {name: фамилия/город, id: номер игрока}, {name: фамилия, id: номер мгрока}
-        else:    
-            name_list = full_player_id(family) # словарь {name: фамилия/город, id: номер игрока}, {name: фамилия, id: номер мгрока}
+        else:
+            if vid_turnira == "личные":    
+                name_list = full_player_id(family) # словарь {name: фамилия/город, id: номер игрока}, {name: фамилия, id: номер мгрока}
+            else:
+                name_list = full_team_id(family) # словарь {name: команда/город, id: номер игрока}, {name: фамилия, id: номер мгрока}
         id_f_n = name_list[0] # словарь name: фамилия/город, id: номер игрока
         id_s_n = name_list[1] # {name: фамилия, id: номер игрока}
             # словарь ключ - полное имя/ город, значение - id
@@ -20699,6 +20691,31 @@ def full_player_id(family):
 
     return name_list
 
+def full_team_id(family):
+    """получает словарь -название команды и его регион и соответствующий ему id в таблице Team"""
+    full_name = {}
+    short_name = {}   
+    teams = Team.select().where(Team.title_id == title_id())
+    if family != "X":
+        teams_id = teams.select().where(Team.team_name == family).get()
+        team_id = teams_id.id # ид игрока
+        team_name = teams_id.team_name # команда/ город
+        team_region = teams_id.region # ФИО без города
+        team_name_region = f"{team_name}/{team_region}"
+        full_name["name"] = team_name_region
+        full_name["id"] = team_id 
+        short_name["name"] = team_name
+        short_name["id"] = team_id
+    else:
+        full_name["name"] = "X"
+        full_name["id"] = 0
+        short_name["name"] = "X"
+        short_name["id"] = 0
+    name_list = []
+    name_list.append(full_name)
+    name_list.append(short_name)
+
+    return name_list
 
 def double_full_player_id(family):
     """получает словарь -фамилия игрока и его город и соответствующий ему id в таблице Players_double парный разряд"""
@@ -20726,7 +20743,6 @@ def double_full_player_id(family):
     name_list.append(short_name)
 
     return name_list    
-
 
 def score_in_table(td, num_gr):
     """заносит счет и места в таблицу группы или таблицу по кругу pdf
@@ -22119,11 +22135,11 @@ def player_choice_in_setka(fin):
     with db:  # записывает в db, что жеребьевка произведена
         systems.choice_flag = True
         systems.save()
-    if flag == 3: # если ручная жеребьевка, то закрывает сетку 
-    #    .my_win.tableView_net.hide()
-        my_win.resize(1270, 825)
-        # my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
+    # if flag == 3: # если ручная жеребьевка, то закрывает сетку 
+    # #    .my_win.tableView_net.hide()
+    #     my_win.resize(1270, 825)
+    #     # my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
+    #     my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
     return posev_data
 
 
