@@ -1,0 +1,16 @@
+2026-04-14 13:55:28,476 - ERROR - Необработанное исключение: AttributeError: 'StartWindow' object has no attribute 'label_4'
+2026-04-14 13:55:28,497 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 1600, in open
+    go_to()
+    ~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 2531, in go_to
+    tab_enabled(id_title)
+    ~~~~~~~~~~~^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 2290, in tab_enabled
+    fir_window.load_old() # загружает в меню -последние- пять
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 1693, in load_old
+    self.label_4.show()
+    ^^^^^^^^^^^^
+AttributeError: 'StartWindow' object has no attribute 'label_4'. Did you mean: 'label_2'?

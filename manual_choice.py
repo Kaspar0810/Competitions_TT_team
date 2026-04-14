@@ -50,7 +50,7 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
         def get_grid_size(self):
             """Определение размера сетки на основе posevs_num"""
             max_num = 0
-            # max_num = self.posevs_num[0]
+            # max_num = self.posevs_num[0][1]
             for group in self.posevs_num:
                 max_num = max(max_num, max(group))
             return max_num

@@ -1,0 +1,11 @@
+2026-04-14 10:01:36,885 - ERROR - Необработанное исключение: AttributeError: module 'manual_choice' has no attribute 'ManualChoiceWindow'
+2026-04-14 10:01:36,942 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 969, in choice
+    posev_data = player_choice_in_setka(fin)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 21504, in player_choice_in_setka
+    posev = choice_setka_automat(fin, flag, count_exit)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11727, in choice_setka_automat
+    my_win.manual_window = manual_choice.ManualChoiceWindow()
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'manual_choice' has no attribute 'ManualChoiceWindow'
