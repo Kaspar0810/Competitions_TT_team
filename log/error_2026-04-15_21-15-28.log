@@ -1,0 +1,34 @@
+2026-04-15 21:17:38,090 - ERROR - Необработанное исключение: PlayerDoesNotExist: <Model: Player> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`player`, `t1`.`bday`, `t1`.`rank`, `t1`.`city`, `t1`.`region`, `t1`.`razryad`, `t1`.`coach_id`, `t1`.`mesto`, `t1`.`fio`, `t1`.`fio_city`, `t1`.`title_id`, `t1`.`pay_rejting`, `t1`.`comment`, `t1`.`coefficient_victories`, `t1`.`total_game_player`, `t1`.`total_win_game`, `t1`.`application`, `t1`.`patronymic_id`, `t1`.`sex` FROM `players` AS `t1` WHERE ((`t1`.`title_id` = %s) AND (`t1`.`fio_city` = %s)) LIMIT %s OFFSET %s
+Params: [78, 'Нижегородец/Нижний Новгород', 1, 0]
+2026-04-15 21:17:38,091 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 7501, in get
+    return clone.execute(database)[0]
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 4744, in __getitem__
+    return self.row_cache[item]
+           ~~~~~~~~~~~~~~^^^^^^
+IndexError: list index out of range
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 6314, in view
+    view_file = made_pdf_table_for_view(sender)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 8822, in made_pdf_table_for_view
+    setka_8_full_made(fin)
+    ~~~~~~~~~~~~~~~~~^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 17843, in setka_8_full_made
+    tds = write_in_setka(data, fin, first_mesto, table)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 20075, in write_in_setka
+    dict_setka = score_in_setka(stage, place_3rd) # список (номер, игрок, счет в партии, номер куда сносится проигравший, его фамилия)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 21326, in score_in_setka
+    id_pl_win = player.select().where(Player.fio_city == res.winner).get()
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 7504, in get
+    raise self.model.DoesNotExist('%s instance matching query does '
+                                  'not exist:\nSQL: %s\nParams: %s' %
+                                  (clone.model, sql, params))
+models.PlayerDoesNotExist: <Model: Player> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`player`, `t1`.`bday`, `t1`.`rank`, `t1`.`city`, `t1`.`region`, `t1`.`razryad`, `t1`.`coach_id`, `t1`.`mesto`, `t1`.`fio`, `t1`.`fio_city`, `t1`.`title_id`, `t1`.`pay_rejting`, `t1`.`comment`, `t1`.`coefficient_victories`, `t1`.`total_game_player`, `t1`.`total_win_game`, `t1`.`application`, `t1`.`patronymic_id`, `t1`.`sex` FROM `players` AS `t1` WHERE ((`t1`.`title_id` = %s) AND (`t1`.`fio_city` = %s)) LIMIT %s OFFSET %s
+Params: [78, 'Нижегородец/Нижний Новгород', 1, 0]

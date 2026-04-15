@@ -291,6 +291,7 @@ class Team(BaseModel):
     r_pl4 = IntegerField(default=0)
     id_pl5 = ForeignKeyField(Player, column_name='id_pl5', null=True)
     r_pl5 = IntegerField(default=0)
+    team_region = CharField(null=True)
 
     class Meta:
         db_table = "teams"
@@ -335,4 +336,15 @@ class Game_list(BaseModel):
         db_table = "game_lists"
         order_by = "number_group"
 
+class Choice_double_player(BaseModel):
+    double_player = CharField(50)
+    region = CharField(25)
+    r_sum = IntegerField()
+    posev = IntegerField()
+    mesto_final = IntegerField()
+    vid_para = CharField(15)
+    title_id = ForeignKeyField(Title)
 
+    class Meta:
+        db_table = "choice_double_players"
+        order_by = "r_sum"

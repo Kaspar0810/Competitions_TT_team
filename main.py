@@ -1366,8 +1366,6 @@ def update_player_list():
                 r_new = gamer.r_list
                 Player.update(rank=r_new).where(Player.id == id_pl).execute()
 # =======================================
-from PyQt5.QtWidgets import QMessageBox
-from peewee import DoesNotExist
 
 class TournamentManager:
     
@@ -1389,34 +1387,33 @@ class TournamentManager:
             tournament_name = tournament.name if hasattr(tournament, 'name') else f"ID {tournament_id}"
             
             # 2. Подтверждение удаления
-            if parent_widget:
-                reply = QMessageBox.question(
-                    parent_widget,
-                    "Подтверждение удаления",
-                    f"Вы действительно хотите удалить соревнование '{tournament_name}'?\n\n"
-                    f"Будут удалены все связанные данные:\n"
-                    f"• Choice\n"
-                    f"• Choice_double_player\n"
-                    f"• Choice_Team\n"
-                    f"• Game_list\n"
-                    f"• Player\n"
-                    f"• Players_double\n"
-                    f"• Result\n"
-                    f"• System\n\n"
-                    f"Это действие необратимо!",
-                    QMessageBox.Yes | QMessageBox.No,
-                    QMessageBox.No
-                )
-                
-                if reply != QMessageBox.Yes:
-                    return False
+            reply = QMessageBox.question(
+                parent_widget,
+                "Подтверждение удаления",
+                f"Вы действительно хотите удалить соревнование '{tournament_name}'?\n\n"
+                f"Будут удалены все связанные данные:\n"
+                f"• Choice\n"
+                f"• Choice_double_player\n"
+                f"• Choice_Team\n"
+                f"• Game_list\n"
+                f"• Player\n"
+                f"• Players_double\n"
+                f"• Result\n"
+                f"• System\n\n"
+                f"Это действие необратимо!",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No
+            )
+            
+            if reply != QMessageBox.Yes:
+                return False
             
             # 3. Удаление в правильном порядке (сначала зависимые записи)
             with db.atomic():  # Транзакция для целостности
-                # # Удаляем записи из Choice_double_player
-                # deleted_choice_double = Choice_double_player.delete().where(
-                #     Choice_double_player.title_id == tournament_id
-                # ).execute()
+                # Удаляем записи из Choice_double_player
+                deleted_choice_double = Choice_double_player.delete().where(
+                    Choice_double_player.title_id == tournament_id
+                ).execute()
                 
                 # Удаляем записи из Choice_Team
                 deleted_choice_team = Choice_Team.delete().where(
@@ -1456,49 +1453,30 @@ class TournamentManager:
                 # Удаляем само соревнование из Title
                 deleted_title = Title.delete().where(Title.id == tournament_id).execute()
                 
-                # Вывод информации об удалении
-                print(f"Удалено соревнование: {tournament_name}")
-                # print(f"  - Choice_double_player: {deleted_choice_double} записей")
-                print(f"  - Choice_Team: {deleted_choice_team} записей")
-                print(f"  - Choice: {deleted_choice} записей")
-                print(f"  - Game_list: {deleted_game_list} записей")
-                print(f"  - Result: {deleted_result} записей")
-                print(f"  - Players_double: {deleted_player_double} записей")
-                print(f"  - Player: {deleted_player} записей")
-                print(f"  - System: {deleted_system} записей")
-                print(f"  - Title: {deleted_title} запись")
-                
-                if parent_widget:
-                    QMessageBox.information(
-                        parent_widget,
-                        "Удаление завершено",
-                        f"Соревнование '{tournament_name}' успешно удалено!\n\n"
-                        f"Удалено связанных записей: {deleted_choice_team + deleted_choice + deleted_game_list + deleted_result + deleted_player_double + deleted_player + deleted_system}")
-                    # )   f"Удалено связанных записей: {deleted_choice_double + deleted_choice_team + deleted_choice + deleted_game_list + deleted_result + deleted_player_double + deleted_player + deleted_system}"
-                    # )
+                QMessageBox.information(
+                    parent_widget,
+                    "Удаление завершено",
+                    f"Соревнование '{tournament_name}' успешно удалено!\n\n"
+                    f"Удалено связанных записей: {deleted_choice_double + deleted_choice_team + deleted_choice + deleted_game_list + deleted_result + deleted_player_double + deleted_player + deleted_system}"
+                    )
                 
                 return True
                 
         except DoesNotExist:
-            if parent_widget:
-                QMessageBox.warning(
-                    parent_widget,
-                    "Ошибка",
-                    f"Соревнование с ID {tournament_id} не найдено!"
-                )
+            QMessageBox.warning(
+                parent_widget,
+                "Ошибка",
+                f"Соревнование с ID {tournament_id} не найдено!"
+            )
             return False
             
         except Exception as e:
-            if parent_widget:
-                QMessageBox.critical(
-                    parent_widget,
-                    "Ошибка при удалении",
-                    f"Произошла ошибка при удалении соревнования:\n{str(e)}"
-                )
-            print(f"Ошибка удаления: {e}")
+            QMessageBox.critical(
+                parent_widget,
+                "Ошибка при удалении",
+                f"Произошла ошибка при удалении соревнования:\n{str(e)}"
+            )
             return False
-
-
 
 class StartWindow(QMainWindow, Ui_Form):
     """Стартовое окно приветствия"""
@@ -21318,6 +21296,8 @@ def score_in_setka(stage, place_3rd):
     match = []
     tmp_match = []
     id_system = system_id(stage)
+    titles = Title.select().where(Title.id == title_id()).get()
+    vid_turnira = titles.vid_turnira
     system = System.select().where(System.id == id_system).get()
     vid_setki = system.label_string
     visible_game = system.visible_game
@@ -21325,7 +21305,10 @@ def score_in_setka(stage, place_3rd):
     if stage == "Парный разряд":
         player = Players_double.select().where(Players_double.title_id == title_id())
     else:
-        player = Player.select().where(Player.title_id == title_id())
+        if vid_turnira == "личные":
+            player = Player.select().where(Player.title_id == title_id())
+        else:
+            teams = Team.select().where(Team.title_id == title_id())
     result = Result.select().where(Result.system_id == id_system)
     for res in result:
         num_game = int(res.tours)
@@ -21345,11 +21328,14 @@ def score_in_setka(stage, place_3rd):
                     id_pl_win = player.select().where(Players_double.para_full == res.winner).get()
                     short_name_win = id_pl_win.para_shot
                 else:
-                    id_pl_win = player.select().where(Player.fio_city == res.winner).get()
-                    # short_name_win = id_pl_win.player
-                    # short_name_win = id_pl_win.fio
+                    if vid_turnira == "личные":
+                        id_pl_win = player.select().where(Player.fio_city == res.winner).get()
+                        short_name_win = id_pl_win.player if id_pl_win.fio is None else id_pl_win.fio
+                    else:
+                        id_pl_win = teams.select().where(Team.team_name == res.winner).get()
+
                     # временный вариант со старой базой
-                    short_name_win = id_pl_win.player if id_pl_win.fio is None else id_pl_win.fio
+                  
                 if res.loser == "X":
                     short_name_los = "X"
                 else: 
@@ -25116,195 +25102,6 @@ def schedule_reset():
     my_win.comboBox_select_stage_schedule.setCurrentIndex(0)
     schedule_filter()
 
-# class GroupSchedulePDF:
-#     # from reportlab.lib import colors
-#     # from reportlab.lib.pagesizes import A4, landscape
-#     # from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
-#     # from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-#     # from reportlab.lib.units import cm
-#     # from reportlab.pdfbase import pdfmetrics
-#     # from reportlab.pdfbase.ttfonts import TTFont
-#     # from datetime import datetime
-
-#     def __init__(self, filename='schedule.pdf'):
-#         self.filename = filename
-#         self.doc = SimpleDocTemplate(
-#             filename,
-#             pagesize=landscape(A4),
-#             rightMargin=1*cm,
-#             leftMargin=1*cm,
-#             topMargin=1.5*cm,
-#             bottomMargin=1*cm
-#         )
-#         self.styles = getSampleStyleSheet()
-#         self.elements = []
-        
-#     def add_title(self):
-#         """Добавление заголовка"""
-#         title_style = PS(
-#             'CustomTitle',
-#             parent=self.styles['Heading1'],
-#             fontSize=18,
-#             alignment=1,
-#             textColor=colors.darkblue,
-#             spaceAfter=20
-#         )
-#         title = Paragraph("Расписание игр", title_style)
-#         self.elements.append(title)
-        
-#         # Дата создания
-#         date_style = PS(
-#             'DateStyle',
-#             parent=self.styles['Normal'],
-#             fontSize=10,
-#             alignment=2,
-#             textColor=colors.grey
-#         )
-#         date_text = Paragraph(f"Создано: {datetime.now().strftime('%d.%m.%Y %H:%M')}", date_style)
-#         self.elements.append(date_text)
-#         self.elements.append(Spacer(1, 10))
-    
-#     def create_group_table(self, group_name, rows):
-#         """Создание таблицы для одной группы"""
-        
-#         # Заголовок группы
-#         group_style = PS(
-#             'GroupStyle',
-#             parent=self.styles['Heading2'],
-#             fontSize=14,
-#             textColor=colors.darkblue,
-#             spaceAfter=5,
-#             spaceBefore=10,
-#             alignment=0
-#         )
-#         self.elements.append(Paragraph(f"Группа: {group_name}", group_style))
-        
-#         # Подготовка данных
-#         table_data = []
-        
-#         # Заголовки
-#         headers = ['№', 'Дата', 'Время', 'Стол', 'Тур', 'Игрок 1', 'Игрок 2']
-#         table_data.append(headers)
-        
-#         # Данные
-#         for idx, row in enumerate(rows, 1):
-#             # Форматирование даты
-#             if row['schedule_date']:
-#                 if isinstance(row['schedule_date'], datetime):
-#                     date_str = row['schedule_date'].strftime('%d.%m.%Y')
-#                 else:
-#                     date_str = str(row['schedule_date'])
-#             else:
-#                 date_str = ''
-            
-#             table_row = [
-#                 str(idx),
-#                 date_str,
-#                 str(row['schedule_time'] or ''),
-#                 str(row['schedule_table'] or ''),
-#                 str(row['tours'] or ''),
-#                 str(row['player1'] or ''),
-#                 str(row['player2'] or '')
-#             ]
-#             table_data.append(table_row)
-        
-#         # Настройка ширины колонок
-#         col_widths = [0.8*cm, 2.2*cm, 1.8*cm, 1.8*cm, 1.8*cm, 4.5*cm, 4.5*cm]
-        
-#         # Создание таблицы
-#         table = Table(table_data, colWidths=col_widths, repeatRows=1)
-        
-#         # Стили
-#         style = TableStyle([
-#             # Заголовок
-#             ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
-#             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-#             ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-#             ('FONTNAME', (0, 0), (-1, 0), 'DejaVuSerif-Bold'),
-#             ('FONTSIZE', (0, 0), (-1, 0), 10),
-            
-#             # Все ячейки
-#             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-#             ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-#             ('FONTNAME', (0, 1), (-1, -1), 'DejaVuSerif'),
-#             ('FONTSIZE', (0, 1), (-1, -1), 9),
-#             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            
-#             # Границы
-#             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-#             ('BOX', (0, 0), (-1, -1), 1, colors.black),
-            
-#             # Выравнивание
-#             ('ALIGN', (0, 1), (0, -1), 'CENTER'),
-#             ('ALIGN', (2, 1), (4, -1), 'CENTER'),
-            
-#             # Чередование цветов
-#             ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.white]),
-#         ])
-        
-#         table.setStyle(style)
-#         self.elements.append(table)
-#         self.elements.append(Spacer(1, 15))
-    
-#     def build(self, grouped_data):
-#         """Построение PDF"""
-#         self.add_title()
-        
-#         for group_name, rows in grouped_data.items():
-#             self.create_group_table(group_name, rows)
-        
-#         self.doc.build(self.elements)
-#         print(f"PDF создан: {self.filename}")
-
-#     def main():
-  
-#         # ====
-#         result_group = Result.select().where(Result.title_id == title_id())
-        
-#         # Группировка данных
-#         grouped_data = {}
-
-#         # query = (result_group.select(Result.id, fn.ROW_NUMBER().over(order_by=[Result.id]).alias('row_num'))
-#         #         .order_by(Result.id))
-
-#         for row in result_group:
-#             group = row.number_group
-#             # group = row['number_group']
-#             if group not in grouped_data:
-#                 grouped_data[group] = []
-#             grouped_data[group].append(row)
-        
-#         # Создание PDF
-#         pdf = GroupSchedulePDF('groups_schedule.pdf')
-#         pdf.build(grouped_data)
-        
-    # except mysql.connector.Error as error:
-    #     print(f"Ошибка MySQL: {error}")
-    # finally:
-    #     if connection.is_connected():
-    #         cursor.close()
-    #         connection.close()
-# def get_row_number_by_id(row_id):
-#     """Получить порядковый номер пользователя по ID"""
-    
-#     # Подзапрос с нумерацией
-#     subquery = (Result
-#                 .select(Result.id, 
-#                         fn.ROW_NUMBER().over(order_by=[Result.id]).alias('row_num'))
-#                 .alias('numbered_users'))
-    
-#     # Основной запрос для получения номера конкретного пользователя
-#     query = (Result
-#              .select(subquery.c.row_num)
-#              .from_(subquery)
-#              .where(subquery.c.id == Result_id))
-#     Result
-#     result = query.scalar()
-#     return result
-
-# Использование
-# user_row = get_row_number_by_id(42)
-# print(f"Пользователь с ID 42 находится на позиции {user_row}")
 
 # def proba():
 #     choices = Choice.select()
@@ -25392,15 +25189,13 @@ def schedule_reset():
     #     migrator = MySQLMigrator(db)
         # migrate(migrator.drop_column('game_lists', 'team_id')) # удаление столбца
         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-        # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
         # migrate(migrator.rename_column('results', 'schedule_time', 'fio_city')) # Переименование столбца (таблица, старое название, новое название столбца)
 
-#         # Добавляем столбец player_double_id 
-        # new_column = ForeignKeyField(Team, field=Team.id, null=True)
-        # migrate(migrator.add_column('game_lists', 'team_id', new_column)) # null=True допускает пустое значение
-#         # Добавляем возможность NULL для поля title_id
-#         # migrate(migrator.set_null('teams', 'id_pl1', True))
-#     db.close()
+        # Добавление простого столбца
+        # new_column = CharField(max_length=100, default='', null=True)
+        # migrate(migrator.add_column('teams', 'team_region', new_column)) # null=True допускает пустое значение
+       # migrate(migrator.set_null('teams', 'id_pl1', True))
+    # db.close()
 # my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.btn_select_range.clicked.connect(select_rows_with_options)
