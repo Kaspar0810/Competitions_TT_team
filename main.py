@@ -1372,7 +1372,7 @@ from peewee import DoesNotExist
 class TournamentManager:
     
     @staticmethod
-    def delete_tournament_by_id(tournament_id, parent_widget-None):
+    def delete_tournament_by_id(tournament_id, parent_widget=None):
         """
         Удаление соревнования и всех связанных записей
         
