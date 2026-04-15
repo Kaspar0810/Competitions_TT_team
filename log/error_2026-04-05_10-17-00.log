@@ -1,7 +1,0 @@
-2026-04-05 10:17:26,433 - ERROR - Необработанное исключение: AttributeError: 'StartWindow' object has no attribute 'button_open'
-2026-04-05 10:17:26,436 - ERROR - Трассировка стека:
-Traceback (most recent call last):
-  File "c:\Users\Alex\Competitions_TT\main.py", line 1498, in on_event_selected
-    self.button_open.setText(f"✏️ Запустить: {selected_items[0].text()}")
-    ^^^^^^^^^^^^^^^^
-AttributeError: 'StartWindow' object has no attribute 'button_open'. Did you mean: 'Button_open'?

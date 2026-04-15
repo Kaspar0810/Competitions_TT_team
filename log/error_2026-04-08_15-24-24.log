@@ -1,7 +1,0 @@
-2026-04-08 15:24:41,894 - ERROR - Необработанное исключение: AttributeError: 'MainWindow' object has no attribute 'lineEdit_team_r'
-2026-04-08 15:24:41,936 - ERROR - Трассировка стека:
-Traceback (most recent call last):
-  File "c:\Users\Alex\Competitions_TT\main.py", line 7687, in filter_player_team_list
-    my_win.lineEdit_team_r.setText(r_sum)
-    ^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'MainWindow' object has no attribute 'lineEdit_team_r'

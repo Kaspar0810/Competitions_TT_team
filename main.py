@@ -6356,6 +6356,10 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
     stage = "Парный разряд" if fin in para_list else fin
     id_system = system_id(stage)
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
+    # определяет какие соревнования личгые или командные
+    titles = Title.select().where(Title.id == title_id()).get()
+    vid_turnira = titles.vid_turnira
+
     st = "Финальный"
     game = 0
     if fin == "Одна таблица":
@@ -6444,9 +6448,14 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
                 game_list = Game_list(number_group=fin, rank_num_player=k, player_double_id=player_id,
                                     system_id=id_system, title_id=title_id()).save()
         else:
-            with db.atomic():
-                game_list = Game_list(number_group=fin, rank_num_player=k, player_group_id=player_id,
-                                    system_id=id_system, title_id=title_id()).save()
+            if vid_turnira == "личные":
+                with db.atomic():
+                    game_list = Game_list(number_group=fin, rank_num_player=k, player_group_id=player_id,
+                                        system_id=id_system, title_id=title_id()).save()
+            else:
+                with db.atomic():
+                    game_list = Game_list(number_group=fin, rank_num_player=k, team_id=player_id,
+                                        system_id=id_system, title_id=title_id()).save()
 
     for i in range(1, mp // 2 + 1):  # присваивает встречи 1-ого тура и записывает в тбл Results
         num_game = i
@@ -20599,17 +20608,30 @@ def setka_player_after_choice(stage):
 
     game_list = Game_list.select().where(Game_list.title_id == title_id())
     pl_list = game_list.select().where(Game_list.system_id == id_system).order_by(Game_list.rank_num_player)
+    # вид соревнований
+    titles = Title.select().where(Title.id == title_id()).get()
+    vid_turnira = titles.vid_turnira
     for i in pl_list:
         p_data['посев'] = i.rank_num_player
-        id_pl = i.player_double_id if stage == "Парный разряд" else i.player_group_id
+        if stage == "Парный разряд":
+            id_pl = i.player_double_id
+        else:
+            if vid_turnira == "личные":
+                id_pl = i.player_group_id
+            else:
+                id_pl = i.team_id
         if id_pl != "X":
             # ==== вариант новый с id игрока
             if stage == "Парный разряд":
                 pl = Players_double.get(Players_double.id == id_pl)
                 p_data['фамилия'] = pl.para_full
             else:
-                pl = Player.get(Player.id == id_pl)
-                p_data['фамилия'] = pl.fio_city
+                if vid_turnira == "личные":
+                    pl = Player.get(Player.id == id_pl)
+                    p_data['фамилия'] = pl.fio_city
+                else:
+                    pl = Team.get(Team.id == id_pl)
+                    p_data['фамилия'] = pl.team_name 
         else:
             p_data['фамилия'] = "X"
         tmp = p_data.copy()
@@ -20655,12 +20677,23 @@ def setka_data(fin, posev_data):
             family_city = family
         else:
             family_city = "X"
-        znak = family.find("/")
-        f = family[:znak]
-        c = family[znak + 1:]
-        family = f"{f}\n{c}" # фио и на другой строке город
-        tds.append(family)
-        fam_name_city.append(family_city)
+        if vid_turnira == "личные":
+            znak = family.find("/")
+            f = family[:znak]
+            c = family[znak + 1:]
+            family = f"{f}\n{c}" # фио и на другой строке город
+            tds.append(family)
+            fam_name_city.append(family_city)
+        else:
+            znak = family.find("/")
+            if znak > 0:
+                f = family[:znak]
+                c = family[znak + 1:]
+                family = f"{f}\n{c}" # фио и на другой строке город
+            #     tds.append(family)
+            # else:
+            tds.append(family)
+            fam_name_city.append(family_city)
     all_list = [tds, id_full_name, id_name, fam_name_city]
 
     return all_list
@@ -20696,6 +20729,10 @@ def full_team_id(family):
     full_name = {}
     short_name = {}   
     teams = Team.select().where(Team.title_id == title_id())
+    # если команда и регион 
+    znak = family.find("/")
+    if znak > 0:
+        family = family[:znak]
     if family != "X":
         teams_id = teams.select().where(Team.team_name == family).get()
         team_id = teams_id.id # ид игрока
@@ -25230,17 +25267,18 @@ def schedule_reset():
     # db.commit()
     # cursor.close()
 # ===== создание, удаление, переименование столбцов
-#     with db.atomic():
-#         migrator = MySQLMigrator(db)
-#         # migrate(migrator.drop_column('results', 'schedule_time')) # удаление столбца
-#         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-#         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-#         # migrate(migrator.rename_column('results', 'schedule_time', 'fio_city')) # Переименование столбца (таблица, старое название, новое название столбца)
+    # with db.atomic():
+    #     migrator = MySQLMigrator(db)
+        # migrate(migrator.drop_column('game_lists', 'team_id')) # удаление столбца
+        # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
+        # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
+        # migrate(migrator.rename_column('results', 'schedule_time', 'fio_city')) # Переименование столбца (таблица, старое название, новое название столбца)
 
 #         # Добавляем столбец player_double_id 
-# #         migrate(migrator.add_column('results', 'stage_net', CharField(null=True))) # null=True допускает пустое значение
+        # new_column = ForeignKeyField(Team, field=Team.id, null=True)
+        # migrate(migrator.add_column('game_lists', 'team_id', new_column)) # null=True допускает пустое значение
 #         # Добавляем возможность NULL для поля title_id
-#         migrate(migrator.set_null('teams', 'id_pl1', True))
+#         # migrate(migrator.set_null('teams', 'id_pl1', True))
 #     db.close()
 # my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 

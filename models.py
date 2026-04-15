@@ -194,19 +194,6 @@ class Players_double(BaseModel):
         db_tables = "players_double"
         order_by = "r_sum"
 
-class Game_list(BaseModel):
-    number_group = CharField()
-    rank_num_player = IntegerField()
-    player_group = ForeignKeyField(Player)
-    system_id = ForeignKeyField(System)
-    title_id = ForeignKeyField(Title)
-    sex = CharField(10)
-    player_double_id = ForeignKeyField(Players_double)
-
-    class Meta:
-        db_table = "game_lists"
-        order_by = "number_group"
-
 class Choice(BaseModel):
 
     player_choice = ForeignKeyField(Player)
@@ -334,6 +321,18 @@ class Choice_Team(BaseModel):
     class Meta:
         db_table = "choice_teams"
     
+class Game_list(BaseModel):
+    number_group = CharField()
+    rank_num_player = IntegerField()
+    player_group = ForeignKeyField(Player)
+    system_id = ForeignKeyField(System)
+    title_id = ForeignKeyField(Title)
+    sex = CharField(10)
+    player_double_id = ForeignKeyField(Players_double)
+    team_id = ForeignKeyField(Team)
 
+    class Meta:
+        db_table = "game_lists"
+        order_by = "number_group"
 
 

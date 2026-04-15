@@ -1,9 +1,0 @@
-2026-04-06 21:42:05,915 - ERROR - Необработанное исключение: TypeError: setDate(self, date: Union[QDate, datetime.date]): argument 1 has unexpected type 'str'
-2026-04-06 21:42:05,915 - ERROR - Трассировка стека:
-Traceback (most recent call last):
-  File "c:\Users\Alex\Competitions_TT\main.py", line 1539, in last_comp_open
-    id_title = db_select_title()
-  File "c:\Users\Alex\Competitions_TT\main.py", line 2570, in db_select_title
-    my_win.dateEdit_start.setDate(title.data_start)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-TypeError: setDate(self, date: Union[QDate, datetime.date]): argument 1 has unexpected type 'str'

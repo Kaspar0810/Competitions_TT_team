@@ -1,7 +1,0 @@
-2026-04-04 21:24:26,937 - ERROR - Необработанное исключение: AttributeError: 'QListWidgetItem' object has no attribute 'setGeometry'
-2026-04-04 21:24:26,937 - ERROR - Трассировка стека:
-Traceback (most recent call last):
-  File "c:\Users\Alex\Competitions_TT\main.py", line 1541, in last_competition
-    self.listWidget_comp.setGeometry(QtCore.Qrect(300, 235, 500, 190))
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'QListWidgetItem' object has no attribute 'setGeometry'

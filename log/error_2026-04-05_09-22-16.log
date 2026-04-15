@@ -1,9 +1,0 @@
-2026-04-05 09:22:17,518 - ERROR - Необработанное исключение: TypeError: StartWindow.setup_calendar() missing 1 required positional argument: 'calendar_widget'
-2026-04-05 09:22:17,527 - ERROR - Трассировка стека:
-Traceback (most recent call last):
-  File "c:\Users\Alex\Competitions_TT\main.py", line 2002, in <module>
-    fir_window = StartWindow()  # Создаём объект класса ExampleApp
-  File "c:\Users\Alex\Competitions_TT\main.py", line 1387, in __init__
-    self.setup_calendar()
-    ~~~~~~~~~~~~~~~~~~~^^
-TypeError: StartWindow.setup_calendar() missing 1 required positional argument: 'calendar_widget'
