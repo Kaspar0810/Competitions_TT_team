@@ -1,0 +1,7 @@
+2026-04-15 15:16:06,153 - ERROR - Необработанное исключение: AttributeError: 'ModelSelect' object has no attribute 'id'
+2026-04-15 15:16:06,154 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 1662, in delete_competition
+    id_title = titles.id
+               ^^^^^^^^^
+AttributeError: 'ModelSelect' object has no attribute 'id'

@@ -311,7 +311,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.hide()  # или self.close() если нужно полностью закрыть
         
         # Запускаем ручную жеребьевку
-        result = manual_choice(full_posev, count_exit, free_num, posevs_num, nums)
+        result = choice_net_manual(full_posev, count_exit, free_num, posevs_num, nums)
         
         # После завершения ручной жеребьевки показываем результат
         if result:
@@ -1366,6 +1366,139 @@ def update_player_list():
                 r_new = gamer.r_list
                 Player.update(rank=r_new).where(Player.id == id_pl).execute()
 # =======================================
+from PyQt5.QtWidgets import QMessageBox
+from peewee import DoesNotExist
+
+class TournamentManager:
+    
+    @staticmethod
+    def delete_tournament_by_id(tournament_id, parent_widget-None):
+        """
+        Удаление соревнования и всех связанных записей
+        
+        Args:
+            tournament_id: ID соревнования для удаления
+            parent_widget: Родительский виджет для диалогов подтверждения
+        
+        Returns:
+            bool: True если удаление успешно, False если ошибка
+        """
+        try:
+            # 1. Проверяем существует ли соревнование
+            tournament = Title.get_by_id(tournament_id)
+            tournament_name = tournament.name if hasattr(tournament, 'name') else f"ID {tournament_id}"
+            
+            # 2. Подтверждение удаления
+            if parent_widget:
+                reply = QMessageBox.question(
+                    parent_widget,
+                    "Подтверждение удаления",
+                    f"Вы действительно хотите удалить соревнование '{tournament_name}'?\n\n"
+                    f"Будут удалены все связанные данные:\n"
+                    f"• Choice\n"
+                    f"• Choice_double_player\n"
+                    f"• Choice_Team\n"
+                    f"• Game_list\n"
+                    f"• Player\n"
+                    f"• Players_double\n"
+                    f"• Result\n"
+                    f"• System\n\n"
+                    f"Это действие необратимо!",
+                    QMessageBox.Yes | QMessageBox.No,
+                    QMessageBox.No
+                )
+                
+                if reply != QMessageBox.Yes:
+                    return False
+            
+            # 3. Удаление в правильном порядке (сначала зависимые записи)
+            with db.atomic():  # Транзакция для целостности
+                # # Удаляем записи из Choice_double_player
+                # deleted_choice_double = Choice_double_player.delete().where(
+                #     Choice_double_player.title_id == tournament_id
+                # ).execute()
+                
+                # Удаляем записи из Choice_Team
+                deleted_choice_team = Choice_Team.delete().where(
+                    Choice_Team.title_id == tournament_id
+                ).execute()
+                
+                # Удаляем записи из Choice
+                deleted_choice = Choice.delete().where(
+                    Choice.title_id == tournament_id
+                ).execute()
+                
+                # Удаляем записи из Game_list
+                deleted_game_list = Game_list.delete().where(
+                    Game_list.title_id == tournament_id
+                ).execute()
+                
+                # Удаляем записи из Result
+                deleted_result = Result.delete().where(
+                    Result.title_id == tournament_id
+                ).execute()
+                
+                # Удаляем записи из Player_double
+                deleted_player_double = Players_double.delete().where(
+                    Players_double.title_id == tournament_id
+                ).execute()
+                
+                # Удаляем записи из Player
+                deleted_player = Player.delete().where(
+                    Player.title_id == tournament_id
+                ).execute()
+                
+                # Удаляем записи из System
+                deleted_system = System.delete().where(
+                    System.title_id == tournament_id
+                ).execute()
+                
+                # Удаляем само соревнование из Title
+                deleted_title = Title.delete().where(Title.id == tournament_id).execute()
+                
+                # Вывод информации об удалении
+                print(f"Удалено соревнование: {tournament_name}")
+                # print(f"  - Choice_double_player: {deleted_choice_double} записей")
+                print(f"  - Choice_Team: {deleted_choice_team} записей")
+                print(f"  - Choice: {deleted_choice} записей")
+                print(f"  - Game_list: {deleted_game_list} записей")
+                print(f"  - Result: {deleted_result} записей")
+                print(f"  - Players_double: {deleted_player_double} записей")
+                print(f"  - Player: {deleted_player} записей")
+                print(f"  - System: {deleted_system} записей")
+                print(f"  - Title: {deleted_title} запись")
+                
+                if parent_widget:
+                    QMessageBox.information(
+                        parent_widget,
+                        "Удаление завершено",
+                        f"Соревнование '{tournament_name}' успешно удалено!\n\n"
+                        f"Удалено связанных записей: {deleted_choice_team + deleted_choice + deleted_game_list + deleted_result + deleted_player_double + deleted_player + deleted_system}")
+                    # )   f"Удалено связанных записей: {deleted_choice_double + deleted_choice_team + deleted_choice + deleted_game_list + deleted_result + deleted_player_double + deleted_player + deleted_system}"
+                    # )
+                
+                return True
+                
+        except DoesNotExist:
+            if parent_widget:
+                QMessageBox.warning(
+                    parent_widget,
+                    "Ошибка",
+                    f"Соревнование с ID {tournament_id} не найдено!"
+                )
+            return False
+            
+        except Exception as e:
+            if parent_widget:
+                QMessageBox.critical(
+                    parent_widget,
+                    "Ошибка при удалении",
+                    f"Произошла ошибка при удалении соревнования:\n{str(e)}"
+                )
+            print(f"Ошибка удаления: {e}")
+            return False
+
+
 
 class StartWindow(QMainWindow, Ui_Form):
     """Стартовое окно приветствия"""
@@ -1382,11 +1515,13 @@ class StartWindow(QMainWindow, Ui_Form):
         
         self.Button_open.clicked.connect(self.open)
         self.Button_new.clicked.connect(self.new)
-        self.Button_view_pdf.clicked.connect(self.view_competition_on_arhive)
-        self.Button_old.clicked.connect(self.last_competition)
+        # self.Button_view_pdf.clicked.connect(self.view_competition_on_arhive)
+        self.Button_delete_old.clicked.connect(self.delete_competition)
+        # self.Button_delete_old.clicked.connect(self.TournamentManagment.delete_tournamet_by_id)
         # self.Button_R.clicked.connect(self.r_load)
         self.LinkButton.clicked.connect(self.last_comp_open)
 
+        self.Button_delete_old.setEnabled(False)
         self.Button_open.setEnabled(False)
         self.Button_view_pdf.setEnabled(False)
         # self.comboBox_arhive_year.setEnabled(False)
@@ -1448,7 +1583,7 @@ class StartWindow(QMainWindow, Ui_Form):
             self.LinkButton.setText("Список прошедших соревнований пуст")
             self.LinkButton.setEnabled(False)
             self.Button_open.setEnabled(False)
-            self.Button_old.setEnabled(False)   
+            self.Button_delete_old.setEnabled(False)   
     
 
 # =========================
@@ -1538,6 +1673,7 @@ class StartWindow(QMainWindow, Ui_Form):
             # Если событие выбрано, меняем текст кнопки
             # self.Button_open.setText("Открыть")
             self.Button_open.setEnabled(True)
+            self.Button_delete_old.setEnabled(True)
             if pdf_comp:
                 self.Button_view_pdf.setEnabled(True)
             else:
@@ -1548,6 +1684,7 @@ class StartWindow(QMainWindow, Ui_Form):
             selected_date = self.calendar.selectedDate()
             events_count = len(self.events_by_date.get(selected_date, []))
             self.Button_open.setEnabled(False)
+            self.Button_delete_old.setEnabled(False)
             # self.btn_edit.setText(f"✏️ Редактировать ({events_count})")
             # self.btn_delete.setText("🗑️ Удалить событие")
     # ===============================
@@ -1626,54 +1763,38 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def last_competition(self):
         """заполняет меню -последние- прошедшими соревнованиями 5 штук"""
-        data_list = []
         # ================= виджет календарь ===============
         self.setFixedSize(735, 431)
         self.progressBar.hide()
         self.comboBox.hide()
 
-        # self.calendar.setGeometry(QtCore.QRect(153, 120, 570, 173))
-        # self.calendar.show()
         self.listWidget_comp.setGeometry(10, 305, 717, 120)
         self.listWidget_comp.show()
         self.load_dates_from_db()
-        #  =================================================      
-        
-        # fir_window.comboBox_arhive_year.clear()
-        # fir_window.comboBox_arhive_year.setEnabled(True)
+        #  =================================================          
 
-        # titles = Title.select().order_by(Title.data_start.desc())
-        # for t in titles:
-        #     date_start = t.data_start
-        #     str_data = date_start.strftime("%Y-%B")
-        #     # str = format_mysql_date(str_data)
-        #     if str_data not in data_list:
-        #         data_list.append(str_data)
-        # data_list.insert(0, "-выберите дату-")
-        # fir_window.comboBox_arhive_year.addItems(data_list)
+    def delete_competition(self):
+        """удаление соревнований из DB после выбора в календаре"""
+        selected_date = fir_window.calendar.selectedDate()
+        date_str = selected_date.toString('yyyy-MM-dd')
+        current_row = fir_window.listWidget_comp.currentRow()
+        if current_row >= 0:
+            current_item = fir_window.listWidget_comp.item(current_row)
+            txt = current_item.text()
+            mark = txt.find(":")
+            text_value = txt[mark + 2:]
 
-    def _choice_competition(self):
-        """выбор соревнования из архива"""
-        full_name_list = []
-        fir_window.comboBox.clear()
-        index = fir_window.comboBox_arhive_year.currentIndex()
-        data_text = fir_window.comboBox_arhive_year.currentText()
-        if index > 0:
-            date_object = datetime.strptime(data_text, '%Y-%B').date()
-            end_date = date_object + relativedelta(months=1)
-            title = Title.select().where((Title.data_start >= date_object) & (Title.data_start < end_date))
-            for m in title:
-                full_comp = m.full_name_comp
-                age = m.vozrast
-                full_name_list.append(f"{full_comp} {age}")
-            fir_window.comboBox.addItems(full_name_list)
-        fir_window.Button_open.setEnabled(True)
-        fir_window.Button_view_pdf.setEnabled(True)
-
-
+        znak1 = text_value.find(".")
+        name = text_value[:znak1]
+        znak2 = text_value.rfind(".")
+        gamer = text_value[znak2 + 1:]
+        titles = Title.select().where((Title.name == name) & (Title.gamer == gamer) & (Title.data_start == date_str)).get()
+        tournament_id = titles.id
+        TournamentManager.delete_tournament_by_id(tournament_id, parent_widget=None)
+        #  =================================================  
+ 
     def load_old(self):
         """загружает в комбобокс архивные соревнования"""
-        # self.label_4.show()
         comp_list = []
         # ==== получение записи текущего соревнования
         id_current = Title.select().where(Title.id == title_id()).get()
@@ -11798,7 +11919,7 @@ def choice_setka_automat(fin, flag, count_exit): # вариант жеребье
     return posev_data
 # ========= функция ручной жеребьвки сетки ====
 
-def manual_choice(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
+def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
     """
     Функция ручной жеребьевки команд с выбором ячейки мышью
     """

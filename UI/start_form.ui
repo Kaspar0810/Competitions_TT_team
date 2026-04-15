@@ -230,7 +230,7 @@
      </spacer>
     </item>
     <item>
-     <widget class="QPushButton" name="Button_old">
+     <widget class="QPushButton" name="Button_delete_old">
       <property name="font">
        <font>
         <family>Times New Roman</family>
@@ -241,7 +241,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Архив</string>
+       <string>Удалить</string>
       </property>
      </widget>
     </item>

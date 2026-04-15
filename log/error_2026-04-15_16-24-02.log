@@ -1,0 +1,7 @@
+2026-04-15 16:24:28,971 - ERROR - Необработанное исключение: AttributeError: type object 'TournamentManager' has no attribute 'delete_tournamet_by_id'
+2026-04-15 16:24:28,974 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 1791, in delete_competition
+    TournamentManager.delete_tournamet_by_id(id_title)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'TournamentManager' has no attribute 'delete_tournamet_by_id'. Did you mean: 'delete_tournament_by_id'?

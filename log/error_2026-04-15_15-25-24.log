@@ -1,0 +1,7 @@
+2026-04-15 15:26:12,824 - ERROR - Необработанное исключение: AttributeError: 'ModelSelect' object has no attribute 'delete_instance'
+2026-04-15 15:26:12,826 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 1664, in delete_competition
+    result_delete.delete_instance()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ModelSelect' object has no attribute 'delete_instance'
