@@ -291,7 +291,7 @@ class Team(BaseModel):
     r_pl4 = IntegerField(default=0)
     id_pl5 = ForeignKeyField(Player, column_name='id_pl5', null=True)
     r_pl5 = IntegerField(default=0)
-    team_region = CharField(null=True)
+    team_full = CharField(null=True)
 
     class Meta:
         db_table = "teams"
@@ -307,7 +307,7 @@ class Team(BaseModel):
 class Choice_Team(BaseModel):
     team_choice = ForeignKeyField(Team)
     team_name = CharField()
-    team_region = CharField()
+    team_region = CharField(null=True)
     team_coach = CharField()
     rank = IntegerField()
     basic = CharField(null=True)
@@ -318,6 +318,7 @@ class Choice_Team(BaseModel):
     posev_final = IntegerField(null=True)
     mesto_final = IntegerField(null=True)
     title_id = ForeignKeyField(Title)
+    team_full = CharField(null=True)
 
     class Meta:
         db_table = "choice_teams"

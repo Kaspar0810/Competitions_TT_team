@@ -1,0 +1,18 @@
+2026-04-16 16:22:41,840 - ERROR - Необработанное исключение: IndexError: list index out of range
+2026-04-16 16:22:41,841 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12415, in finish_draw
+    result[slot_num] = [team_data[0], team_data[1], team_data[2], team_data[3]]
+                                                    ~~~~~~~~~^^^
+IndexError: list index out of range
+2026-04-16 16:23:23,893 - ERROR - Необработанное исключение: AttributeError: 'NoneType' object has no attribute 'keys'
+2026-04-16 16:23:23,906 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 992, in choice
+    posev_data = player_choice_in_setka(fin)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 22252, in player_choice_in_setka
+    posev = choice_setka_automat(fin, flag, count_exit)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11820, in choice_setka_automat
+    for i in num_id_player.keys():
+             ^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'keys'

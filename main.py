@@ -986,10 +986,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         id_system = system_id(stage=fin)
                         clear_db_before_choice_final(fin)
                         System.update(choice_flag=0).where(System.id == id_system).execute()
-                        # player_fin_on_circle(fin) # создание жеребьевки по кругу
                         one_table(fin, group)
-                        # player_in_one_table(fin)
-                        # player_in_table_group_and_write_Game_list_Result(stage=fin)
                     else:
                         clear_db_before_choice_final(fin)
                         posev_data = player_choice_in_setka(fin)
@@ -1334,7 +1331,6 @@ def dolg_R():
         dolg_R_list.append(family)
     return dolg_R_list  
 
-
 def unconfirmed_city():
     """список городов которые еще не подтвердились"""
     player_city_dict = {}
@@ -1344,7 +1340,6 @@ def unconfirmed_city():
         player = k.player
         player_city_dict[player] = city
     return player_city_dict 
-
 
 def update_player_list():
     """Обновление рейтинга у спортсменов текущим R_list"""
@@ -1696,8 +1691,6 @@ class StartWindow(QMainWindow, Ui_Form):
         if isinstance(flag, list): # узнает принадлежит переменная к типу
            delete_db_copy(del_files_list=flag) 
         go_to()
-        # self.choice_competition()
-        # button_comp() 
         my_win.show()
 
     def new(self):
@@ -1863,7 +1856,6 @@ class ProgressBarThread(QThread):
         else:           
            fir_window.progressBar.setValue(0)
 
-
 def check_delete_db():
     """Проверка сроков на удаления бэкап DB"""
     msgBox = QMessageBox
@@ -1901,7 +1893,6 @@ def check_delete_db():
         flag = 0 # нет старых баз
     return flag
 
-
 def delete_db_copy(del_files_list):
     """Удаление копий базы данных старше 3-х дней"""
     from datetime import timedelta
@@ -1926,7 +1917,6 @@ def delete_db_copy(del_files_list):
     else:
         return
 
-
 def dbase():
     """Создание DB и таблиц"""
     conn = pymysql.connect(host='localhost', user='root', password='db_pass')
@@ -1936,7 +1926,6 @@ def dbase():
     with db:
         db.create_tables([Title, R_list_m, R_list_d, Region, City, Player, R1_list_m, R1_list_d, Coach, System,
                           Result, Game_list, Choice, Delete_player, Referee, Patronymic, Team])
-
 
 def db_r(gamer):  # table_db присваивает по умолчанию значение R_list
     """переходит на функцию выбора файла рейтинга в зависимости от текущего или январского,
@@ -2000,7 +1989,6 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     my_win.statusbar.showMessage("Список регионов загружен", 5000)
     my_win.lineEdit_title_nazvanie.hasFocus()
 
-
 def control_R_list(fname, gamer):
     """проверка рейтинга текущему месяцу"""
     filepatch = str(fname[0])
@@ -2019,7 +2007,6 @@ def control_R_list(fname, gamer):
             db_r(gamer)
     else:
         return
-
 
 def control_date_R_list():
     """Проверка на дату загруженного R_list и дату соревнований"""
@@ -2041,7 +2028,6 @@ def control_date_R_list():
             pass
         else:
             return
-
 
 def load_listR_in_db(fname, table_db):
     """при отсутствии выбора файла рейтинга, позволяет выбрать вторично или выйти из диалога
@@ -2099,7 +2085,6 @@ def load_listR_in_db(fname, table_db):
         with db.atomic():
             for idx in range(0, len(data), 100):
                 table_db.insert_many(data[idx:idx+100]).execute()
-
 
 def region():
     """добавляет из таблицы в комбобокс регионы"""
@@ -3283,12 +3268,7 @@ def fill_table(player_list):
                 my_win.statusbar.showMessage(
                 "Нет спортсменов из предварительной заявки", 10000)
                 my_win.textEdit.setText("Нет спортсменов из предварительной заявки")
-            # else:
-            #     row = 0
-            #     my_win.statusbar.showMessage(
-            #         "Нет спортсменов удаленных из списка", 10000)
-            #     my_win.textEdit.setText("Нет спортсменов удаленных из списка")
-            #     my_win.checkBox_6.setChecked(False)
+
         elif tb == 6:
             row = 0
             my_win.statusbar.showMessage(
@@ -3441,15 +3421,7 @@ def _fill_table(player_list): # ============== вариант эксперемн
         my_win.tableView.setFont(font)
         my_win.tableView.horizontalHeader().setFont(QFont("Times", 12, QFont.Bold)) # делает заголовки жирный и размер 13
         my_win.tableView.horizontalHeader().setStyleSheet("background-color:yellow;") # делает фон заголовков светлоголубой
-        # Установка размеров столбцов
-        # header = table_view.horizontalHeader()
-        # header.setSectionResizeMode(QHeaderView.Stretch)
-        # # Установка размеров строкh
-        # eader = table_view.verticalHeader()
-        # header.setSectionResizeMode(QHeaderView.ResizeToContents)
         my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
-        # my_win.tableView.setSortingEnabled(True)
-        # my_win.tableView.setSectionResizeMode(QHeaderView.ResizeToContents)
         my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
         my_win.tableView.horizontalHeader().setStretchLastSection(True) # растягивает последнюю колонку до конца
         my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
@@ -3467,23 +3439,9 @@ def _fill_table(player_list): # ============== вариант эксперемн
         elif tb == 6:
             my_win.statusbar.showMessage(
                 "Такого спортсмена в рейтинг листе нет нет", 10000)
-    # font = my_win.tableView.font()
-    # font.setPointSize(11)
-    # my_win.tableView.setFont(font)
-    # my_win.tableView.horizontalHeader().setFont(QFont("Times", 12, QFont.Bold)) # делает заголовки жирный и размер 13
-    # my_win.tableView.horizontalHeader().setStyleSheet("background-color:yellow;") # делает фон заголовков светлоголубой
-    # my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
-    # my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
-    # my_win.tableView.horizontalHeader().setStretchLastSection(True) # растягивает последнюю колонку до конца
-    # my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
-    # my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
-   
+    
     my_win.tableView.show()
     my_win.tableView.setModel(model)               
-    # finish = time.time()
-    # res = finish - start
-    # res_msec = res * 1000
-    # print('Время работы в миллисекундах: ', res_msec)
 
 
 def fill_table_R_list():
@@ -3873,6 +3831,10 @@ def add_players_to_team(pl_id, team, coach_team, player_rating):
         created = False
     except Team.DoesNotExist:
         # Создаём новую команду
+        if region == "":
+           team_region = f"{team}/{region}"
+        else:
+           team_region = team 
         team = Team.create(
             team_name=team,
             region=region,
@@ -3888,7 +3850,8 @@ def add_players_to_team(pl_id, team, coach_team, player_rating):
             id_pl4=None,
             r_pl4=0,
             id_pl5=None,
-            r_pl5=0
+            r_pl5=0,
+            team_region=team_region
         )
         print(f"Создана новая команда '{team}'.")
         created = True
@@ -11722,9 +11685,6 @@ def choice_setka_automat(fin, flag, count_exit): # вариант жеребье
             else:
                 real_all_player_in_final = len(choice.select().where(Choice_Team.basic == fin))
                 choice_posev = choice.select().order_by(Choice_Team.rank)
-
-            # real_all_player_in_final = len(choice.select().where(Choice.basic == fin))
-            # choice_posev = choice.select().order_by(Choice.rank)
             # ===
             count_exit = 1
         elif fin == "1-й финал":
@@ -11796,9 +11756,8 @@ def choice_setka_automat(fin, flag, count_exit): # вариант жеребье
                 region = region.strip()
                 player = Player.get(Player.id == pl_id)
                 city = player.city
-                rank = player.rank
-                
-            else:
+                rank = player.rank                
+            else: # команды
                 family = posevs.team_name
                 if fin == "Суперфинал":
                     count_exit = 1
@@ -11820,7 +11779,8 @@ def choice_setka_automat(fin, flag, count_exit): # вариант жеребье
                     mesto_group = ""
                 team_id = posevs.team_choice_id # id игрока
                 region = posevs.team_region
-                region = region.strip()
+                if region is not None:
+                    region = region.strip()
                 teams = Choice_Team.get(Choice_Team.team_choice_id == team_id)
                 rank = teams.rank
             if vid_turnira == "личные":
@@ -11948,20 +11908,23 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             available = [slot for slot in all_slots if slot not in self.free_num]
             return available
             
-        def get_current_available_numbers(self):
+        def get_current_available_numbers(self, posevs_num):
             """Получение доступных номеров для текущей команды"""
+            sev_num = posevs_num[1]
             if self.current_team_index >= len(self.sorted_sportsmen):
                 return []
                 
             # Определяем, на каком этапе посева находимся
             if self.current_team_index == 0:
-                available = [1]
+                available = [sev_num[0][0]]
             elif self.current_team_index == 1:
-                available = [8]
+                available = [sev_num[0][1]]
             elif self.current_team_index == 2 or self.current_team_index == 3:
-                available = [4, 5]
+                available = sev_num[1]
+            elif self.current_team_index == 4 or self.current_team_index == 5 or self.current_team_index == 6 or self.current_team_index == 7:
+                available = sev_num[2]
             else:
-                available = [2, 3, 6, 7]
+                available = sev_num[3]
             
             # Фильтруем уже занятые номера
             available = [num for num in available if num in self.available_slots 
@@ -11969,9 +11932,10 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             
             return available
             
-        def update_current_available_numbers(self):
+        def update_current_available_numbers(self, posevs_num):
             """Обновление доступных номеров и отображения"""
-            self.current_available_numbers = self.get_current_available_numbers()
+            self.current_available_numbers = self.get_current_available_numbers(posevs_num)
+            sev_num = posevs_num[1]
             
             # Обновляем текст подсказки
             if self.current_team_index < len(self.sorted_sportsmen):
@@ -11979,7 +11943,7 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 if self.current_team_index == 0:
                     hint = f"1. Команда {team[1]} должна быть размещена на номер 1"
                 elif self.current_team_index == 1:
-                    hint = f"2. Команда {team[1]} должна быть размещена на номер 8"
+                    hint = f"2. Команда {team[1]} должна быть размещена на номер {sev_num[0][1]}"
                 elif self.current_team_index == 2 or self.current_team_index == 3:
                     hint = f"{self.current_team_index + 1}. Команда {team[1]} может быть размещена на номера: {self.current_available_numbers}"
                 else:
@@ -11997,7 +11961,7 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 
         def init_ui(self):
             self.setWindowTitle("Ручная жеребьевка команд - Выберите ячейку мышью")
-            self.setGeometry(100, 100, 1200, 600)
+            self.setGeometry(100, 100, 1000, 1000)
             self.setModal(True)
             
             # Центральный виджет
@@ -12025,7 +11989,7 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             self.update_grid_table()
             
             # Обновляем доступные номера
-            self.update_current_available_numbers()
+            self.update_current_available_numbers(posevs_num)
             
         def create_left_panel(self):
             """Создание левой панели со списком команд"""
@@ -12269,7 +12233,7 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             self.selected_team_label.setText("Не выбрана")
             
             # Обновление интерфейса
-            self.update_current_available_numbers()
+            self.update_current_available_numbers(posevs_num)
             self.update_team_list()
             self.update_grid_table()
             
@@ -12308,8 +12272,19 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 
                 # Если номер свободен
                 if i in self.free_num:
+                    # проверяет есть ли команда - Х -
+                    teams = Team.get_or_none(Team.team_name == 'X')
+                    if teams:
+                        team_id = teams.id
+                        team_name = teams.team_name 
+                    else:
+                        teams = Team.insert(team_name="X", title_id=title_id()).execute()
+                        team_name = teams.team_name
+                        team_id = teams.id
+                 
                     slot_item.setBackground(QColor(200, 200, 200))
-                    team_item = QTableWidgetItem("🚫 СВОБОДНО (нет команды)")
+                    team_item = QTableWidgetItem(f"✅{team_id} {team_name}")
+                    self.placed_teams[i] = [team_id, team_name]
                     team_item.setBackground(QColor(200, 200, 200))
                     team_item.setFlags(team_item.flags() & ~Qt.ItemIsEditable)
                 # Если номер занят командой
@@ -12437,8 +12412,10 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                     
             result = {}
             for slot_num, team_data in self.placed_teams.items():
-                result[slot_num] = [team_data[0], team_data[1], team_data[2], team_data[3]]
-                
+                if team_data[1] != "X":
+                    result[slot_num] = [team_data[0], team_data[1], team_data[2], team_data[3]]
+                else:
+                    result[slot_num] = [team_data[0], team_data[1]]             
             self.result = result
             self.accept()
     
@@ -14629,8 +14606,9 @@ def choice_tbl_made():
             region = i.region            
             coach_team = i.coach_team
             rank = i.r_sum
+            team_full = i.team_full
             chc = Choice_Team(team_choice=id_team, team_name=team_name, team_region=region, team_coach=coach_team, rank=rank,
-                        title_id=title_id()).save()
+                        title_id=title_id(), team_full=team_full).save()
 
 
 def filter_player_on_system():
@@ -21332,8 +21310,8 @@ def score_in_setka(stage, place_3rd):
                         id_pl_win = player.select().where(Player.fio_city == res.winner).get()
                         short_name_win = id_pl_win.player if id_pl_win.fio is None else id_pl_win.fio
                     else:
-                        id_pl_win = teams.select().where(Team.team_name == res.winner).get()
-
+                        id_pl_win = teams.select().where(Team.team_region == res.winner).get()
+                        short_name_win = id_pl_win.team_name if id_pl_win.team_region is None else id_pl_win.team_region
                     # временный вариант со старой базой
                   
                 if res.loser == "X":
@@ -21344,10 +21322,14 @@ def score_in_setka(stage, place_3rd):
                         short_name_los = id_pl_los.para_shot
                         # short_name_los = res.loser
                     else:
-                        id_pl_los = player.select().where(Player.fio_city == res.loser).get()
-                        # short_name_los = id_pl_los.fio
+                        if vid_turnira == "личные":
+                            id_pl_los = player.select().where(Player.fio_city == res.loser).get()
+                            short_name_los = id_pl_los.player if id_pl_los.fio is None else id_pl_los.fio
+                        else:
+                            id_pl_los = teams.select().where(Team.team_region == res.loser).get()
+                            short_name_los = id_pl_los.team_name if id_pl_los.team_region is None else id_pl_los.team_region
                         # временный вариант со старой базой
-                        short_name_los = id_pl_los.player if id_pl_los.fio is None else id_pl_los.fio
+                       
             else:
                 short_name_win = "X"
                 short_name_los = "X"
@@ -22279,11 +22261,6 @@ def player_choice_in_setka(fin):
     with db:  # записывает в db, что жеребьевка произведена
         systems.choice_flag = True
         systems.save()
-    # if flag == 3: # если ручная жеребьевка, то закрывает сетку 
-    # #    .my_win.tableView_net.hide()
-    #     my_win.resize(1270, 825)
-    #     # my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
-    #     my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
     return posev_data
 
 
@@ -25188,14 +25165,14 @@ def schedule_reset():
     # with db.atomic():
     #     migrator = MySQLMigrator(db)
         # migrate(migrator.drop_column('game_lists', 'team_id')) # удаление столбца
-        # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-        # migrate(migrator.rename_column('results', 'schedule_time', 'fio_city')) # Переименование столбца (таблица, старое название, новое название столбца)
+        # migrate(migrator.alter_column_type('choice_teams', 'team_region', CharField(null=True)))
+        # migrate(migrator.rename_column('teams', 'team_region', 'team_full')) # Переименование столбца (таблица, старое название, новое название столбца)
 
         # Добавление простого столбца
         # new_column = CharField(max_length=100, default='', null=True)
-        # migrate(migrator.add_column('teams', 'team_region', new_column)) # null=True допускает пустое значение
-       # migrate(migrator.set_null('teams', 'id_pl1', True))
-    # db.close()
+        # migrate(migrator.add_column('choice_teams', 'team_full', new_column)) # null=True допускает пустое значение
+        # migrate(migrator.set_null('teams', 'id_pl1', True))
+#     db.close()
 # my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.btn_select_range.clicked.connect(select_rows_with_options)

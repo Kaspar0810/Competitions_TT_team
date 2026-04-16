@@ -1,0 +1,16 @@
+2026-04-16 09:42:52,001 - ERROR - Необработанное исключение: UnboundLocalError: cannot access local variable 'short_name_win' where it is not associated with a value
+2026-04-16 09:42:52,005 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 6314, in view
+    view_file = made_pdf_table_for_view(sender)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 8822, in made_pdf_table_for_view
+    setka_8_full_made(fin)
+    ~~~~~~~~~~~~~~~~~^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 17843, in setka_8_full_made
+    tds = write_in_setka(data, fin, first_mesto, table)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 20075, in write_in_setka
+    dict_setka = score_in_setka(stage, place_3rd) # список (номер, игрок, счет в партии, номер куда сносится проигравший, его фамилия)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 21360, in score_in_setka
+    tmp_match.append(short_name_win)
+                     ^^^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'short_name_win' where it is not associated with a value
