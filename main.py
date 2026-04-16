@@ -6461,9 +6461,14 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
     for r in tds:
         if r != "\nX":
             znak = r.find("\n")
-            family = r[:znak]
-            id_pl = all_list[2][family]
-            player_id = int(id_pl)
+            if znak > 0:
+                family = r[:znak]
+                id_pl = all_list[2][family]
+                player_id = int(id_pl)
+            else:
+                family = r
+                id_pl = all_list[2][family]
+                player_id = int(id_pl)
         else:
             # === вариант с добавлением игрока вместо фамилии -Х- ====
             if st == "Парный разряд":
@@ -11843,7 +11848,10 @@ def choice_setka_automat(fin, flag, count_exit): # вариант жеребье
                     team_id = Team.get(Team.id == id)
                     team_name = team_id.team_name
                     region = team_id.region
-                    team_name_region = f"{team_name}/{region}"
+                    if region is not None:
+                        team_name_region = f"{team_name}/{region}"
+                    else:
+                        team_name_region = team_name
                     posev_data[i] = team_name_region
                     with db:
                         choice_final = choice_posev.select().where(Choice_Team.team_choice_id == team_id).get()
@@ -12283,8 +12291,8 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                         team_id = teams.id
                  
                     slot_item.setBackground(QColor(200, 200, 200))
-                    team_item = QTableWidgetItem(f"✅{team_id} {team_name}")
-                    self.placed_teams[i] = [team_id, team_name]
+                    team_item = QTableWidgetItem(f"✅{team_name}")
+                    self.placed_teams[i] = [team_name]
                     team_item.setBackground(QColor(200, 200, 200))
                     team_item.setFlags(team_item.flags() & ~Qt.ItemIsEditable)
                 # Если номер занят командой
@@ -12412,10 +12420,10 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                     
             result = {}
             for slot_num, team_data in self.placed_teams.items():
-                if team_data[1] != "X":
+                if team_data[0] != "X":
                     result[slot_num] = [team_data[0], team_data[1], team_data[2], team_data[3]]
                 else:
-                    result[slot_num] = [team_data[0], team_data[1]]             
+                    result[slot_num] = [team_data[0]]             
             self.result = result
             self.accept()
     
