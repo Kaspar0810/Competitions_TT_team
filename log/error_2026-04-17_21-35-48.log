@@ -1,0 +1,13 @@
+2026-04-17 21:37:02,101 - ERROR - Необработанное исключение: IndexError: list index out of range
+2026-04-17 21:37:02,102 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 2688, in r_list_load_tableView
+    fill_table_R_list()
+    ~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 3302, in fill_table_R_list
+    fill_table(player_list)
+    ~~~~~~~~~~^^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 3187, in fill_table
+    item_7 = str(list(player_selected[row].values())[num_columns[6]]) # разряд
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+IndexError: list index out of range
