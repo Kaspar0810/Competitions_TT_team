@@ -1,0 +1,16 @@
+2026-04-17 14:28:50,081 - ERROR - Необработанное исключение: AttributeError: type object 'Team' has no attribute 'team_region'
+2026-04-17 14:28:50,082 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 6277, in view
+    view_file = made_pdf_table_for_view(sender)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 8790, in made_pdf_table_for_view
+    setka_8_full_made(fin)
+    ~~~~~~~~~~~~~~~~~^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 17829, in setka_8_full_made
+    tds = write_in_setka(data, fin, first_mesto, table)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 20061, in write_in_setka
+    dict_setka = score_in_setka(stage, place_3rd) # список (номер, игрок, счет в партии, номер куда сносится проигравший, его фамилия)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 21319, in score_in_setka
+    id_pl_win = teams.select().where(Team.team_region == res.winner).get()
+                                     ^^^^^^^^^^^^^^^^
+AttributeError: type object 'Team' has no attribute 'team_region'

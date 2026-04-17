@@ -6418,7 +6418,7 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
     stage = "Парный разряд" if fin in para_list else fin
     id_system = system_id(stage)
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
-    # определяет какие соревнования личгые или командные
+    # определяет какие соревнования личные или командные
     titles = Title.select().where(Title.id == title_id()).get()
     vid_turnira = titles.vid_turnira
 
@@ -11841,7 +11841,7 @@ def choice_setka_automat(fin, flag, count_exit): # вариант жеребье
                             choice_final.posev_final = i
                         choice_final.save()
             else: # команды
-                if tmp_list[0] == "X":
+                if tmp_list[1] == "X":
                     posev_data[i] = "X"
                 else:
                     id = tmp_list[0]
@@ -12281,18 +12281,18 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 # Если номер свободен
                 if i in self.free_num:
                     # проверяет есть ли команда - Х -
+                    # team_data = self.placed_teams[i]
                     teams = Team.get_or_none(Team.team_name == 'X')
                     if teams:
                         team_id = teams.id
                         team_name = teams.team_name 
                     else:
-                        teams = Team.insert(team_name="X", title_id=title_id()).execute()
-                        team_name = teams.team_name
-                        team_id = teams.id
-                 
-                    slot_item.setBackground(QColor(200, 200, 200))
-                    team_item = QTableWidgetItem(f"✅{team_name}")
-                    self.placed_teams[i] = [team_name]
+                        team_free = Team.insert(team_name="X", title_id=title_id()).execute()
+                        team_name = "X"
+                        team_id = team_free
+                    self.placed_teams[i] = [team_id, team_name]
+                    slot_item.setBackground(QColor(200, 200, 200))                                        
+                    team_item = QTableWidgetItem(f"✅ {team_name}")
                     team_item.setBackground(QColor(200, 200, 200))
                     team_item.setFlags(team_item.flags() & ~Qt.ItemIsEditable)
                 # Если номер занят командой
@@ -12420,10 +12420,10 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                     
             result = {}
             for slot_num, team_data in self.placed_teams.items():
-                if team_data[0] != "X":
+                if team_data[1] != "X":
                     result[slot_num] = [team_data[0], team_data[1], team_data[2], team_data[3]]
                 else:
-                    result[slot_num] = [team_data[0]]             
+                    result[slot_num] = [team_data[0], team_data[1]]             
             self.result = result
             self.accept()
     
@@ -20769,14 +20769,12 @@ def setka_data(fin, posev_data):
             family = f"{f}\n{c}" # фио и на другой строке город
             tds.append(family)
             fam_name_city.append(family_city)
-        else:
+        else: # командные соревнования
             znak = family.find("/")
             if znak > 0:
                 f = family[:znak]
                 c = family[znak + 1:]
-                family = f"{f}\n{c}" # фио и на другой строке город
-            #     tds.append(family)
-            # else:
+                family = f"{f}\n{c}" # команда и на другой строке город, область
             tds.append(family)
             fam_name_city.append(family_city)
     all_list = [tds, id_full_name, id_name, fam_name_city]
@@ -20814,13 +20812,13 @@ def full_team_id(family):
     full_name = {}
     short_name = {}   
     teams = Team.select().where(Team.title_id == title_id())
+    teams_id = teams.select().where(Team.team_name == family).get()
+    team_id = teams_id.id # ид игрока
     # если команда и регион 
     znak = family.find("/")
     if znak > 0:
         family = family[:znak]
     if family != "X":
-        teams_id = teams.select().where(Team.team_name == family).get()
-        team_id = teams_id.id # ид игрока
         team_name = teams_id.team_name # команда/ город
         team_region = teams_id.region # ФИО без города
         team_name_region = f"{team_name}/{team_region}"
@@ -20830,9 +20828,9 @@ def full_team_id(family):
         short_name["id"] = team_id
     else:
         full_name["name"] = "X"
-        full_name["id"] = 0
+        full_name["id"] = team_id
         short_name["name"] = "X"
-        short_name["id"] = 0
+        short_name["id"] = team_id
     name_list = []
     name_list.append(full_name)
     name_list.append(short_name)

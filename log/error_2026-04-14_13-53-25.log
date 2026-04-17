@@ -1,9 +1,0 @@
-2026-04-14 13:53:27,072 - ERROR - Необработанное исключение: AttributeError: 'StartWindow' object has no attribute 'comboBox_arhive_year'
-2026-04-14 13:53:27,077 - ERROR - Трассировка стека:
-Traceback (most recent call last):
-  File "c:\Users\Alex\Competitions_TT_team\main.py", line 2034, in <module>
-    fir_window = StartWindow()  # Создаём объект класса ExampleApp
-  File "c:\Users\Alex\Competitions_TT_team\main.py", line 1409, in __init__
-    self.comboBox_arhive_year.setEnabled(False)
-    ^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'StartWindow' object has no attribute 'comboBox_arhive_year'

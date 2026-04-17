@@ -1,7 +1,0 @@
-2026-04-15 13:45:43,454 - ERROR - Необработанное исключение: AttributeError: 'MainWindow' object has no attribute 'comboBox_filter_schedule_tour'
-2026-04-15 13:45:43,460 - ERROR - Трассировка стека:
-Traceback (most recent call last):
-  File "c:\Users\Alex\Competitions_TT_team\main.py", line 24528, in load_combo_schedule_tours
-    my_win.comboBox_filter_schedule_tour.clear()
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'MainWindow' object has no attribute 'comboBox_filter_schedule_tour'
