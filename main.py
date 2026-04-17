@@ -20178,12 +20178,7 @@ def _write_in_setka(data, stage, first_mesto, table):
         player = Players_double.select().where(Players_double.title_id == title_id())
     else:  
         player = Player.select().where(Player.title_id == title_id())  
-    # ====
-    # if sender == my_win.action:
-    #     system_flag = False
-    # else:
-    #     system_flag = True
-    #    
+
     system_flag = True
     if system_flag is True: 
         id_system = system_id(stage)
@@ -20653,12 +20648,7 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
         posev = posev_data[((i + 1) // 2) - 1]
         fam_id = posev["фамилия"]
         znak = fam_id.find("/")
-        #==== вариант вместо фамилия id игрока
-        # if znak != -1:
-        #     tbl_tmp[i - 1][1] = fam_id[znak + 1:]
-        # else:
-        #     tbl_tmp[i - 1][1] = posev["фамилия"]
-        #=====================================
+
         fam = fam_id[:znak]
         id_fam = fam_id[znak + 1:]
         if znak != -1:
@@ -20683,7 +20673,6 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
     tdt_tmp.append(td_id)
 
     return tdt_tmp
-
 
 def setka_player_after_choice(stage):
     """список игроков сетки после жеребьевки"""
@@ -20723,7 +20712,6 @@ def setka_player_after_choice(stage):
         posev_data.append(tmp)
         p_data.clear()
     return posev_data
-
 
 def setka_data(fin, posev_data):
     """данные сетки"""
@@ -20780,7 +20768,6 @@ def setka_data(fin, posev_data):
     all_list = [tds, id_full_name, id_name, fam_name_city]
 
     return all_list
-
 
 def full_player_id(family):
     """получает словарь -фамилия игрока и его город и соответствующий ему id в таблице Players"""
@@ -21013,7 +21000,6 @@ def score_in_table(td, num_gr):
         rank_in_group(total_score, td, num_gr, stage)  # определяет места в группе
     return td_color
 
-
 def _score_in_table(td, num_gr):
     """заносит счет и места в таблицу группы или таблицу по кругу pdf
     -td- список строки таблицы, куда пишут счет"""
@@ -21057,7 +21043,6 @@ def _score_in_table(td, num_gr):
             group_in_sf = ta.total_group # общее кол-во групп в ПФ
             mp = max_pl // group_in_sf
             # =======
-            # mp = len(gamelist.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr)))
             results = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
             ch = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))  # фильтрует по группе
         elif tab_etap == 2 or my_win.choice_fin_Action: # финалы
@@ -21073,7 +21058,6 @@ def _score_in_table(td, num_gr):
                 if etap_exit == "Предварительный":
                     ch = choice.select().where(Choice.final == num_gr)
                 else:
-                    # ch = choice.select().where((Choice.final == num_gr) & (Choice.semi_final == etap_exit))
                     ch = choice.select().where(Choice.final == num_gr)
             mp = len(gamelist.select().where(Game_list.system_id == id_system))
     
@@ -21162,7 +21146,6 @@ def _score_in_table(td, num_gr):
     if a == count_game:
         rank_in_group(total_score, td, num_gr, stage)  # определяет места в группе
     return td_color
-
 
 def numer_game(num_game, vid_setki):
     """определяет куда записывать победителя и проигравшего по сноске в сетке, номера встреч"""
@@ -21273,7 +21256,6 @@ def numer_game(num_game, vid_setki):
         snoska.append(game_loser) # список: номер встречи победителя, номер - проигравшего и куда снести проигравшего
     return snoska
 
-
 def score_in_setka(stage, place_3rd):
     """ выставляет счет победителя и сносит на свои места в сетке"""
     dict_setka = {}
@@ -21316,8 +21298,8 @@ def score_in_setka(stage, place_3rd):
                         id_pl_win = player.select().where(Player.fio_city == res.winner).get()
                         short_name_win = id_pl_win.player if id_pl_win.fio is None else id_pl_win.fio
                     else:
-                        id_pl_win = teams.select().where(Team.team_region == res.winner).get()
-                        short_name_win = id_pl_win.team_name if id_pl_win.team_region is None else id_pl_win.team_region
+                        id_pl_win = teams.select().where(Team.team_full == res.winner).get()
+                        short_name_win = id_pl_win.team_name if id_pl_win.team_full is None else id_pl_win.team_full
                     # временный вариант со старой базой
                   
                 if res.loser == "X":
@@ -21332,8 +21314,8 @@ def score_in_setka(stage, place_3rd):
                             id_pl_los = player.select().where(Player.fio_city == res.loser).get()
                             short_name_los = id_pl_los.player if id_pl_los.fio is None else id_pl_los.fio
                         else:
-                            id_pl_los = teams.select().where(Team.team_region == res.loser).get()
-                            short_name_los = id_pl_los.team_name if id_pl_los.team_region is None else id_pl_los.team_region
+                            id_pl_los = teams.select().where(Team.team_full == res.loser).get()
+                            short_name_los = id_pl_los.team_name if id_pl_los.team_full is None else id_pl_los.team_full
                         # временный вариант со старой базой
                        
             else:
@@ -21358,11 +21340,9 @@ def score_in_setka(stage, place_3rd):
 
     return dict_setka
 
-
 def result_rank_group_in_choice(num_gr, player_rank_group, stage):
     """записывает места из группы в таблицу -Choice-, а если одна таблица в финале по кругу то в список
     player_rank_group список списков 1-е число номер игрок в группе, 2-е его место"""
-    # tab = my_win.tabWidget.currentIndex()
     tab_etap = my_win.tabWidget_stage.currentIndex()
 
     chc = Choice.select().where(Choice.title_id == title_id())
@@ -21404,7 +21384,6 @@ def result_rank_group_in_choice(num_gr, player_rank_group, stage):
                 player.mesto = player_rank_group[n][1]
                 player.save()
                 n += 1
-
 
 def rank_in_group(total_score, td, num_gr, stage):
     """выставляет места в группах соответственно очкам 
