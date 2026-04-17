@@ -1,0 +1,32 @@
+2026-04-17 15:48:56,851 - ERROR - Необработанное исключение: TeamDoesNotExist: <Model: Team> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`team_name`, `t1`.`region`, `t1`.`coach_team`, `t1`.`r_sum`, `t1`.`title_id`, `t1`.`id_pl1`, `t1`.`r_pl1`, `t1`.`id_pl2`, `t1`.`r_pl2`, `t1`.`id_pl3`, `t1`.`r_pl3`, `t1`.`id_pl4`, `t1`.`r_pl4`, `t1`.`id_pl5`, `t1`.`r_pl5`, `t1`.`team_full` FROM `teams` AS `t1` WHERE (`t1`.`id` = %s) LIMIT %s OFFSET %s
+Params: ['Самарская область', 1, 0]
+2026-04-17 15:48:56,913 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 7297, in get
+    return clone.execute(database)[0]
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 4583, in __getitem__
+    return self.row_cache[item]
+           ~~~~~~~~~~~~~~^^^^^^
+IndexError: list index out of range
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 992, in choice
+    posev_data = player_choice_in_setka(fin)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 22830, in player_choice_in_setka
+    posev = choice_setka_automat(fin, flag, count_exit)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11848, in choice_setka_automat
+    team_id = Team.get(Team.id == id)
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 6840, in get
+    return sq.get()
+           ~~~~~~^^
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 7300, in get
+    raise self.model.DoesNotExist('%s instance matching query does '
+                                  'not exist:\nSQL: %s\nParams: %s' %
+                                  (clone.model, sql, params))
+models.TeamDoesNotExist: <Model: Team> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`team_name`, `t1`.`region`, `t1`.`coach_team`, `t1`.`r_sum`, `t1`.`title_id`, `t1`.`id_pl1`, `t1`.`r_pl1`, `t1`.`id_pl2`, `t1`.`r_pl2`, `t1`.`id_pl3`, `t1`.`r_pl3`, `t1`.`id_pl4`, `t1`.`r_pl4`, `t1`.`id_pl5`, `t1`.`r_pl5`, `t1`.`team_full` FROM `teams` AS `t1` WHERE (`t1`.`id` = %s) LIMIT %s OFFSET %s
+Params: ['Самарская область', 1, 0]

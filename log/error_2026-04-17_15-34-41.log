@@ -1,0 +1,20 @@
+2026-04-17 15:34:55,341 - ERROR - Необработанное исключение: TypeError: choice_net_manual.<locals>.ManualChoiceDialog.update_current_available_numbers() missing 1 required positional argument: 'posevs_num'
+2026-04-17 15:34:55,345 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 992, in choice
+    posev_data = player_choice_in_setka(fin)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 22829, in player_choice_in_setka
+    posev = choice_setka_automat(fin, flag, count_exit)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11822, in choice_setka_automat
+    num_id_player = my_win.start_draw(full_posev, count_exit, free_num, posevs_num, nums)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 314, in start_draw
+    result = choice_net_manual(full_posev, count_exit, free_num, posevs_num, nums)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 13021, in choice_net_manual
+    dialog = ManualChoiceDialog()
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12480, in __init__
+    self.init_ui()
+    ~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12591, in init_ui
+    self.update_current_available_numbers()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+TypeError: choice_net_manual.<locals>.ManualChoiceDialog.update_current_available_numbers() missing 1 required positional argument: 'posevs_num'
