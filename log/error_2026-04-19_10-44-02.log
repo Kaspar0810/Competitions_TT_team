@@ -1,0 +1,7 @@
+2026-04-19 10:44:48,943 - ERROR - Необработанное исключение: AttributeError: 'QListWidget' object has no attribute 'setRowHeight'
+2026-04-19 10:44:48,956 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11925, in adjust_sizes
+    self.team_list.setRowHeight(i, self.row_height)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'QListWidget' object has no attribute 'setRowHeight'

@@ -1,0 +1,22 @@
+2026-04-19 14:21:50,424 - ERROR - Необработанное исключение: RuntimeError: 'cryptography' package is required for sha256_password or caching_sha2_password auth methods
+2026-04-19 14:21:50,431 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 2095, in <module>
+    fir_window = StartWindow()  # Создаём объект класса ExampleApp
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 1527, in __init__
+    conn = pymysql.connect(host='localhost', user='root', password='db_pass')
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 365, in __init__
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 681, in connect
+    self._request_authentication()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 980, in _request_authentication
+    auth_packet = _auth.caching_sha2_password_auth(self, auth_packet)
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\_auth.py", line 271, in caching_sha2_password_auth
+    data = sha2_rsa_encrypt(conn.password, conn.salt, conn.server_public_key)
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\pymysql\_auth.py", line 144, in sha2_rsa_encrypt
+    raise RuntimeError(
+    ...<2 lines>...
+    )
+RuntimeError: 'cryptography' package is required for sha256_password or caching_sha2_password auth methods

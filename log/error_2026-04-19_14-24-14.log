@@ -1,0 +1,71 @@
+2026-04-19 14:24:33,879 - ERROR - Необработанное исключение: AttributeError: 'QListWidget' object has no attribute 'setRowHeight'
+2026-04-19 14:24:33,880 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12615, in adjust_sizes
+    self.team_list.setRowHeight(i, self.row_height)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'QListWidget' object has no attribute 'setRowHeight'
+2026-04-19 14:24:49,891 - ERROR - Необработанное исключение: TypeError: choice_net_manual.<locals>.ManualChoiceDialog.update_current_available_numbers() missing 1 required positional argument: 'posevs_num'
+2026-04-19 14:24:49,893 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12914, in on_cell_clicked
+    self.update_current_available_numbers()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+TypeError: choice_net_manual.<locals>.ManualChoiceDialog.update_current_available_numbers() missing 1 required positional argument: 'posevs_num'
+2026-04-19 14:25:07,101 - ERROR - Необработанное исключение: TypeError: choice_net_manual.<locals>.ManualChoiceDialog.update_current_available_numbers() missing 1 required positional argument: 'posevs_num'
+2026-04-19 14:25:07,101 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 13076, in reset_draw
+    self.update_current_available_numbers()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+TypeError: choice_net_manual.<locals>.ManualChoiceDialog.update_current_available_numbers() missing 1 required positional argument: 'posevs_num'
+2026-04-19 14:25:17,018 - ERROR - Необработанное исключение: TypeError: choice_net_manual.<locals>.ManualChoiceDialog.update_current_available_numbers() missing 1 required positional argument: 'posevs_num'
+2026-04-19 14:25:17,018 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12914, in on_cell_clicked
+    self.update_current_available_numbers()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+TypeError: choice_net_manual.<locals>.ManualChoiceDialog.update_current_available_numbers() missing 1 required positional argument: 'posevs_num'
+2026-04-19 14:25:28,843 - ERROR - Необработанное исключение: TypeError: choice_net_manual.<locals>.ManualChoiceDialog.update_current_available_numbers() missing 1 required positional argument: 'posevs_num'
+2026-04-19 14:25:28,844 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 13076, in reset_draw
+    self.update_current_available_numbers()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+TypeError: choice_net_manual.<locals>.ManualChoiceDialog.update_current_available_numbers() missing 1 required positional argument: 'posevs_num'
+2026-04-19 14:25:32,610 - ERROR - Необработанное исключение: AttributeError: 'NoneType' object has no attribute 'keys'
+2026-04-19 14:25:32,636 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 994, in choice
+    posev_data = player_choice_in_setka(fin)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 23498, in player_choice_in_setka
+    posev = choice_setka_automat(fin, flag, count_exit)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11671, in choice_setka_automat
+    for i in num_id_player.keys():
+             ^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'keys'
+2026-04-19 14:25:42,910 - ERROR - Необработанное исключение: AttributeError: 'QListWidget' object has no attribute 'setRowHeight'
+2026-04-19 14:25:42,912 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12615, in adjust_sizes
+    self.team_list.setRowHeight(i, self.row_height)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'QListWidget' object has no attribute 'setRowHeight'
+2026-04-19 14:25:47,625 - ERROR - Необработанное исключение: TypeError: choice_net_manual.<locals>.ManualChoiceDialog.update_current_available_numbers() missing 1 required positional argument: 'posevs_num'
+2026-04-19 14:25:47,625 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12914, in on_cell_clicked
+    self.update_current_available_numbers()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+TypeError: choice_net_manual.<locals>.ManualChoiceDialog.update_current_available_numbers() missing 1 required positional argument: 'posevs_num'
+2026-04-19 14:27:00,961 - ERROR - Необработанное исключение: AttributeError: 'NoneType' object has no attribute 'keys'
+2026-04-19 14:27:01,040 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 994, in choice
+    posev_data = player_choice_in_setka(fin)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 23498, in player_choice_in_setka
+    posev = choice_setka_automat(fin, flag, count_exit)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11671, in choice_setka_automat
+    for i in num_id_player.keys():
+             ^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'keys'
