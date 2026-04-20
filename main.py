@@ -11712,19 +11712,9 @@ def choice_setka_automat(fin, flag, count_exit): # вариант жеребье
         n += 1 # добавил в связи со сменой цикла
     return posev_data
 # ========= функция ручной жеребьвки сетки ====
-# manual_choice_final.py
-import sys
-from PyQt5.QtWidgets import (QApplication, QDialog, QWidget, QVBoxLayout, 
-                             QHBoxLayout, QListWidget, QListWidgetItem,
-                             QPushButton, QTableWidget, QTableWidgetItem, QLabel,
-                             QMessageBox, QGroupBox, QHeaderView, QSplitter, QScrollArea,
-                             QFrame, QSizePolicy)
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QFont, QColor, QBrush
-
-def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
+def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
     """
-    Функция ручной жеребьевки команд с адаптивным размером под сетку 8, 16, 32
+    Функция ручной жеребьевки команд с автоматическим выбором команды
     """
     
     class ManualChoiceDialog(QDialog):
@@ -11753,9 +11743,6 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
             # Доступные номера для выбора на текущем этапе
             self.current_available_numbers = []
             
-            # Выбранная команда
-            self.selected_team = None
-            
             # Результат
             self.result = None
             
@@ -11764,10 +11751,12 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
             
             self.init_ui()
             
+            # Автоматически выбираем первую команду
+            self.select_current_team()
+            
         def get_grid_size(self):
-            """Определение размера сетки на основе posevs_num"""
             max_num = 0
-            for group in self.posevs_num:
+            for group in self.posevs_num[1]:
                 max_num = max(max_num, max(group))
             return max_num
             
@@ -11775,28 +11764,33 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
             """Расчет размеров в зависимости от типа сетки (8, 16, 32)"""
             # Базовая высота строки
             if self.grid_size == 32:
-                self.row_height = 28  # Уменьшаем высоту для 32 команд
-                self.font_size = 8    # Уменьшаем шрифт
-                self.window_height = 800  # Фиксированная высота со скроллом
-                self.use_scroll = True
+                self.row_height = 18
+                self.font_size = 10
+                self.window_height = self.grid_size * self.row_height + 150
+                self.table_max_height = self.grid_size * self.row_height + 100
+                # self.window_height = 800
+                # self.table_max_height = 700
+                self.use_scroll = False
             elif self.grid_size == 16:
                 self.row_height = 35
                 self.font_size = 10
                 # 16 * 35 = 560px, помещается без скролла
-                self.window_height = self.grid_size * self.row_height + 200
+                self.window_height = self.grid_size * self.row_height + 250
+                self.table_max_height = self.grid_size * self.row_height + 50
                 self.use_scroll = False
             else:  # 8 команд
                 self.row_height = 40
                 self.font_size = 10
                 # 8 * 40 = 320px, помещается без скролла
-                self.window_height = self.grid_size * self.row_height + 200
+                self.window_height = self.grid_size * self.row_height + 250
+                self.table_max_height = self.grid_size * self.row_height + 50
                 self.use_scroll = False
                 
             # Ширина окна
-            self.window_width = 1300
+            self.window_width = 1000
             
-            # Высота списка команд (такая же как у таблицы)
-            self.list_height = self.grid_size * self.row_height + 50
+            # Высота списка команд
+            self.list_height = min(self.teams_count * self.row_height + 150, 500)
             
         def get_available_slots(self):
             """Получение списка доступных слотов в сетке"""
@@ -11804,42 +11798,60 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
             available = [slot for slot in all_slots if slot not in self.free_num]
             return available
             
-        def get_current_available_numbers(self):
+        def get_current_available_numbers(self, posevs_num):
             """Получение доступных номеров для текущей команды"""
+            sev_num = posevs_num[1]
             if self.current_team_index >= len(self.sorted_sportsmen):
                 return []
                 
-            # Определяем доступные номера в зависимости от этапа
+            # Определяем, на каком этапе посева находимся
             if self.current_team_index == 0:
-                available = [1]
+                available = [sev_num[0][0]]
             elif self.current_team_index == 1:
-                available = [8]
+                available = [sev_num[0][1]]
             elif self.current_team_index == 2 or self.current_team_index == 3:
-                available = [4, 5]
+                available = sev_num[1]
+            elif self.current_team_index == 4 or self.current_team_index == 5 or self.current_team_index == 6 or self.current_team_index == 7:
+                available = sev_num[2]
             else:
-                available = [2, 3, 6, 7]
+                available = sev_num[3]
             
-            # Фильтруем занятые номера
+            # Фильтруем уже занятые номера
             available = [num for num in available if num in self.available_slots 
                         and num not in self.placed_teams]
             
             return available
             
+        def select_current_team(self):
+            """Автоматический выбор текущей команды"""
+            if self.current_team_index < len(self.sorted_sportsmen):
+                current_team = self.sorted_sportsmen[self.current_team_index]
+                # Подсвечиваем текущую команду в списке
+                for i in range(self.team_list.count()):
+                    item = self.team_list.item(i)
+                    team = item.data(Qt.UserRole)
+                    if team and team[0] == current_team[0]:
+                        self.team_list.setCurrentItem(item)
+                        self.team_list.scrollToItem(item)
+                        break
+                
+                self.status_label.setText(f"🎯 Очередь: {current_team[1]} (Рейтинг: {current_team[3]})")
+                
         def update_current_available_numbers(self):
             """Обновление доступных номеров и отображения"""
-            self.current_available_numbers = self.get_current_available_numbers()
+            self.current_available_numbers = self.get_current_available_numbers(posevs_num)
             
             # Обновляем текст подсказки
             if self.current_team_index < len(self.sorted_sportsmen):
                 team = self.sorted_sportsmen[self.current_team_index]
                 if self.current_team_index == 0:
-                    hint = f"1. Команда {team[1]} должна быть размещена на номер 1"
+                    hint = f"1. Команда {team[1]} → номер 1"
                 elif self.current_team_index == 1:
-                    hint = f"2. Команда {team[1]} должна быть размещена на номер 8"
+                    hint = f"2. Команда {team[1]} → номер 8"
                 elif self.current_team_index == 2 or self.current_team_index == 3:
-                    hint = f"{self.current_team_index + 1}. Команда {team[1]} может быть размещена на номера: {self.current_available_numbers}"
+                    hint = f"{self.current_team_index + 1}. Команда {team[1]} → номера: {self.current_available_numbers}"
                 else:
-                    hint = f"{self.current_team_index + 1}. Команда {team[1]} может быть размещена на номера: {self.current_available_numbers}"
+                    hint = f"{self.current_team_index + 1}. Команда {team[1]} → номера: {self.current_available_numbers}"
                 
                 if self.current_available_numbers:
                     self.current_seed_label.setText(hint)
@@ -11862,39 +11874,41 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
             main_layout.setContentsMargins(5, 5, 5, 5)
             main_layout.setSpacing(10)
             
-            # ЛЕВАЯ ПАНЕЛЬ (содержит список команд и управление)
+            # ЛЕВАЯ ПАНЕЛЬ (список команд и управление)
             left_panel = self.create_left_panel()
-            main_layout.addWidget(left_panel, 35)  # 35% ширины
+            main_layout.addWidget(left_panel, 35)
             
             # ПРАВАЯ ПАНЕЛЬ (только таблица сетки)
             right_panel = self.create_right_panel()
-            main_layout.addWidget(right_panel, 65)  # 65% ширины
+            main_layout.addWidget(right_panel, 65)
             
             self.setLayout(main_layout)
             
             # Заполняем данные
-            self.update_team_list()
+            self.update_team_list(posevs_num)
             self.update_grid_table()
             self.update_current_available_numbers()
             
         def create_left_panel(self):
-            """Создание левой панели со списком команд и управлением"""
+            """Создание левой панели"""
             panel = QWidget()
             layout = QVBoxLayout(panel)
             layout.setContentsMargins(0, 0, 5, 0)
             layout.setSpacing(10)
             
             # Группа для списка команд
-            team_group = QGroupBox(f"📋 СПИСОК КОМАНД (всего: {self.teams_count})")
+            team_group = QGroupBox(f"📋 СПИСОК КОМАНД/ УЧАСТНИКОВ (всего: {self.teams_count})")
             team_layout = QVBoxLayout(team_group)
             
             # Инструкция
-            instruction = QLabel("👉 Кликните на команду для выбора")
-            instruction.setStyleSheet("color: #0066cc; font-weight: bold; padding: 5px; background-color: #e7f3ff; border-radius: 3px;")
+            instruction = QLabel("✅ Команда/ Игрок выбирается автоматически\n👇 Кликните на ячейку в таблице для размещения")
+            instruction.setStyleSheet("color: #0066cc; font-weight: bold; padding: 8px; background-color: #e7f3ff; border-radius: 5px;")
+            instruction.setAlignment(Qt.AlignCenter)
             team_layout.addWidget(instruction)
             
-            # Список команд с прокруткой (если нужно)
+            # Список команд
             if self.use_scroll and self.grid_size == 32:
+            # if self.grid_size == 32:
                 scroll = QScrollArea()
                 scroll.setWidgetResizable(True)
                 scroll.setFrameShape(QFrame.NoFrame)
@@ -11905,55 +11919,38 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
                 self.team_list = QListWidget()
                 team_layout.addWidget(self.team_list)
             
-            # Настройка списка
             self.team_list.setFont(QFont("Arial", self.font_size))
-            self.team_list.itemClicked.connect(self.on_team_selected)
-            self.team_list.setMinimumHeight(min(self.list_height, 600))
+            self.team_list.setMinimumHeight(min(self.list_height, 500))
             
+            team_layout.addWidget(self.team_list)
             layout.addWidget(team_group)
             
             # Группа с инструкцией по размещению
-            info_group = QGroupBox("📌 ИНСТРУКЦИЯ ПО РАЗМЕЩЕНИЮ")
+            info_group = QGroupBox("📌 ТЕКУЩАЯ КОМАНДА/ ИГРОК")
             info_layout = QVBoxLayout(info_group)
             
             self.current_seed_label = QLabel("Загрузка...")
             self.current_seed_label.setFont(QFont("Arial", 11))
             self.current_seed_label.setWordWrap(True)
-            self.current_seed_label.setStyleSheet("padding: 5px;")
+            self.current_seed_label.setStyleSheet("padding: 8px; background-color: #f8f9fa; border-radius: 5px;")
             info_layout.addWidget(self.current_seed_label)
-            
-            hint = QLabel("💡 Как разместить команду:\n1. Выберите команду из списка\n2. Кликните на ячейку в таблице")
-            hint.setStyleSheet("color: #6c757d; font-style: italic; padding: 5px; background-color: #f8f9fa; border-radius: 3px;")
-            hint.setWordWrap(True)
-            info_layout.addWidget(hint)
             
             layout.addWidget(info_group)
             
-            # Группа с управлением жеребьевкой
+            # Группа с управлением
             control_group = QGroupBox("🎮 УПРАВЛЕНИЕ")
             control_layout = QVBoxLayout(control_group)
             
-            # Информация о выбранной команде
-            selected_frame = QFrame()
-            selected_frame.setStyleSheet("background-color: #e7f3ff; border-radius: 5px; padding: 5px;")
-            selected_layout = QHBoxLayout(selected_frame)
-            selected_layout.addWidget(QLabel("Выбрано:"))
-            self.selected_team_label = QLabel("—")
-            self.selected_team_label.setStyleSheet("color: #0066cc; font-weight: bold;")
-            selected_layout.addWidget(self.selected_team_label)
-            selected_layout.addStretch()
-            control_layout.addWidget(selected_frame)
-            
             # Статистика
             stats_frame = QFrame()
-            stats_frame.setStyleSheet("background-color: #f0f0f0; border-radius: 5px; padding: 5px;")
+            stats_frame.setStyleSheet("background-color: #f0f0f0; border-radius: 5px; padding: 8px;")
             stats_layout = QVBoxLayout(stats_frame)
             
-            # Прогресс-бар
+            # Прогресс
             progress_layout = QHBoxLayout()
             progress_layout.addWidget(QLabel("Прогресс:"))
             self.progress_label = QLabel("0%")
-            self.progress_label.setStyleSheet("color: #28a745; font-weight: bold;")
+            self.progress_label.setStyleSheet("color: #28a745; font-weight: bold; font-size: 14px;")
             progress_layout.addWidget(self.progress_label)
             progress_layout.addStretch()
             stats_layout.addLayout(progress_layout)
@@ -11989,7 +11986,7 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
             control_layout.addLayout(buttons_layout)
             
             # Кнопка завершения
-            self.finish_button = QPushButton("✅ ЗАВЕРШИТЬ ЖЕРЕБЬЕВКУ")
+            self.finish_button = QPushButton("✅ ЗАВЕРШИТЬ")
             self.finish_button.clicked.connect(self.finish_draw)
             self.finish_button.setStyleSheet("""
                 background-color: #28a745; 
@@ -12016,42 +12013,45 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
             layout.addWidget(control_group)
             
             # Статусная строка
-            self.status_label = QLabel("✅ Готов к работе")
-            self.status_label.setStyleSheet("color: #6c757d; padding: 5px; background-color: #f8f9fa; border-radius: 3px;")
+            self.status_label = QLabel("✅ Готов к работе. Кликните на ячейку в таблице")
+            self.status_label.setStyleSheet("color: #6c757d; padding: 8px; background-color: #f8f9fa; border-radius: 5px;")
             self.status_label.setWordWrap(True)
             layout.addWidget(self.status_label)
             
             return panel
             
         def create_right_panel(self):
-            """Создание правой панели только с таблицей сетки"""
+            """Создание правой панели с таблицей сетки (прижата к верху)"""
             panel = QWidget()
             layout = QVBoxLayout(panel)
             layout.setContentsMargins(5, 0, 0, 0)
             layout.setSpacing(0)
+            layout.setAlignment(Qt.AlignTop)  # Прижимаем к верху
             
             # Группа для сетки
             grid_group = QGroupBox(f"🏆 СЕТКА ТУРНИРА (номера 1-{self.grid_size})")
             grid_layout = QVBoxLayout(grid_group)
+            grid_layout.setAlignment(Qt.AlignTop)
             
             # Инструкция для таблицы
-            instruction = QLabel("👇 КЛИКНИТЕ ПО ЯЧЕЙКЕ для размещения команды 👇")
+            instruction = QLabel("👇 КЛИКНИТЕ ПО ЯЧЕЙКЕ для размещения команды/участника 👇")
             instruction.setStyleSheet("""
                 color: #856404; 
                 font-weight: bold; 
                 background-color: #fff3cd; 
                 padding: 8px; 
-                border-radius: 3px;
+                border-radius: 5px;
                 font-size: 12px;
             """)
             instruction.setAlignment(Qt.AlignCenter)
             grid_layout.addWidget(instruction)
             
-            # Таблица с прокруткой (только для 32 команд)
+            # Таблица
             if self.use_scroll and self.grid_size == 32:
                 scroll = QScrollArea()
                 scroll.setWidgetResizable(True)
                 scroll.setFrameShape(QFrame.NoFrame)
+                scroll.setAlignment(Qt.AlignTop)
                 self.grid_table = QTableWidget()
                 scroll.setWidget(self.grid_table)
                 grid_layout.addWidget(scroll)
@@ -12061,7 +12061,7 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
             
             # Настройка таблицы
             self.grid_table.setColumnCount(2)
-            self.grid_table.setHorizontalHeaderLabels(["№ в сетке", "КОМАНДА"])
+            self.grid_table.setHorizontalHeaderLabels(["№ в сетке", "КОМАНДА/ИГРОК"])
             self.grid_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
             self.grid_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
             self.grid_table.setSelectionBehavior(QTableWidget.SelectItems)
@@ -12069,38 +12069,49 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
             self.grid_table.cellClicked.connect(self.on_cell_clicked)
             
             # Устанавливаем высоту таблицы
-            table_height = self.grid_size * self.row_height + 40
+            table_height = self.grid_size * self.row_height + 240
             self.grid_table.setMinimumHeight(table_height)
             if not self.use_scroll:
                 self.grid_table.setMaximumHeight(table_height)
             
+            # Прижимаем таблицу к верху
+            self.grid_table.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+            
             layout.addWidget(grid_group)
+            
+            # Добавляем распорку, чтобы заполнить оставшееся пространство
+            layout.addStretch()
             
             return panel
             
-        def update_team_list(self):
+        def update_team_list(self, posevs_num):
             """Обновление списка команд"""
             self.team_list.clear()
-            
+            sev = posevs_num[1]
+            self.team_list.clear()
+            titles = Title.select().where(Title.id == title_id()).get()            
+            vid_turnira = titles.vid_turnira
+
             for i, team in enumerate(self.remaining_teams):
-                # Определяем очередь
+                # Определяем номер очереди для каждой команды
                 if i == 0:
-                    queue = "→ номер 1"
+                    queue_info = f" {sev[0][0]}"
                 elif i == 1:
-                    queue = "→ номер 8"
+                    queue_info = f" {sev[0][1]}"
                 elif i == 2 or i == 3:
-                    queue = "→ 4 или 5"
+                    queue_info = f" {sev[1]}"
+                elif i == 4 or i == 5 or i == 6 or i == 7:
+                    queue_info = f" {sev[2]}"
                 else:
-                    queue = "→ 2,3,6,7"
+                    queue_info = f" {sev[3]}"
                     
                 is_current = (i == self.current_team_index)
                 prefix = "👉 " if is_current else "   "
                 
-                # Формируем текст с учетом размера шрифта
-                if self.grid_size == 32:
-                    item_text = f"{prefix}{team[1]} | {team[2]} | {team[3]} {queue}"
-                else:
-                    item_text = f"{prefix}{team[1]} ({team[2]}) - Рейтинг: {team[3]} {queue}"
+                if vid_turnira == "личные":
+                    item_text = f"{prefix}{team[1]} ({team[2]}) - R:{team[6]} {queue_info}" 
+                else:   
+                    item_text = f"{prefix}{team[0]} ({team[1]}) - R:{team[5]} {queue_info}"
                 
                 item = QListWidgetItem(item_text)
                 item.setData(Qt.UserRole, team)
@@ -12114,7 +12125,7 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
                     item.setFont(font)
                     
                 self.team_list.addItem(item)
-                
+            
             # Обновляем статистику
             placed = len(self.placed_teams)
             self.placed_count_label.setText(str(placed))
@@ -12126,19 +12137,11 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
             self.progress_label.setText(f"{progress}%")
             
             if progress == 100:
-                self.progress_label.setStyleSheet("color: #28a745; font-weight: bold;")
+                self.progress_label.setStyleSheet("color: #28a745; font-weight: bold; font-size: 14px;")
             elif progress > 50:
-                self.progress_label.setStyleSheet("color: #ff9800; font-weight: bold;")
+                self.progress_label.setStyleSheet("color: #ff9800; font-weight: bold; font-size: 14px;")
             else:
-                self.progress_label.setStyleSheet("color: #17a2b8; font-weight: bold;")
-            
-            # Обновляем выбранную команду
-            if hasattr(self, 'selected_team') and self.selected_team:
-                self.selected_team_label.setText(self.selected_team[1])
-                self.selected_team_label.setStyleSheet("color: #28a745; font-weight: bold;")
-            else:
-                self.selected_team_label.setText("—")
-                self.selected_team_label.setStyleSheet("color: #0066cc; font-weight: bold;")
+                self.progress_label.setStyleSheet("color: #17a2b8; font-weight: bold; font-size: 14px;")
                 
         def update_grid_table(self):
             """Обновление таблицы сетки"""
@@ -12155,37 +12158,34 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
                 
                 # Определяем доступность
                 is_available = (i in self.current_available_numbers)
-                is_correct_team = False
-                
-                if hasattr(self, 'selected_team') and self.selected_team and self.current_team_index < len(self.sorted_sportsmen):
-                    current = self.sorted_sportsmen[self.current_team_index]
-                    is_correct_team = (self.selected_team[0] == current[0])
                 
                 # Оформление
                 if i in self.free_num:
-                    slot_item.setBackground(QColor(200, 200, 200))
-                    team_item = QTableWidgetItem("🚫 НЕТ КОМАНДЫ")
+                    # проверяет есть ли команда - Х -
+                    teams = Team.get_or_none(Team.team_name == "X")
+                    if teams:
+                        team_id = teams.id
+                        team_name = teams.team_name 
+                    else:
+                        team_free = Team.insert(team_name="X", team_full="X", title_id=title_id()).execute()
+                        team_name = "X"
+                        team_id = team_free
+                    self.placed_teams[i] = [team_id, team_name]
+                    team_item = QTableWidgetItem(team_name)
                     team_item.setBackground(QColor(200, 200, 200))
                 elif i in self.placed_teams:
                     data = self.placed_teams[i]
-                    if self.grid_size == 32:
-                        text = f"✅ {data[0]} | {data[1]} | {data[2]}"
-                    else:
-                        text = f"✅ {data[0]} ({data[1]}) - {data[2]}"
+                    text = f"✅ {data[1]} R: {data[3]}"
                     team_item = QTableWidgetItem(text)
                     team_item.setBackground(QColor(144, 238, 144))
                     slot_item.setBackground(QColor(144, 238, 144))
                 else:
-                    if is_available and is_correct_team:
+                    if is_available:
                         team_item = QTableWidgetItem("🎯 КЛИКНИТЕ ДЛЯ РАЗМЕЩЕНИЯ!")
                         team_item.setBackground(QColor(255, 100, 100))
                         slot_item.setBackground(QColor(255, 100, 100))
                         team_item.setForeground(QBrush(QColor(255, 255, 255)))
                         slot_item.setForeground(QBrush(QColor(255, 255, 255)))
-                    elif is_available:
-                        team_item = QTableWidgetItem("📌 ДОСТУПНО")
-                        team_item.setBackground(QColor(255, 255, 100))
-                        slot_item.setBackground(QColor(255, 255, 100))
                     else:
                         team_item = QTableWidgetItem("⚪ СВОБОДНО")
                         team_item.setBackground(QColor(255, 255, 200))
@@ -12195,83 +12195,65 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
                 self.grid_table.setItem(row, 0, slot_item)
                 self.grid_table.setItem(row, 1, team_item)
                 
-        def on_team_selected(self, item):
-            """Выбор команды из списка"""
-            team = item.data(Qt.UserRole)
-            self.selected_team = team
-            
-            if self.current_team_index < len(self.sorted_sportsmen):
-                current = self.sorted_sportsmen[self.current_team_index]
-                if team[0] == current[0]:
-                    self.status_label.setText(f"✅ Выбрана {team[1]}. Кликните на ячейку в таблице.")
-                    self.selected_team_label.setStyleSheet("color: #28a745; font-weight: bold;")
-                else:
-                    self.status_label.setText(f"⚠️ Нужно выбрать {current[1]}, а выбрана {team[1]}")
-                    self.selected_team_label.setStyleSheet("color: #dc3545; font-weight: bold;")
-            else:
-                self.status_label.setText("⚠️ Жеребьевка завершена")
-                
-            self.update_grid_table()
-            
         def on_cell_clicked(self, row, column):
-            """Размещение команды по клику на ячейку"""
+            """Размещение команды/ участника по клику на ячейку"""
+            titles = Title.select().where(Title.id == title_id()).get()
+            vid_turnira = titles.vid_turnira
             if column not in [0, 1]:
                 return
                 
             slot = row + 1
             
             if self.current_team_index >= len(self.sorted_sportsmen):
-                QMessageBox.information(self, "Информация", "Все команды уже размещены!")
+                QMessageBox.information(self, "Информация", "Все команды/ участники уже размещены!")
                 return
-                
-            if not hasattr(self, 'selected_team') or not self.selected_team:
-                current = self.sorted_sportsmen[self.current_team_index]
-                QMessageBox.warning(self, "Ошибка", f"Сначала выберите команду {current[1]} из списка!")
-                return
-                
-            current = self.sorted_sportsmen[self.current_team_index]
             
-            if self.selected_team[0] != current[0]:
-                QMessageBox.warning(self, "Ошибка", 
-                    f"Сейчас должна быть {current[1]}, а выбрана {self.selected_team[1]}")
-                return
+            # current_team = self.sorted_sportsmen[self.current_team_index]
+            current_team = self.sorted_sportsmen[self.current_team_index]
                 
             if slot in self.free_num:
-                QMessageBox.warning(self, "Ошибка", f"Номер {slot} - свободная позиция (нет команды)")
+                QMessageBox.warning(self, "Ошибка", f"Номер {slot} - свободная позиция (нет команды/ участника в сетке)")
                 return
                 
             if slot in self.placed_teams:
-                QMessageBox.warning(self, "Ошибка", f"Номер {slot} уже занят")
+                QMessageBox.warning(self, "Ошибка", f"Номер {slot} уже занят командой/ участником {self.placed_teams[slot][0]}")
                 return
                 
             if slot not in self.current_available_numbers:
                 if self.current_team_index == 0:
-                    msg = "Первая команда только на номер 1!"
+                    msg = f"Первая команда ({current_team[1]}) должна быть на номер 1!"
                 elif self.current_team_index == 1:
-                    msg = "Вторая команда только на номер 8!"
+                    msg = f"Вторая команда ({current_team[1]}) должна быть на номер 8!"
                 elif self.current_team_index <= 3:
-                    msg = f"Команда должна быть на 4 или 5! Доступно: {self.current_available_numbers}"
+                    msg = f"Команда {current_team[1]} должна быть на 4 или 5! Доступно: {self.current_available_numbers}"
                 else:
-                    msg = f"Команда должна быть на 2,3,6,7! Доступно: {self.current_available_numbers}"
+                    msg = f"Команда {current_team[1]} должна быть на 2,3,6,7! Доступно: {self.current_available_numbers}"
                 QMessageBox.warning(self, "Ошибка", msg)
                 return
                 
             # Размещаем команду
-            self.placed_teams[slot] = [self.selected_team[1], self.selected_team[2], self.selected_team[3], self.selected_team[0]]
-            self.remaining_teams.remove(self.selected_team)
+            # team = self.selected_team
+            if vid_turnira == "личные":
+                self.placed_teams[slot] = [current_team[0], current_team[1], current_team[2], current_team[6]] # [ id, игрок, регион, рейтинг]
+            else:
+                self.placed_teams[slot] = [current_team[0], current_team[1], current_team[2], current_team[5]] # [ id, игрок, регион, рейтинг]
+
+            self.remaining_teams.remove(current_team)
             self.current_team_index += 1
-            self.selected_team = None
             
             self.update_current_available_numbers()
-            self.update_team_list()
+            self.update_team_list(posevs_num)
             self.update_grid_table()
             
             if self.current_team_index >= len(self.sorted_sportsmen):
                 self.status_label.setText("🎉 ПОЗДРАВЛЯЮ! Жеребьевка завершена!")
+                self.current_seed_label.setText("✅ Жеребьевка успешно завершена!")
                 QMessageBox.information(self, "Успех", "Жеребьевка успешно завершена!")
             else:
                 next_team = self.sorted_sportsmen[self.current_team_index]
-                self.status_label.setText(f"✅ {current[1]} на {slot} место. Следующая: {next_team[1]}")
+                self.status_label.setText(f"✅ {current_team[1]} на {slot} место. Следующая: {next_team[1]}")
+                # Автоматически выбираем следующую команду
+                self.select_current_team()
                 
         def edit_placement(self):
             """Редактирование размещения"""
@@ -12311,10 +12293,10 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
                 self.remaining_teams = self.sorted_sportsmen[idx:].copy()
                 
             self.update_current_available_numbers()
-            self.selected_team = None
             self.update_team_list()
             self.update_grid_table()
             self.status_label.setText(f"🔄 {data[0]} возвращена для переразмещения")
+            self.select_current_team()
             
         def reset_draw(self):
             """Сброс жеребьевки"""
@@ -12324,11 +12306,11 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
                 self.placed_teams.clear()
                 self.current_team_index = 0
                 self.remaining_teams = self.sorted_sportsmen.copy()
-                self.selected_team = None
                 self.update_current_available_numbers()
                 self.update_team_list()
                 self.update_grid_table()
                 self.status_label.setText("🔄 Жеребьевка сброшена")
+                self.select_current_team()
                 
         def finish_draw(self):
             """Завершение жеребьевки"""
@@ -12351,722 +12333,9 @@ def _____choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, n
     result_code = dialog.exec_()
     return dialog.result if result_code == QDialog.Accepted else {}
 
-# # Тестирование
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-    
-#     # Тест для 8, 16 и 32 команд
-#     for size in [8, 16, 32]:
-#         print(f"\n=== ТЕСТ ДЛЯ {size} КОМАНД ===")
-#         teams = []
-#         for i in range(1, size + 1):
-#             teams.append([i, f"Команда{i}", f"Город{i}", 100 - i])
-        
-#         if size == 8:
-#             posevs = [[1, 8], [4, 5], [2, 3, 6, 7]]
-#         else:
-#             posevs = [[1, 8], [4, 5], [2, 3, 6, 7]]  # Адаптируйте под размер
-        
-#         result = manual_choice(teams, 2, [], posevs, [1])
-        
-#         if result:
-#             print("Результат получен")
 
-def ___choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
-    """
-    Функция ручной жеребьевки команд с динамической высотой панелей
-    """
-    
-    class ManualChoiceDialog(QDialog):
-        def __init__(self, parent=None):
-            super().__init__(parent)
-            self.sorted_sportsmen = sorted_sportsmen
-            self.count_exit = count_exit
-            self.free_num = free_num
-            self.posevs_num = posevs_num
-            self.nums = nums
-            self.grid_size = self.get_grid_size()
-            self.teams_count = len(sorted_sportsmen)
-            
-            # Словарь для хранения размещенных команд
-            self.placed_teams = {}
-            
-            # Индекс текущей команды для посева
-            self.current_team_index = 0
-            
-            # Список еще не размещенных команд
-            self.remaining_teams = self.sorted_sportsmen.copy()
-            
-            # Свободные номера в сетке
-            self.available_slots = self.get_available_slots()
-            
-            # Доступные номера для выбора на текущем этапе
-            self.current_available_numbers = []
-            
-            # Выбранная команда
-            self.selected_team = None
-            
-            # Результат
-            self.result = None
-            
-            self.init_ui()
-            
-        def get_grid_size(self):
-            max_num = 0
-            for group in self.posevs_num[1]:
-                max_num = max(max_num, max(group))
-            return max_num
-            
-        def get_available_slots(self):
-            """Получение списка доступных слотов в сетке"""
-            all_slots = list(range(1, self.grid_size + 1))
-            available = [slot for slot in all_slots if slot not in self.free_num]
-            return available
-            
-        def get_current_available_numbers(self, posevs_num):
-            """Получение доступных номеров для текущей команды"""
-            sev_num = posevs_num[1]
-            if self.current_team_index >= len(self.sorted_sportsmen):
-                return []
-                
-            # Определяем, на каком этапе посева находимся
-            if self.current_team_index == 0:
-                available = [sev_num[0][0]]
-            elif self.current_team_index == 1:
-                available = [sev_num[0][1]]
-            elif self.current_team_index == 2 or self.current_team_index == 3:
-                available = sev_num[1]
-            elif self.current_team_index == 4 or self.current_team_index == 5 or self.current_team_index == 6 or self.current_team_index == 7:
-                available = sev_num[2]
-            else:
-                available = sev_num[3]
-            
-            # Фильтруем уже занятые номера
-            available = [num for num in available if num in self.available_slots 
-                        and num not in self.placed_teams]
-            
-            return available
-            
-        def update_current_available_numbers(self, posevs_num):
-            """Обновление доступных номеров и отображения"""
-            self.current_available_numbers = self.get_current_available_numbers(posevs_num)
-            sev_num = posevs_num[1]
-            
-             # Обновляем текст подсказки
-            if self.current_team_index < len(self.sorted_sportsmen):
-                team = self.sorted_sportsmen[self.current_team_index]
-                if self.current_team_index == 0:
-                    hint = f"1. Команда {team[1]} должна быть размещена на номер 1"
-                elif self.current_team_index == 1:
-                    hint = f"2. Команда {team[1]} должна быть размещена на номер {sev_num[0][1]}"
-                elif self.current_team_index == 2 or self.current_team_index == 3:
-                    hint = f"{self.current_team_index + 1}. Команда {team[1]} может быть размещена на номера: {self.current_available_numbers}"
-                else:
-                    hint = f"{self.current_team_index + 1}. Команда {team[1]} может быть размещена на номера: {self.current_available_numbers}"
-                
-                if self.current_available_numbers:
-                    self.current_seed_label.setText(hint)
-                    self.current_seed_label.setStyleSheet("color: lightgreen; font-weight: bold;")
-                else:
-                    self.current_seed_label.setText(f"{hint}\n(нет доступных номеров!)")
-                    self.current_seed_label.setStyleSheet("color: lightred; font-weight: bold;")
-            else:
-                self.current_seed_label.setText("Все команды размещены!")
-                self.current_seed_label.setStyleSheet("color: lightblue; font-weight: bold;")
-                
-        def init_ui(self):
-            # Рассчитываем размер окна в зависимости от количества команд
-            window_width = 1400
-            # Для 32 команд нужно больше высоты
-            if self.teams_count > 20:
-                window_height = min(1000, 600 + self.teams_count * 10)
-            else:
-                window_height = 700
-                
-            self.setWindowTitle(f"Ручная жеребьевка команд (всего команд: {self.teams_count} | сетка: {self.grid_size})")
-            self.setGeometry(100, 100, window_width, window_height)
-            self.setModal(True)
-            
-            # Центральный виджет
-            central_widget = QWidget()
-            main_layout = QVBoxLayout(central_widget)
-            main_layout.setContentsMargins(5, 5, 5, 5)
-            
-            # Создаем горизонтальный сплиттер
-            splitter = QSplitter(Qt.Horizontal)
-            
-            # Левая панель
-            left_panel = self.create_left_panel()
-            splitter.addWidget(left_panel)
-            
-            # Правая панель
-            right_panel = self.create_right_panel()
-            splitter.addWidget(right_panel)
-            
-            # Устанавливаем соотношение размеров (50% - левая, 50% - правая)
-            splitter.setSizes([int(window_width * 0.5), int(window_width * 0.5)])
-            
-            main_layout.addWidget(splitter)
-            
-            # Информационная панель
-            info_frame = self.create_info_panel()
-            main_layout.addWidget(info_frame)
-            
-            self.setLayout(main_layout)
-            
-            # Заполняем данные
-            self.update_team_list()
-            self.update_grid_table()
-            self.update_current_available_numbers(posevs_num)
-            
-            # Настраиваем размеры после отображения
-            QTimer.singleShot(100, self.adjust_sizes)
-            
-        def create_left_panel(self):
-            """Создание левой панели со списком команд"""
-            panel = QWidget()
-            layout = QVBoxLayout(panel)
-            layout.setContentsMargins(5, 5, 5, 5)
-            layout.setSpacing(5)
-            
-            # Группа для списка команд
-            group_box = QGroupBox(f"Список команд (всего: {self.teams_count})")
-            group_layout = QVBoxLayout(group_box)
-            
-            # Инструкция
-            instruction_label = QLabel("👉 Кликните на команду для выбора")
-            instruction_label.setStyleSheet("color: blue; font-weight: bold; padding: 5px;")
-            group_layout.addWidget(instruction_label)
-            
-            # Список команд с прокруткой
-            scroll_area = QScrollArea()
-            scroll_area.setWidgetResizable(True)
-            scroll_area.setFrameShape(QFrame.NoFrame)
-            
-            self.team_list = QListWidget()
-            self.team_list.setFont(QFont("Arial", 10))
-            self.team_list.itemClicked.connect(self.on_team_selected)
-            self.team_list.setUniformItemSizes(False)  # Разрешаем разную высоту
-            
-            # Настраиваем размер элементов
-            row_height = 35
-            total_height = self.teams_count * row_height + 20
-            
-            # Устанавливаем минимальную высоту списка, но не более 800px
-            self.team_list.setMinimumHeight(min(total_height, 600))
-            self.team_list.setMaximumHeight(min(total_height, 800))
-            
-            scroll_area.setWidget(self.team_list)
-            group_layout.addWidget(scroll_area)
-            
-            layout.addWidget(group_box)
-            
-            # Текущий этап посева
-            current_seed_group = QGroupBox("Инструкция по размещению")
-            seed_layout = QVBoxLayout(current_seed_group)
-            self.current_seed_label = QLabel("Загрузка...")
-            self.current_seed_label.setFont(QFont("Arial", 11))
-            self.current_seed_label.setWordWrap(True)
-            seed_layout.addWidget(self.current_seed_label)
-            
-            # Добавляем подсказку
-            hint_label = QLabel("💡 Подсказка: Выберите команду из списка,\nзатем кликните на ячейку в таблице\nдля размещения команды")
-            hint_label.setStyleSheet("color: gray; font-style: italic; padding: 5px;")
-            hint_label.setWordWrap(True)
-            seed_layout.addWidget(hint_label)
-            
-            layout.addWidget(current_seed_group)
-            
-            # Кнопка отмены
-            cancel_button = QPushButton("❌ Отменить и вернуться")
-            cancel_button.clicked.connect(self.reject)
-            cancel_button.setStyleSheet("background-color: #dc3545; color: white; font-size: 12px; padding: 8px; border-radius: 5px;")
-            layout.addWidget(cancel_button)
-            
-            return panel
-            
-        def create_right_panel(self):
-            """Создание правой панели с сеткой и управлением"""
-            panel = QWidget()
-            layout = QVBoxLayout(panel)
-            layout.setContentsMargins(5, 5, 5, 5)
-            layout.setSpacing(5)
-            
-            # Таблица сетки
-            grid_group = QGroupBox(f"Сетка турнира (номера 1-{self.grid_size})")
-            grid_layout = QVBoxLayout(grid_group)
-            
-            # Инструкция для таблицы
-            grid_instruction = QLabel("👇 КЛИКНИТЕ ПО ЯЧЕЙКЕ для размещения команды 👇")
-            grid_instruction.setStyleSheet("color: green; font-weight: bold; background-color: #fff3cd; padding: 5px; border-radius: 3px;")
-            grid_instruction.setAlignment(Qt.AlignCenter)
-            grid_layout.addWidget(grid_instruction)
-            
-            # Таблица с прокруткой
-            table_scroll = QScrollArea()
-            table_scroll.setWidgetResizable(True)
-            # table_scroll.setFrameShape(QFrame.NoFrame)
-            
-            self.grid_table = QTableWidget()
-            self.grid_table.setColumnCount(2)
-            self.grid_table.setHorizontalHeaderLabels(["Номер", "Команда/ Участник"])
-            
-            # Настройка таблицы
-            self.grid_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
-            self.grid_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-            
-            # Включаем кликабельность ячеек
-            self.grid_table.setSelectionBehavior(QTableWidget.SelectItems)
-            self.grid_table.setSelectionMode(QTableWidget.SingleSelection)
-            
-            # Подключаем обработчик клика
-            self.grid_table.cellClicked.connect(self.on_cell_clicked)
-            
-            # Настраиваем размер таблицы
-            row_height = 10
-            total_height = self.grid_size * row_height + 30
-            
-            self.grid_table.setMinimumHeight(min(total_height, 500))
-            self.grid_table.setMaximumHeight(min(total_height, 800))
-            
-            table_scroll.setWidget(self.grid_table)
-            grid_layout.addWidget(table_scroll)
-            
-            layout.addWidget(grid_group)
-            
-            # Панель управления
-            control_group = self.create_control_panel()
-            layout.addWidget(control_group)
-            
-            # Статусная строка
-            self.status_label = QLabel("✅ Готов к работе. Выберите команду из списка.")
-            self.status_label.setStyleSheet("color: #6c757d; padding: 5px; background-color: #f8f9fa; border-radius: 3px;")
-            self.status_label.setWordWrap(True)
-            layout.addWidget(self.status_label)
-            
-            return panel
-            
-        def create_control_panel(self):
-            """Создание панели управления"""
-            control_group = QGroupBox("Управление жеребьевкой")
-            control_layout = QVBoxLayout(control_group)
-            
-            # Информация о выбранной команде
-            info_frame = QFrame()
-            info_frame.setStyleSheet("background-color: #e7f3ff; border-radius: 5px; padding: 5px;")
-            info_layout = QHBoxLayout(info_frame)
-            
-            info_layout.addWidget(QLabel("📌 Выбранная команда:"))
-            self.selected_team_label = QLabel("Не выбрана")
-            self.selected_team_label.setStyleSheet("color: #0066cc; font-weight: bold;")
-            info_layout.addWidget(self.selected_team_label)
-            info_layout.addStretch()
-            
-            control_layout.addWidget(info_frame)
-            
-            # Статистика размещения
-            stats_frame = QFrame()
-            stats_frame.setStyleSheet("background-color: #f0f0f0; border-radius: 5px; padding: 5px;")
-            stats_layout = QHBoxLayout(stats_frame)
-            
-            stats_layout.addWidget(QLabel("✅ Размещено:"))
-            self.placed_count_label = QLabel("0")
-            self.placed_count_label.setStyleSheet("color: #28a745; font-weight: bold; font-size: 14px;")
-            stats_layout.addWidget(self.placed_count_label)
-            
-            stats_layout.addStretch()
-            
-            stats_layout.addWidget(QLabel("⏳ Осталось:"))
-            self.remaining_count_label = QLabel(str(self.teams_count))
-            self.remaining_count_label.setStyleSheet("color: #ffc107; font-weight: bold; font-size: 14px;")
-            stats_layout.addWidget(self.remaining_count_label)
-            
-            stats_layout.addStretch()
-            
-            stats_layout.addWidget(QLabel("📊 Прогресс:"))
-            self.progress_label = QLabel("0%")
-            self.progress_label.setStyleSheet("color: #17a2b8; font-weight: bold;")
-            stats_layout.addWidget(self.progress_label)
-            
-            control_layout.addWidget(stats_frame)
-            
-            # Кнопки управления
-            buttons_layout = QHBoxLayout()
-            
-            self.edit_button = QPushButton("✏️ Редактировать")
-            self.edit_button.clicked.connect(self.edit_placement)
-            self.edit_button.setStyleSheet("padding: 5px;")
-            buttons_layout.addWidget(self.edit_button)
-            
-            self.reset_button = QPushButton("🔄 Сбросить")
-            self.reset_button.clicked.connect(self.reset_draw)
-            self.reset_button.setStyleSheet("padding: 5px;")
-            buttons_layout.addWidget(self.reset_button)
-            
-            control_layout.addLayout(buttons_layout)
-            
-            # Кнопка завершения
-            self.finish_button = QPushButton("✅ Завершить жеребьевку")
-            self.finish_button.clicked.connect(self.finish_draw)
-            self.finish_button.setStyleSheet("""
-                background-color: #28a745; 
-                color: white; 
-                font-size: 14px; 
-                padding: 10px; 
-                border-radius: 5px;
-                font-weight: bold;
-            """)
-            control_layout.addWidget(self.finish_button)
-            
-            return control_group
-            
-        def create_info_panel(self):
-            """Создание информационной панели"""
-            info_frame = QFrame()
-            info_frame.setStyleSheet("background-color: #f8f9fa; border-top: 1px solid #dee2e6; padding: 5px;")
-            info_layout = QHBoxLayout(info_frame)
-            info_layout.setContentsMargins(5, 5, 5, 5)
-            
-            # Информация о количестве команд
-            teams_info = QLabel(f"📊 Всего команд: {self.teams_count} | Размер сетки: {self.grid_size}")
-            teams_info.setStyleSheet("color: #0066cc; font-weight: bold;")
-            info_layout.addWidget(teams_info)
-            
-            info_layout.addStretch()
-            
-            # Подсказка о изменении размера
-            resize_hint = QLabel("💡 Потяните за разделитель между панелями для изменения размера")
-            resize_hint.setStyleSheet("color: #6c757d; font-style: italic;")
-            info_layout.addWidget(resize_hint)
-            
-            return info_frame
-            
-        def adjust_sizes(self):
-            """Корректировка размеров после отображения"""
-            # Настраиваем высоту строк в списке
-            row_height = 15
-            # for i in range(self.team_list.count()):
-            #     self.team_list.setRowHeight(i, row_height)
-                
-            # Настраиваем высоту строк в таблице
-            for i in range(self.grid_table.rowCount()):
-                self.grid_table.setRowHeight(i, row_height)
-                
-        def update_team_list(self):
-            """Обновление списка команд"""
-            self.team_list.clear()
-            
-            # Определяем размер шрифта в зависимости от количества команд
-            if self.teams_count > 24:
-                font_size = 8
-            elif self.teams_count > 16:
-                font_size = 9
-            else:
-                font_size = 8
-                
-            for i, team in enumerate(self.remaining_teams):
-                # Определяем номер очереди
-                if i == 0:
-                    queue_info = " [→ номер 1]"
-                elif i == 1:
-                    queue_info = " [→ номер 8]"
-                elif i == 2 or i == 3:
-                    queue_info = " [→ 4 или 5]"
-                else:
-                    queue_info = " [→ 2,3,6,7]"
-                    
-                is_current = (i == self.current_team_index)
-                prefix = "👉 " if is_current else "   "
-                    
-                item_text = f"{prefix}{team[1]} ({team[2]}) - Рейтинг: {team[3]}{queue_info}"
-                item = QListWidgetItem(item_text)
-                item.setData(Qt.UserRole, team)
-                
-                font = QFont("Arial", font_size)
-                item.setFont(font)
-                
-                if is_current:
-                    item.setBackground(QColor(173, 216, 230))
-                    font.setBold(True)
-                    item.setFont(font)
-                    
-                self.team_list.addItem(item)
-                
-            # Обновляем статистику
-            placed_count = len(self.placed_teams)
-            self.placed_count_label.setText(str(placed_count))
-            remaining = self.teams_count - placed_count
-            self.remaining_count_label.setText(str(remaining))
-            
-            # Обновляем прогресс
-            progress = int((placed_count / self.teams_count) * 100) if self.teams_count > 0 else 0
-            self.progress_label.setText(f"{progress}%")
-            
-            # Обновляем цвет прогресса
-            if progress == 100:
-                self.progress_label.setStyleSheet("color: #28a745; font-weight: bold;")
-            elif progress > 50:
-                self.progress_label.setStyleSheet("color: #ffc107; font-weight: bold;")
-            else:
-                self.progress_label.setStyleSheet("color: #17a2b8; font-weight: bold;")
-                
-            # Обновляем выбранную команду
-            if hasattr(self, 'selected_team') and self.selected_team:
-                self.selected_team_label.setText(f"{self.selected_team[1]}")
-                self.selected_team_label.setStyleSheet("color: #28a745; font-weight: bold;")
-            else:
-                self.selected_team_label.setText("Не выбрана")
-                self.selected_team_label.setStyleSheet("color: #0066cc; font-weight: bold;")
-                
-        def update_grid_table(self):
-            """Обновление таблицы сетки"""
-            self.grid_table.setRowCount(self.grid_size)
-            
-            for i in range(1, self.grid_size + 1):
-                row = i - 1
-                
-                # Номер в сетке
-                slot_item = QTableWidgetItem(str(i))
-                slot_item.setTextAlignment(Qt.AlignCenter)
-                slot_item.setFlags(slot_item.flags() & ~Qt.ItemIsEditable)  # Запрещаем редактирование
-                
-                # Определяем доступность для текущей команды
-                is_available_for_current = (i in self.current_available_numbers)
-                is_selected_team_correct = False
-                
-                # Проверяем, выбрана ли правильная команда
-                if hasattr(self, 'selected_team') and self.selected_team and self.current_team_index < len(self.sorted_sportsmen):
-                    current_team = self.sorted_sportsmen[self.current_team_index]
-                    is_selected_team_correct = (self.selected_team[0] == current_team[0])
-                
-                # Если номер свободен
-                if i in self.free_num:
-                    # проверяет есть ли команда - Х -
-                    teams = Team.get_or_none(Team.team_name == 'X')
-                    if teams:
-                        team_id = teams.id
-                        team_name = teams.team_name 
-                    else:
-                        team_free = Team.insert(team_name="X", team_full="X", title_id=title_id()).execute()
-                        team_name = "X"
-                        team_id = team_free
-                    self.placed_teams[i] = [team_id, team_name]
-                    slot_item.setBackground(QColor(200, 200, 200))                                        
-                    team_item = QTableWidgetItem(f"✅ {team_name}")
-                    team_item.setBackground(QColor(200, 200, 200))
-                    team_item.setFlags(team_item.flags() & ~Qt.ItemIsEditable)
-                # Если номер занят командой
-                elif i in self.placed_teams:
-                    team_data = self.placed_teams[i]
-                    team_item = QTableWidgetItem(f"✅ {team_data[0]} {team_data[1]}/{team_data[2]} - R: {team_data[3]}")
-                    team_item.setBackground(QColor(144, 238, 144))  # Светло-зеленый
-                    slot_item.setBackground(QColor(144, 238, 144))
-                    team_item.setFlags(team_item.flags() & ~Qt.ItemIsEditable)
-                # Если номер свободен для размещения
-                else:
-                    if is_available_for_current and is_selected_team_correct:
-                        # team_item = QTableWidgetItem("🎯 ДОСТУПНО ДЛЯ РАЗМЕЩЕНИЯ - КЛИКНИТЕ СЮДА!")
-                        team_item = QTableWidgetItem("ДОСТУПНО ДЛЯ РАЗМЕЩЕНИЯ - КЛИКНИТЕ СЮДА!")
-                        team_item.setBackground(QColor(255, 100, 100))  # Ярко-красный для привлечения внимания
-                        slot_item.setBackground(QColor(255, 100, 100))
-                        team_item.setForeground(QBrush(QColor(255, 255, 255)))
-                        slot_item.setForeground(QBrush(QColor(255, 255, 255)))
-                    elif is_available_for_current:
-                        team_item = QTableWidgetItem("📌 ДОСТУПНО (выберите команду)")
-                        team_item.setBackground(QColor(255, 255, 100))  # Желтый
-                        slot_item.setBackground(QColor(255, 255, 100))
-                    else:
-                        team_item = QTableWidgetItem("⚪ СВОБОДНО")
-                        team_item.setBackground(QColor(255, 255, 200))
-                        slot_item.setBackground(QColor(255, 255, 200))
-                    team_item.setFlags(team_item.flags() & ~Qt.ItemIsEditable)
-                    
-                self.grid_table.setItem(row, 0, slot_item)
-                self.grid_table.setItem(row, 1, team_item)
-                
-            # Автоматическое изменение размера строк
-            self.grid_table.resizeRowsToContents()
-            
-            # Подсвечиваем выбранную команду в списке
-            for i in range(self.team_list.count()):
-                item = self.team_list.item(i)
-                team = item.data(Qt.UserRole)
-                if hasattr(self, 'selected_team') and self.selected_team and team[0] == self.selected_team[0]:
-                    item.setBackground(QColor(144, 238, 144))  # Зеленый для выбранной
-                elif i == self.current_team_index and self.current_team_index < len(self.sorted_sportsmen):
-                    item.setBackground(QColor(173, 216, 230))  # Голубой для текущей
-                else:
-                    item.setBackground(QColor(255, 255, 255))  # Белый для остальных
-                
-        # Остальные методы (on_team_selected, on_cell_clicked, edit_placement, reset_draw, finish_draw)
-        # остаются без изменений из предыдущей версии...
-        def on_team_selected(self, item):
-            """Обработка выбора команды из списка"""
-            team = item.data(Qt.UserRole)
-            self.selected_team = team
-            
-            current_team = self.sorted_sportsmen[self.current_team_index] if self.current_team_index < len(self.sorted_sportsmen) else None
-            
-            if current_team and team[0] == current_team[0]:
-                self.status_label.setText(f"✅ Выбрана правильная команда: {team[1]}. Теперь кликните на ячейку в таблице.")
-                self.selected_team_label.setStyleSheet("color: #28a745; font-weight: bold;")
-            else:
-                if current_team:
-                    self.status_label.setText(f"⚠️ Выбрана команда {team[1]}, но сейчас должна быть {current_team[1]}")
-                    self.selected_team_label.setStyleSheet("color: #dc3545; font-weight: bold;")
-                else:
-                    self.status_label.setText(f"⚠️ Выбрана команда {team[1]}, но жеребьевка уже завершена!")
-                    
-            self.update_grid_table()
-            
-        def on_cell_clicked(self, row, column):
-            """Обработка клика по ячейке таблицы"""
-            if column not in [0, 1]:
-                return
-                
-            slot_num = row + 1
-            
-            if self.current_team_index >= len(self.sorted_sportsmen):
-                QMessageBox.information(self, "Информация", "Все команды уже размещены!")
-                return
-                
-            if not hasattr(self, 'selected_team') or self.selected_team is None:
-                QMessageBox.warning(self, "Ошибка", 
-                                  f"Пожалуйста, сначала выберите команду {self.sorted_sportsmen[self.current_team_index][1]} из списка!")
-                return
-                
-            current_team = self.sorted_sportsmen[self.current_team_index]
-            
-            if self.selected_team[0] != current_team[0]:
-                QMessageBox.warning(self, "Ошибка", 
-                                  f"Сейчас должна быть размещена команда: {current_team[1]}\n"
-                                  f"Вы выбрали команду: {self.selected_team[1]}")
-                return
-                
-            if slot_num in self.free_num:
-                QMessageBox.warning(self, "Ошибка", f"Номер {slot_num} свободен (нет команды в сетке)!")
-                return
-                
-            if slot_num in self.placed_teams:
-                QMessageBox.warning(self, "Ошибка", f"Номер {slot_num} уже занят командой {self.placed_teams[slot_num][0]}!")
-                return
-                
-            if slot_num not in self.current_available_numbers:
-                if self.current_team_index == 0:
-                    QMessageBox.warning(self, "Ошибка", f"Первая команда должна быть размещена ТОЛЬКО на номер 1!")
-                elif self.current_team_index == 1:
-                    QMessageBox.warning(self, "Ошибка", f"Вторая команда должна быть размещена ТОЛЬКО на номер 8!")
-                elif self.current_team_index == 2 or self.current_team_index == 3:
-                    QMessageBox.warning(self, "Ошибка", f"Команда {self.current_team_index + 1} должна быть размещена на номера 4 или 5!\nДоступные номера: {self.current_available_numbers}")
-                else:
-                    QMessageBox.warning(self, "Ошибка", f"Команда {self.current_team_index + 1} должна быть размещена на номера 2, 3, 6 или 7!\nДоступные номера: {self.current_available_numbers}")
-                return
-                
-            # Размещение команды
-            team = self.selected_team
-            self.placed_teams[slot_num] = [team[1], team[2], team[3], team[0]]
-            self.remaining_teams.remove(team)
-            self.current_team_index += 1
-            
-            self.selected_team = None
-            self.selected_team_label.setText("Не выбрана")
-            
-            self.update_current_available_numbers()
-            self.update_team_list()
-            self.update_grid_table()
-            
-            if self.current_team_index >= len(self.sorted_sportsmen):
-                self.status_label.setText("🎉 Жеребьевка завершена! Все команды размещены.")
-                QMessageBox.information(self, "Поздравляем", "Жеребьевка успешно завершена!")
-            else:
-                next_team = self.sorted_sportsmen[self.current_team_index]
-                self.status_label.setText(f"✅ Команда {team[1]} размещена на позиции {slot_num}. Следующая: {next_team[1]}")
-                
-        def edit_placement(self):
-            """Редактирование размещения"""
-            current_row = self.grid_table.currentRow()
-            if current_row < 0:
-                QMessageBox.warning(self, "Ошибка", "Выберите ячейку с командой для редактирования!")
-                return
-                
-            slot_num = current_row + 1
-            
-            if slot_num in self.free_num:
-                QMessageBox.warning(self, "Ошибка", "Этот номер свободен!")
-                return
-                
-            if slot_num not in self.placed_teams:
-                QMessageBox.warning(self, "Ошибка", "На этом номере нет команды!")
-                return
-                
-            team_data = self.placed_teams[slot_num]
-            team_id = team_data[3]
-            
-            original_index = None
-            for i, team in enumerate(self.sorted_sportsmen):
-                if team[0] == team_id:
-                    original_index = i
-                    break
-                    
-            if original_index is None:
-                QMessageBox.warning(self, "Ошибка", "Команда не найдена!")
-                return
-                
-            del self.placed_teams[slot_num]
-            
-            if original_index < self.current_team_index:
-                self.current_team_index = original_index
-                self.remaining_teams = self.sorted_sportsmen[original_index:].copy()
-                
-            self.remaining_teams.sort(key=lambda x: x[3], reverse=True)
-            self.update_current_available_numbers()
-            
-            self.selected_team = None
-            self.selected_team_label.setText("Не выбрана")
-            
-            self.update_team_list()
-            self.update_grid_table()
-            self.status_label.setText(f"🔄 Команда {team_data[0]} возвращена в список")
-            
-        def reset_draw(self):
-            """Сброс жеребьевки"""
-            reply = QMessageBox.question(self, "Подтверждение", 
-                                        "Сбросить всю жеребьевку?",
-                                        QMessageBox.Yes | QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                self.placed_teams.clear()
-                self.current_team_index = 0
-                self.remaining_teams = self.sorted_sportsmen.copy()
-                self.selected_team = None
-                self.selected_team_label.setText("Не выбрана")
-                
-                self.update_current_available_numbers()
-                self.update_team_list()
-                self.update_grid_table()
-                self.status_label.setText("🔄 Жеребьевка сброшена")
-                
-        def finish_draw(self):
-            """Завершение жеребьевки"""
-            if self.current_team_index < len(self.sorted_sportsmen):
-                remaining_count = len(self.sorted_sportsmen) - self.current_team_index
-                reply = QMessageBox.question(self, "Подтверждение", 
-                                            f"Осталось команд: {remaining_count}. Завершить?",
-                                            QMessageBox.Yes | QMessageBox.No)
-                if reply == QMessageBox.No:
-                    return
-                    
-            result = {}
-            for slot_num, team_data in self.placed_teams.items():
-                result[slot_num] = [team_data[0], team_data[1], team_data[2]]
-                
-            self.result = result
-            self.accept()
-    
-    # Запуск диалога
-    dialog = ManualChoiceDialog()
-    result_code = dialog.exec_()
-    
-    return dialog.result if result_code == QDialog.Accepted else {}
+
+
 
 # =========
 def choice_net_manual_work(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
