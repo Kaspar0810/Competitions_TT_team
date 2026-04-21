@@ -1,0 +1,23 @@
+2026-04-21 12:23:27,206 - ERROR - Необработанное исключение: NameError: name 'titles' is not defined
+2026-04-21 12:23:27,208 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 994, in choice
+    posev_data = player_choice_in_setka(fin)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 23453, in player_choice_in_setka
+    posev = choice_setka_automat(fin, flag, count_exit)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11668, in choice_setka_automat
+    num_id_player = my_win.start_draw(full_posev, count_exit, free_num, posevs_num, nums)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 314, in start_draw
+    result = choice_net_manual(full_posev, count_exit, free_num, posevs_num, nums)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12340, in choice_net_manual
+    dialog = ManualChoiceDialog()
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11752, in __init__
+    self.init_ui()
+    ~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11895, in init_ui
+    self.update_current_available_numbers()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11843, in update_current_available_numbers
+    vid_turnira = titles.vid_turnira
+                  ^^^^^^
+NameError: name 'titles' is not defined
