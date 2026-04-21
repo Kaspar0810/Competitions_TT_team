@@ -1,0 +1,11 @@
+2026-04-21 20:46:35,189 - ERROR - Необработанное исключение: AttributeError: 'NoneType' object has no attribute 'keys'
+2026-04-21 20:46:35,225 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 994, in choice
+    posev_data = player_choice_in_setka(fin)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 23593, in player_choice_in_setka
+    posev = choice_setka_automat(fin, flag, count_exit)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11671, in choice_setka_automat
+    for i in num_id_player.keys():
+             ^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'keys'

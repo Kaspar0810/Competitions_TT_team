@@ -9,7 +9,10 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont, QColor, QBrush
 from PyQt5 import QtGui, QtWidgets, QtCore
 
-def manual_choice(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
+import pymysql
+from models import *
+
+def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
     """
     Функция ручной жеребьевки команд с подсветкой команд из того же региона
     """
@@ -54,33 +57,39 @@ def manual_choice(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
         def get_grid_size(self):
             """Определение размера сетки на основе posevs_num"""
             max_num = 0
-            for group in self.posevs_num:
+            for group in self.posevs_num[1]:
                 max_num = max(max_num, max(group))
             return max_num
             
         def calculate_sizes_by_grid(self):
             """Расчет размеров в зависимости от типа сетки (8, 16, 32)"""
+            # Базовая высота строки
             if self.grid_size == 32:
-                self.row_height = 28
-                self.font_size = 8
-                self.window_height = 800
-                self.table_max_height = 700
-                self.use_scroll = True
+                self.row_height = 18
+                self.font_size = 10
+                self.window_height = self.grid_size * self.row_height + 150
+                self.table_max_height = self.grid_size * self.row_height + 100
+                self.use_scroll = False
             elif self.grid_size == 16:
                 self.row_height = 35
                 self.font_size = 10
+                # 16 * 35 = 560px, помещается без скролла
                 self.window_height = self.grid_size * self.row_height + 250
                 self.table_max_height = self.grid_size * self.row_height + 50
                 self.use_scroll = False
-            else:
+            else:  # 8 команд
                 self.row_height = 40
                 self.font_size = 10
+                # 8 * 40 = 320px, помещается без скролла
                 self.window_height = self.grid_size * self.row_height + 250
                 self.table_max_height = self.grid_size * self.row_height + 50
                 self.use_scroll = False
                 
-            self.window_width = 1300
-            self.list_height = min(self.teams_count * self.row_height + 50, 500)
+            # Ширина окна
+            self.window_width = 1000
+            
+            # Высота списка команд
+            self.list_height = min(self.teams_count * self.row_height + 150, 500)
             
         def get_available_slots(self):
             """Получение списка доступных слотов в сетке"""
@@ -90,26 +99,23 @@ def manual_choice(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             
         def get_current_available_numbers(self):
             """Получение доступных номеров для текущей команды"""
+            sev_num = posevs_num[1]
             if self.current_team_index >= len(self.sorted_sportsmen):
                 return []
                 
+            # Определяем, на каком этапе посева находимся
             if self.current_team_index == 0:
-                available = [1]
+                available = [sev_num[0][0]]
             elif self.current_team_index == 1:
-                available = [8]
+                available = [sev_num[0][1]]
             elif self.current_team_index == 2 or self.current_team_index == 3:
-                available = [4, 5]
+                available = sev_num[1]
+            elif self.current_team_index == 4 or self.current_team_index == 5 or self.current_team_index == 6 or self.current_team_index == 7:
+                available = sev_num[2]
             else:
-                if self.grid_size == 8:
-                    available = [2, 3, 6, 7]
-                elif self.grid_size == 16:
-                    available = [2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16]
-                else:
-                    available = list(range(2, 33))
-                    available.remove(8)
-                    available.remove(4)
-                    available.remove(5)
+                available = sev_num[3]
             
+            # Фильтруем уже занятые номера
             available = [num for num in available if num in self.available_slots 
                         and num not in self.placed_teams]
             
@@ -506,15 +512,21 @@ def manual_choice(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 is_available = (i in self.current_available_numbers)
                 
                 if i in self.free_num:
-                    slot_item.setBackground(QColor(200, 200, 200))
-                    team_item = QTableWidgetItem("🚫 НЕТ КОМАНДЫ")
+                    # проверяет есть ли команда - Х -
+                    teams = Team.get_or_none(Team.team_name == "X")
+                    if teams:
+                        team_id = teams.id
+                        team_name = teams.team_name 
+                    else:
+                        team_free = Team.insert(team_name="X", team_full="X", title_id=title_id()).execute()
+                        team_name = "X"
+                        team_id = team_free
+                    self.placed_teams[i] = [team_id, team_name]
+                    team_item = QTableWidgetItem(team_name)
                     team_item.setBackground(QColor(200, 200, 200))
                 elif i in self.placed_teams:
                     data = self.placed_teams[i]
-                    if self.grid_size == 32:
-                        text = f"✅ {data[0]} | {data[1]} | {data[2]}"
-                    else:
-                        text = f"✅ {data[0]} ({data[1]}) - {data[2]}"
+                    text = f"✅ {data[1]}/{data[2]} R: {data[3]}"
                     team_item = QTableWidgetItem(text)
                     
                     # Проверяем конфликт регионов с текущей командой
@@ -689,31 +701,31 @@ def manual_choice(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
     result_code = dialog.exec_()
     return dialog.result if result_code == QDialog.Accepted else {}
 
-# Тестирование
-if __name__ == "__main__":
-    import sys
-    from PyQt5.QtWidgets import QApplication
+# # Тестирование
+# if __name__ == "__main__":
+#     import sys
+#     from PyQt5.QtWidgets import QApplication
     
-    app = QApplication(sys.argv)
+#     app = QApplication(sys.argv)
     
-    # Тестовые данные с разными регионами
-    teams = [
-        [1, "Спартак", "Москва", 100],
-        [2, "ЦСКА", "Москва", 95],
-        [3, "Зенит", "СПб", 90],
-        [4, "Динамо", "Москва", 85],
-        [5, "Локомотив", "Москва", 80],
-        [6, "Краснодар", "Краснодар", 75],
-        [7, "Ростов", "Ростов", 70],
-        [8, "Ахмат", "Грозный", 65]
-    ]
+#     # Тестовые данные с разными регионами
+#     teams = [
+#         [1, "Спартак", "Москва", 100],
+#         [2, "ЦСКА", "Москва", 95],
+#         [3, "Зенит", "СПб", 90],
+#         [4, "Динамо", "Москва", 85],
+#         [5, "Локомотив", "Москва", 80],
+#         [6, "Краснодар", "Краснодар", 75],
+#         [7, "Ростов", "Ростов", 70],
+#         [8, "Ахмат", "Грозный", 65]
+#     ]
     
-    posevs = [[1, 8], [4, 5], [2, 3, 6, 7]]
+#     posevs = [[1, 8], [4, 5], [2, 3, 6, 7]]
     
-    result = manual_choice(teams, 2, [], posevs, [1])
+#     result = manual_choice(teams, 2, [], posevs, [1])
     
-    if result:
-        print("\n=== РЕЗУЛЬТАТЫ ЖЕРЕБЬЕВКИ ===")
-        for slot in sorted(result.keys()):
-            team = result[slot]
-            print(f"Номер {slot:2d}: {team[0]:15s} ({team[1]:10s}) - Рейтинг: {team[2]}")
+#     if result:
+#         print("\n=== РЕЗУЛЬТАТЫ ЖЕРЕБЬЕВКИ ===")
+#         for slot in sorted(result.keys()):
+#             team = result[slot]
+#             print(f"Номер {slot:2d}: {team[0]:15s} ({team[1]:10s}) - Рейтинг: {team[2]}")
