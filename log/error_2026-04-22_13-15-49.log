@@ -1,0 +1,85 @@
+2026-04-22 13:15:56,873 - ERROR - Необработанное исключение: AttributeError: 'MainWindow' object has no attribute 'comboBox_filter_schedule_tour'
+2026-04-22 13:15:56,874 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 26076, in load_combo_schedule_tours
+    my_win.comboBox_filter_schedule_tour.clear()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MainWindow' object has no attribute 'comboBox_filter_schedule_tour'
+2026-04-22 13:15:59,990 - ERROR - Необработанное исключение: ProgrammingError: (1146, "Table 'mysql_db.gamelists' doesn't exist")
+2026-04-22 13:15:59,991 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 3352, in execute_sql
+    cursor.execute(sql, params or ())
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 575, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 826, in _read_query_result
+    result.read()
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 1203, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 782, in _read_packet
+    packet.raise_for_error()
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.ProgrammingError: (1146, "Table 'mysql_db.gamelists' doesn't exist")
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 26624, in proba
+    migrate(migrator.add_column('gamelists', 'team_id', new_column)) # null=True допускает пустое значение
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\playhouse\migrate.py", line 957, in migrate
+    operation.run()
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\playhouse\migrate.py", line 162, in run
+    self._handle_result(method(*self.args, **kwargs))
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\playhouse\migrate.py", line 156, in _handle_result
+    self._handle_result(item)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\playhouse\migrate.py", line 153, in _handle_result
+    result.run()
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\playhouse\migrate.py", line 162, in run
+    self._handle_result(method(*self.args, **kwargs))
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\playhouse\migrate.py", line 151, in _handle_result
+    self.execute(result)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\playhouse\migrate.py", line 147, in execute
+    self.migrator.database.execute(node)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 3358, in execute
+    return self.execute_sql(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 3350, in execute_sql
+    with __exception_wrapper__:
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 3121, in __exit__
+    reraise(new_type, new_type(exc_value, *exc_args), traceback)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 164, in reraise
+    raise value.with_traceback(tb)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 3352, in execute_sql
+    cursor.execute(sql, params or ())
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 575, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 826, in _read_query_result
+    result.read()
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 1203, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\connections.py", line 782, in _read_packet
+    packet.raise_for_error()
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+peewee.ProgrammingError: (1146, "Table 'mysql_db.gamelists' doesn't exist")

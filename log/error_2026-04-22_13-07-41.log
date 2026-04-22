@@ -1,0 +1,24 @@
+2026-04-22 13:07:51,097 - ERROR - Необработанное исключение: AttributeError: 'MainWindow' object has no attribute 'comboBox_filter_schedule_tour'
+2026-04-22 13:07:51,098 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 26076, in load_combo_schedule_tours
+    my_win.comboBox_filter_schedule_tour.clear()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MainWindow' object has no attribute 'comboBox_filter_schedule_tour'
+2026-04-22 13:07:55,059 - ERROR - Необработанное исключение: ValueError: Foreign keys must specify a `field`.
+2026-04-22 13:07:55,062 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 26624, in proba
+    migrate(migrator.add_column('gamelists', 'team_id', new_column)) # null=True допускает пустое значение
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\playhouse\migrate.py", line 957, in migrate
+    operation.run()
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\playhouse\migrate.py", line 162, in run
+    self._handle_result(method(*self.args, **kwargs))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\playhouse\migrate.py", line 170, in inner
+    return fn(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\venv\Lib\site-packages\playhouse\migrate.py", line 324, in add_column
+    raise ValueError('Foreign keys must specify a `field`.')
+ValueError: Foreign keys must specify a `field`.

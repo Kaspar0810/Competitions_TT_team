@@ -1,0 +1,32 @@
+2026-04-22 10:23:54,697 - ERROR - Необработанное исключение: AttributeError: 'MainWindow' object has no attribute 'textEdit'
+2026-04-22 10:23:54,698 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 8162, in check_real_player
+    fill_table(player_list)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 3259, in fill_table
+    my_win.textEdit.setText("Нет спортсменов из предварительной заявки")
+    ^^^^^^^^^^^^^^^
+AttributeError: 'MainWindow' object has no attribute 'textEdit'
+2026-04-22 10:24:47,133 - ERROR - Необработанное исключение: AttributeError: 'MainWindow' object has no attribute 'textEdit'
+2026-04-22 10:24:47,134 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 7635, in filter_player_list
+    my_win.textEdit.clear()
+    ^^^^^^^^^^^^^^^
+AttributeError: 'MainWindow' object has no attribute 'textEdit'
+2026-04-22 10:25:40,236 - ERROR - Необработанное исключение: AttributeError: 'MainWindow' object has no attribute 'textEdit'
+2026-04-22 10:25:40,236 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 8162, in check_real_player
+    fill_table(player_list)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 3259, in fill_table
+    my_win.textEdit.setText("Нет спортсменов из предварительной заявки")
+    ^^^^^^^^^^^^^^^
+AttributeError: 'MainWindow' object has no attribute 'textEdit'
+2026-04-22 10:26:28,139 - ERROR - Необработанное исключение: AttributeError: 'MainWindow' object has no attribute 'textEdit'
+2026-04-22 10:26:28,139 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 7635, in filter_player_list
+    my_win.textEdit.clear()
+    ^^^^^^^^^^^^^^^
+AttributeError: 'MainWindow' object has no attribute 'textEdit'
