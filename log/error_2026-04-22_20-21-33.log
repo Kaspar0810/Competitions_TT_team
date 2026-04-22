@@ -1,0 +1,31 @@
+2026-04-22 20:22:31,573 - ERROR - Необработанное исключение: CoachDoesNotExist: <Model: Coach> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`coach` FROM `coachs` AS `t1` WHERE (`t1`.`id` = %s) LIMIT %s OFFSET %s
+Params: ['None', 1, 0]
+2026-04-22 20:22:31,574 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 7501, in get
+    return clone.execute(database)[0]
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 4744, in __getitem__
+    return self.row_cache[item]
+           ~~~~~~~~~~~~~~^^^^^^
+IndexError: list index out of range
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 9092, in filter_fin
+    fill_table(player_list)
+    ~~~~~~~~~~^^^^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 3195, in fill_table
+    coach = Coach.get(Coach.id == coach_id)
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 7035, in get
+    return sq.get()
+           ~~~~~~^^
+  File "C:\Users\Alex\Competitions_TT_team\venv\Lib\site-packages\peewee.py", line 7504, in get
+    raise self.model.DoesNotExist('%s instance matching query does '
+                                  'not exist:\nSQL: %s\nParams: %s' %
+                                  (clone.model, sql, params))
+models.CoachDoesNotExist: <Model: Coach> instance matching query does not exist:
+SQL: SELECT `t1`.`id`, `t1`.`coach` FROM `coachs` AS `t1` WHERE (`t1`.`id` = %s) LIMIT %s OFFSET %s
+Params: ['None', 1, 0]

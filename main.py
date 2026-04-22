@@ -12912,7 +12912,7 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 if vid_turnira == "личные":
                     item_text = f"{prefix}{i+1}. {team[1]} ({team[2]}) R:{team[6]}"
                 else:
-                    item_text = f"{prefix}{i+1}. {team[1]} ({team[2]}) -R:{team[6]}"
+                    item_text = f"{prefix}{i+1}. {team[1]} ({team[2]}) -R:{team[5]}"
                                
                 item = QListWidgetItem(item_text)
                 item.setData(Qt.UserRole, team)
@@ -12941,17 +12941,7 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             self.placed_count_label.setText(str(placed))
             remaining = self.teams_count - placed
             self.remaining_count_label.setText(str(remaining))
-            
-            # progress = int((placed / self.teams_count) * 100) if self.teams_count > 0 else 0
-            # self.progress_label.setText(f"{progress}%")
-            
-            # if progress == 100:
-            #     self.progress_label.setStyleSheet("color: #28a745; font-weight: bold; font-size: 14px;")
-            # elif progress > 50:
-            #     self.progress_label.setStyleSheet("color: #ff9800; font-weight: bold; font-size: 14px;")
-            # else:
-            #     self.progress_label.setStyleSheet("color: #17a2b8; font-weight: bold; font-size: 14px;")
-                
+                            
         def update_grid_table(self):
             """Обновление таблицы сетки с учетом регионов"""
             self.grid_table.setRowCount(self.grid_size)
@@ -13028,6 +13018,9 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 
         def on_cell_clicked(self, row, column):
             """Размещение команды по клику на ячейку с проверкой региона"""
+            titles = Title.select().where(Title.id == title_id()).get()
+            vid_turnira = titles.vid_turnira
+
             if column not in [0, 1]:
                 return
                 
@@ -13072,7 +13065,10 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                     return
             
             # Размещаем команду
-            self.placed_teams[slot] = [current_team[0], current_team[1], current_team[2], current_team[6]]
+            if vid_turnira == "личные":
+                self.placed_teams[slot] = [current_team[0], current_team[1], current_team[2], current_team[6]]
+            else:
+                self.placed_teams[slot] = [current_team[0], current_team[1], current_team[2], current_team[5]]
             self.remaining_teams.remove(current_team)
             self.current_team_index += 1
             
@@ -13163,7 +13159,10 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                     
             result = {}
             for slot, data in self.placed_teams.items():
-                result[slot] = [data[0], data[1], data[2]]
+                if data[1] == "X":
+                    result[slot] = [data[0], data[1]]
+                else:
+                    result[slot] = [data[0], data[1], data[2]]
                 
             self.result = result
             self.accept()
