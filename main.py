@@ -11757,20 +11757,20 @@ def _choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums)
             """Расчет размеров в зависимости от типа сетки (8, 16, 32)"""
             # Базовая высота строки
             if self.grid_size == 32:
-                self.row_height = 18
+                self.row_height = 15
                 self.font_size = 10
                 self.window_height = self.grid_size * self.row_height + 150
                 self.table_max_height = self.grid_size * self.row_height + 100
                 self.use_scroll = False
             elif self.grid_size == 16:
-                self.row_height = 35
+                self.row_height = 20
                 self.font_size = 10
                 # 16 * 35 = 560px, помещается без скролла
                 self.window_height = self.grid_size * self.row_height + 250
                 self.table_max_height = self.grid_size * self.row_height + 50
                 self.use_scroll = False
             else:  # 8 команд
-                self.row_height = 40
+                self.row_height = 25
                 self.font_size = 10
                 # 8 * 40 = 320px, помещается без скролла
                 self.window_height = self.grid_size * self.row_height + 250
@@ -12058,17 +12058,17 @@ def _choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums)
             # stats_layout.addLayout(progress_layout)
             
             # Счетчики
-            counters_layout = QHBoxLayout()
-            counters_layout.addWidget(QLabel("✅ Размещено:"))
-            self.placed_count_label = QLabel("0")
-            self.placed_count_label.setStyleSheet("color: #28a745; font-weight: bold;")
-            counters_layout.addWidget(self.placed_count_label)
-            counters_layout.addStretch()
-            counters_layout.addWidget(QLabel("⏳ Осталось:"))
-            self.remaining_count_label = QLabel(str(self.teams_count))
-            self.remaining_count_label.setStyleSheet("color: #ff9800; font-weight: bold;")
-            counters_layout.addWidget(self.remaining_count_label)
-            stats_layout.addLayout(counters_layout)
+            # counters_layout = QHBoxLayout()
+            # counters_layout.addWidget(QLabel("✅ Размещено:"))
+            # self.placed_count_label = QLabel("0")
+            # self.placed_count_label.setStyleSheet("color: #28a745; font-weight: bold;")
+            # counters_layout.addWidget(self.placed_count_label)
+            # counters_layout.addStretch()
+            # counters_layout.addWidget(QLabel("⏳ Осталось:"))
+            # self.remaining_count_label = QLabel(str(self.teams_count))
+            # self.remaining_count_label.setStyleSheet("color: #ff9800; font-weight: bold;")
+            # counters_layout.addWidget(self.remaining_count_label)
+            # stats_layout.addLayout(counters_layout)
             
             control_layout.addWidget(stats_frame)
             
@@ -12093,7 +12093,7 @@ def _choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums)
             self.finish_button.setStyleSheet("""
                 background-color: #28a745; 
                 color: white; 
-                font-size: 13px; 
+                font-size: 10px; 
                 padding: 10px; 
                 border-radius: 5px;
                 font-weight: bold;
@@ -12106,7 +12106,7 @@ def _choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums)
             cancel_button.setStyleSheet("""
                 background-color: #dc3545; 
                 color: white; 
-                font-size: 12px; 
+                font-size: 10px; 
                 padding: 8px; 
                 border-radius: 5px;
             """)
@@ -12624,7 +12624,7 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                         self.team_list.scrollToItem(item)
                         break
                 
-                self.status_label.setText(f"🎯 Очередь: {current_team[1]} (R: {current_team[3]}, Регион: {current_team[2]})")
+                # self.status_label.setText(f"🎯 Очередь: {current_team[1]} (R: {current_team[3]}, Регион: {current_team[2]})")
                 
         def update_current_available_numbers(self):
             """Обновление доступных номеров и отображения"""
@@ -12686,14 +12686,14 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             panel = QWidget()
             layout = QVBoxLayout(panel)
             layout.setContentsMargins(0, 0, 5, 0)
-            layout.setSpacing(10)
+            layout.setSpacing(5)
             
             # Группа для списка команд
             team_group = QGroupBox(f"📋 СПИСОК КОМАНД (всего: {self.teams_count})")
             team_layout = QVBoxLayout(team_group)
             
             instruction = QLabel("✅ Команда выбирается автоматически\n👇 Кликните на ячейку в таблице для размещения")
-            instruction.setStyleSheet("color: #0066cc; font-weight: bold; padding: 8px; background-color: #e7f3ff; border-radius: 5px;")
+            instruction.setStyleSheet("color: #0066cc; font-weight: bold; padding: 5px; background-color: #e7f3ff; border-radius: 5px;")
             instruction.setAlignment(Qt.AlignCenter)
             team_layout.addWidget(instruction)
             
@@ -12851,7 +12851,7 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             self.grid_table.setSelectionMode(QTableWidget.SingleSelection)
             self.grid_table.cellClicked.connect(self.on_cell_clicked)
             
-            table_height = self.grid_size * self.row_height + 110 # высота таблицы (правая)
+            table_height = self.grid_size * self.row_height + 150 # высота таблицы (правая)
             self.grid_table.setMinimumHeight(table_height)
             if not self.use_scroll:
                 self.grid_table.setMaximumHeight(table_height)
@@ -13224,10 +13224,10 @@ def choice_net_manual_with_wybor(sorted_sportsmen, count_exit, free_num, posevs_
         def calculate_optimal_sizes(self):
             """Расчет оптимальных размеров окна и панелей в зависимости от количества команд"""
             # Базовая высота на одну команду (в пикселях)
-            height_per_team = 20
+            height_per_team = 15
             
             # Высота для списка команд (с учетом заголовков и отступов)
-            self.list_height = min(self.teams_count * height_per_team + 50, 800)
+            self.list_height = min(self.teams_count * height_per_team + 50, 500)
             
             # Высота для таблицы сетки (с учетом заголовков)
             self.grid_height = min(self.grid_size * height_per_team + 50, 900)
