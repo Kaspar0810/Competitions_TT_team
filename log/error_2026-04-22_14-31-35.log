@@ -1,0 +1,10 @@
+2026-04-22 14:41:44,941 - ERROR - Необработанное исключение: IndexError: list index out of range
+2026-04-22 14:41:44,941 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11874, in on_team_clicked_for_info
+    self.highlight_same_region_teams(team[2])
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 11896, in highlight_same_region_teams
+    if team_data[2] == region:  # team_data[2] - это регион
+       ~~~~~~~~~^^^
+IndexError: list index out of range
