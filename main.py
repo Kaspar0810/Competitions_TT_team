@@ -12541,7 +12541,7 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             
         def get_current_available_numbers(self):
             """Получение доступных номеров для текущей команды"""
-            sev_num = posevs_num[1]
+            sev_num = posevs_num[1] + posevs_num[2]
             if self.current_team_index >= len(self.sorted_sportsmen):
                 return []
                 
@@ -12554,8 +12554,12 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 available = sev_num[1]
             elif self.current_team_index == 4 or self.current_team_index == 5 or self.current_team_index == 6 or self.current_team_index == 7:
                 available = sev_num[2]
-            else:
+            elif (self.current_team_index == 8 or self.current_team_index == 9 or self.current_team_index == 10
+                   or self.current_team_index == 11 or self.current_team_index == 12 or self.current_team_index == 13
+                     or self.current_team_index == 14 or self.current_team_index == 15):
                 available = sev_num[3]
+            else:
+                available = sev_num[4]
             
             # Фильтруем уже занятые номера
             available = [num for num in available if num in self.available_slots 
@@ -12576,22 +12580,24 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             # Получаем все уже посеянные команды
             placed_teams_list = []
             for slot, placed_team in self.placed_teams.items():
-                placed_teams_list.append({
-                    'name': placed_team[0],
-                    'region': placed_team[1],
-                    'slot': slot
-                })
+                if placed_team[1] != "X":
+                    placed_teams_list.append({
+                        'name': placed_team[1],
+                        'region': placed_team[2],
+                        'slot': slot
+                    })
             
             # Проверяем, есть ли команды из того же региона
             same_region_teams = [t for t in placed_teams_list if t['region'] == team[2]]
-            
+            region = team[2]
             if same_region_teams:
-                # Формируем сообщение о конфликте
-                conflict_msg = f"⚠️ ВНИМАНИЕ! Команда из региона {team[2]} уже посеяна:\n"
-                for t in same_region_teams:
-                    conflict_msg += f"  • {t['name']} на позиции {t['slot']}\n"
-                conflict_msg += f"\nРазместить {team[1]} (тоже из {team[2]}) на позицию {selected_slot}?"
-                return conflict_msg, same_region_teams
+                self.highlight_same_region_teams(region)
+                # # Формируем сообщение о конфликте
+                # conflict_msg = f"⚠️ ВНИМАНИЕ! Команда из региона {team[2]} уже посеяна:\n"
+                # for t in same_region_teams:
+                #     conflict_msg += f"  • {t['name']} на позиции {t['slot']}\n"
+                # conflict_msg += f"\nРазместить {team[1]} (тоже из {team[2]}) на позицию {selected_slot}?"
+                # return conflict_msg, same_region_teams
             return None, None
             
         def select_current_team(self):
@@ -12872,14 +12878,15 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             
             # Затем подсвечиваем команды из указанного региона, который будет сеятся
             for slot, team_data in self.placed_teams.items():
-                if team_data[1] == region:  # team_data[1] - это регионы посеянные в таблице
-                    row = slot - 1
-                    # Подсвечиваем строку
-                    for col in range(2):
-                        item = self.grid_table.item(row, col)
-                        if item:
-                            item.setBackground(QColor(255, 200, 200))  # Светло-красный
-                            item.setForeground(QBrush(QColor(139, 0, 0)))  # Темно-красный текст
+                if team_data[1] != "X":
+                    if team_data[2] == region:  # team_data[2] - это регионы посеянные в таблице
+                        row = slot - 1
+                        # Подсвечиваем строку
+                        for col in range(2):
+                            item = self.grid_table.item(row, col)
+                            if item:
+                                item.setBackground(QColor(255, 200, 200))  # Светло-красный
+                                item.setForeground(QBrush(QColor(139, 0, 0)))  # Темно-красный текст
                             
         def update_team_list(self):
             """Обновление списка команд"""
@@ -12927,8 +12934,8 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 #             break
                     
                 if same_region_in_grid:
-                    self.highlight_same_region_teams(region)
-                    # item.setBackground(QColor(255, 255, 200))  # Светло-желтый
+                    # self.highlight_same_region_teams(region)
+                    item.setBackground(QColor(255, 255, 200))  # Светло-желтый
                         
                 self.team_list.addItem(item)
             
