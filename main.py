@@ -4361,26 +4361,7 @@ def page():
             my_win.tabWidget_player.setGeometry(QtCore.QRect(2, 2, 452, 60))
             my_win.tabWidget_player.setCurrentIndex(0)
             my_win.tabWidget_filter_players.setCurrentIndex(0)
-            # my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 430))
-            # QFrame {
-            #     background-color: #f5f5f5;
-            #     border: 1px solid #ccc;
-            #     border-radius: 5px;
-            #     }
 
-            # QLineEdit, QComboBox {
-            #     padding: 3px;
-            #     border: 1px solid #aaa;
-            #     border-radius: 3px;
-            #     }
-
-            # QLineEdit:focus, QComboBox:focus {
-            #     border: 1px solid #4a9eff;
-            #     }
-
-            # QLabel {
-            #     font-weight: bold;
-            #     }
             teams = Team.select().where(Team.title_id == title_id())
             count = len(teams)
             my_win.label_114.setText(f"Всего: {count} команд")
@@ -12549,7 +12530,8 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             self.window_width = 1000
             
             # Высота списка команд
-            self.list_height = min(self.teams_count * self.row_height + 150, 500)
+            # self.list_height = min(self.teams_count * self.row_height + 150, 500)
+            self.list_height = min(10 * self.row_height + 150, 500)
             
         def get_available_slots(self):
             """Получение списка доступных слотов в сетке"""
@@ -12697,7 +12679,7 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             instruction.setAlignment(Qt.AlignCenter)
             team_layout.addWidget(instruction)
             
-            if self.use_scroll and self.grid_size == 32:
+            if self.use_scroll and self.grid_size >= 16:
                 scroll = QScrollArea()
                 scroll.setWidgetResizable(True)
                 scroll.setFrameShape(QFrame.NoFrame)
@@ -12888,9 +12870,9 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             # Сначала обновляем таблицу без подсветки
             self.update_grid_table()
             
-            # Затем подсвечиваем команды из указанного региона
+            # Затем подсвечиваем команды из указанного региона, который будет сеятся
             for slot, team_data in self.placed_teams.items():
-                if team_data[1] == region:  # team_data[1] - это регион
+                if team_data[1] == region:  # team_data[1] - это регионы посеянные в таблице
                     row = slot - 1
                     # Подсвечиваем строку
                     for col in range(2):
@@ -12901,16 +12883,18 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                             
         def update_team_list(self):
             """Обновление списка команд"""
+
             self.team_list.clear()
             titles = Title.select().where(Title.id == title_id()).get()
             vid_turnira = titles.vid_turnira
             for i, team in enumerate(self.remaining_teams):
-                    
-                is_current = (i == self.current_team_index)
-                prefix = "👉 " if is_current else "   "
-                
+                is_current = (i == 0)
+                # is_current = (i == self.current_team_index)
+                prefix = "👉 " if i == 0 else "   "
+                # prefix = "👉 " if is_current else "   "
+                # отображение в левой панели списка
                 if vid_turnira == "личные":
-                    item_text = f"{prefix}{i+1}. {team[1]} ({team[2]}) R:{team[6]}"
+                    item_text = f"{prefix}{i+1}. {team[1]} ({team[2]}) {team[4]} R:{team[6]}"
                 else:
                     item_text = f"{prefix}{i+1}. {team[1]} ({team[2]}) -R:{team[5]}"
                                
@@ -12918,22 +12902,33 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 item.setData(Qt.UserRole, team)
                 
                 font = QFont("Arial", self.font_size)
-                item.setFont(font)
-                
-                if is_current:
-                    item.setBackground(QColor(173, 216, 230))
-                    font.setBold(True)
-                    item.setFont(font)
-                else:
-                    # Проверяем, есть ли команды из того же региона в сетке
-                    same_region_in_grid = False
-                    for placed_team in self.placed_teams.values():
-                        if placed_team[1] == team[2]:
+                item.setFont(font)  
+
+                same_region_in_grid = False
+                for placed_team in self.placed_teams.values():
+                    if placed_team[1] != "X":
+                        if placed_team[2] == team[2]:
+                            region = placed_team[2]
                             same_region_in_grid = True
-                            break
+                            break            
+
+                # if is_current:
+                #     item.setBackground(QColor(173, 216, 230))
+                #     font.setBold(True)
+                #     item.setFont(font)
+                # else:
+                #     # Проверяем, есть ли команды из того же региона в сетке
+                #     same_region_in_grid = False
+                #     for placed_team in self.placed_teams.values():
+                #         if placed_team[1] == "X":
+                #             break
+                #         elif placed_team[2] == team[2]:
+                #             same_region_in_grid = True
+                #             break
                     
-                    if same_region_in_grid:
-                        item.setBackground(QColor(255, 255, 200))  # Светло-желтый
+                if same_region_in_grid:
+                    self.highlight_same_region_teams(region)
+                    # item.setBackground(QColor(255, 255, 200))  # Светло-желтый
                         
                 self.team_list.addItem(item)
             
@@ -13023,13 +13018,13 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
 
             if column not in [0, 1]:
                 return
-                
+            n = 0   
             slot = row + 1
             
             if self.current_team_index >= len(self.sorted_sportsmen):
                 QMessageBox.information(self, "Информация", "Все команды уже размещены!")
                 return
-            
+            # текущий игрок или команда
             current_team = self.sorted_sportsmen[self.current_team_index]
                 
             if slot in self.free_num:
@@ -13052,17 +13047,17 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 QMessageBox.warning(self, "Ошибка", msg)
                 return
             
-            # Проверяем конфликт регионов
-            conflict_msg, conflict_teams = self.check_region_conflict(current_team, slot)
+            # # Проверяем конфликт регионов
+            # conflict_msg, conflict_teams = self.check_region_conflict(current_team, slot)
             
-            if conflict_msg:
-                # Показываем предупреждение и запрашиваем подтверждение
-                reply = QMessageBox.question(self, "Конфликт регионов!", 
-                                            conflict_msg + "\n\nПродолжить размещение?",
-                                            QMessageBox.Yes | QMessageBox.No,
-                                            QMessageBox.No)
-                if reply == QMessageBox.No:
-                    return
+            # if conflict_msg:
+            #     # Показываем предупреждение и запрашиваем подтверждение
+            #     reply = QMessageBox.question(self, "Конфликт регионов!", 
+            #                                 conflict_msg + "\n\nПродолжить размещение?",
+            #                                 QMessageBox.Yes | QMessageBox.No,
+            #                                 QMessageBox.No)
+            #     if reply == QMessageBox.No:
+            #         return
             
             # Размещаем команду
             if vid_turnira == "личные":
@@ -13071,17 +13066,20 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 self.placed_teams[slot] = [current_team[0], current_team[1], current_team[2], current_team[5]]
             self.remaining_teams.remove(current_team)
             self.current_team_index += 1
-            
+            # self.current_team_index = 0
+            n += 1
             self.update_current_available_numbers()
             self.update_team_list()
             self.update_grid_table()
             
-            if self.current_team_index >= len(self.sorted_sportsmen):
+            # if self.current_team_index >= len(self.sorted_sportsmen):
+            if n >= len(self.sorted_sportsmen):
                 self.status_label.setText("🎉 ПОЗДРАВЛЯЮ! Жеребьевка завершена!")
                 self.current_seed_label.setText("✅ Жеребьевка успешно завершена!")
                 QMessageBox.information(self, "Успех", "Жеребьевка успешно завершена!")
             else:
                 next_team = self.sorted_sportsmen[self.current_team_index]
+                # next_team = self.sorted_sportsmen[n]
                 
                 # Проверяем конфликт для следующей команды
                 next_conflict, _ = self.check_region_conflict(next_team, None)

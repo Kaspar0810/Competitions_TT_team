@@ -1,0 +1,10 @@
+2026-04-23 16:15:52,290 - ERROR - Необработанное исключение: TypeError: choice_net_manual.<locals>.ManualChoiceDialog.highlight_same_region_teams() takes 2 positional arguments but 3 were given
+2026-04-23 16:15:52,292 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 13072, in on_cell_clicked
+    self.update_team_list()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12930, in update_team_list
+    self.highlight_same_region_teams(self, region)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+TypeError: choice_net_manual.<locals>.ManualChoiceDialog.highlight_same_region_teams() takes 2 positional arguments but 3 were given
