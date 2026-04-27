@@ -12721,14 +12721,6 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             stats_frame.setStyleSheet("background-color: #f0f0f0; border-radius: 5px; padding: 5px;")
             stats_layout = QVBoxLayout(stats_frame)
             
-            # progress_layout = QHBoxLayout()
-            # progress_layout.addWidget(QLabel("Прогресс:"))
-            # self.progress_label = QLabel("0%")
-            # self.progress_label.setStyleSheet("color: #28a745; font-weight: bold; font-size: 14px;")
-            # progress_layout.addWidget(self.progress_label)
-            # progress_layout.addStretch()
-            # stats_layout.addLayout(progress_layout)
-            
             counters_layout = QHBoxLayout()
             counters_layout.addWidget(QLabel("✅ Размещено:"))
             self.placed_count_label = QLabel("0")
@@ -12896,12 +12888,10 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             vid_turnira = titles.vid_turnira
             for i, team in enumerate(self.remaining_teams):
                 is_current = (i == 0)
-                # is_current = (i == self.current_team_index)
                 prefix = "👉 " if i == 0 else "   "
-                # prefix = "👉 " if is_current else "   "
                 # отображение в левой панели списка
                 if vid_turnira == "личные":
-                    item_text = f"{prefix}{i+1}. {team[1]} ({team[2]}) {team[4]} R:{team[6]}"
+                    item_text = f"{prefix}{i+1}. {team[1]} ({team[2]}) {team[4]} R:{team[6]} {team[7]} место"
                 else:
                     item_text = f"{prefix}{i+1}. {team[1]} ({team[2]}) -R:{team[5]}"
                                
@@ -12918,20 +12908,6 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                             region = placed_team[2]
                             same_region_in_grid = True
                             break            
-
-                # if is_current:
-                #     item.setBackground(QColor(173, 216, 230))
-                #     font.setBold(True)
-                #     item.setFont(font)
-                # else:
-                #     # Проверяем, есть ли команды из того же региона в сетке
-                #     same_region_in_grid = False
-                #     for placed_team in self.placed_teams.values():
-                #         if placed_team[1] == "X":
-                #             break
-                #         elif placed_team[2] == team[2]:
-                #             same_region_in_grid = True
-                #             break
                     
                 if same_region_in_grid:
                     # self.highlight_same_region_teams(region)
@@ -12990,7 +12966,10 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                     team_item.setBackground(QColor(200, 200, 200))
                 elif i in self.placed_teams:
                     data = self.placed_teams[i]
-                    text = f"✅ {data[1]}/{data[2]} R: {data[3]}"
+                    if vid_turnira == "личные":
+                        text = f"✅ {data[1]}/{data[2]} R: {data[3]} {data[4]}"
+                    else:
+                        text = f"✅ {data[1]}/{data[2]} R: {data[3]}"
                     team_item = QTableWidgetItem(text)
                     
                     # Проверяем конфликт регионов с текущей командой
@@ -13068,7 +13047,7 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             
             # Размещаем команду
             if vid_turnira == "личные":
-                self.placed_teams[slot] = [current_team[0], current_team[1], current_team[2], current_team[6]]
+                self.placed_teams[slot] = [current_team[0], current_team[1], current_team[2], current_team[6], current_team[4], current_team[7]]
             else:
                 self.placed_teams[slot] = [current_team[0], current_team[1], current_team[2], current_team[5]]
             self.remaining_teams.remove(current_team)
