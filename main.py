@@ -12967,7 +12967,7 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                 elif i in self.placed_teams:
                     data = self.placed_teams[i]
                     if vid_turnira == "личные":
-                        text = f"✅ {data[1]}/{data[2]} R: {data[3]} {data[4]}"
+                        text = f"✅ {data[1]} ({data[2]}) {data[4]} R: {data[3]} {data[5]} место"
                     else:
                         text = f"✅ {data[1]}/{data[2]} R: {data[3]}"
                     team_item = QTableWidgetItem(text)
@@ -12981,6 +12981,16 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
                     else:
                         team_item.setBackground(QColor(144, 238, 144))
                         slot_item.setBackground(QColor(144, 238, 144))
+                    # Подсвечивает одинаковые группы
+                    if current_team and data[1] == current_team[4]:
+                        team_item.setBackground(QColor(255, 100, 100))  # Светло-красный
+                        slot_item.setBackground(QColor(255, 100, 100))
+                        team_item.setForeground(QBrush(QColor(100, 0, 0)))
+                        slot_item.setForeground(QBrush(QColor(100, 0, 0)))
+                    else:
+                        team_item.setBackground(QColor(144, 238, 144))
+                        slot_item.setBackground(QColor(144, 238, 144))
+                    
                 else:
                     if is_available:
                         team_item = QTableWidgetItem("🎯 КЛИКНИТЕ ДЛЯ РАЗМЕЩЕНИЯ!")
