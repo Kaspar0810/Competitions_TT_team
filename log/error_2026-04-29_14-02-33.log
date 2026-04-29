@@ -1,0 +1,12 @@
+2026-04-29 14:03:26,239 - ERROR - Необработанное исключение: AttributeError: 'Title' object has no attribute 'data'
+2026-04-29 14:03:26,242 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 3438, in add_player
+    check_age_player(znak, bd)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 3871, in check_age_player
+    age = calculate_age_on_date(birth_date)
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 3852, in calculate_age_on_date
+    day_start = titles.data.start
+                ^^^^^^^^^^^
+AttributeError: 'Title' object has no attribute 'data'
