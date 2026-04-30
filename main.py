@@ -3440,7 +3440,7 @@ def add_player():
     if flag == True:
         my_win.lineEdit_Family_name.clear()
         my_win.lineEdit_otchestvo.clear()
-        bd = my_win.lineEdit_bday.text()
+        my_win.lineEdit_bday.clear()
         my_win.lineEdit_R.clear()
         my_win.lineEdit_city_list.clear()
         my_win.lineEdit_coach.clear()
@@ -11806,7 +11806,11 @@ def choice_net_manual(sorted_sportsmen, count_exit, free_num, posevs_num, nums):
             
         def get_current_available_numbers(self):
             """Получение доступных номеров для текущей команды"""
-            sev_num = posevs_num[1] + posevs_num[2]
+            if count_exit == 1:
+                sev_num = posevs_num[1]
+            elif count_exit == 2:
+                sev_num = posevs_num[1] + posevs_num[2]
+
             if self.current_team_index >= len(self.sorted_sportsmen):
                 return []
                 
