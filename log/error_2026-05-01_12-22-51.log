@@ -1,0 +1,28 @@
+2026-05-01 12:26:13,829 - ERROR - Необработанное исключение: IndexError: list index out of range
+2026-05-01 12:26:13,831 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12358, in on_cell_clicked
+    next_team = self.sorted_sportsmen[self.current_team_index]
+                ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+IndexError: list index out of range
+2026-05-01 12:27:26,168 - ERROR - Необработанное исключение: IndexError: list index out of range
+2026-05-01 12:27:26,168 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12358, in on_cell_clicked
+    next_team = self.sorted_sportsmen[self.current_team_index]
+                ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+IndexError: list index out of range
+2026-05-01 12:28:45,657 - ERROR - Необработанное исключение: IndexError: list index out of range
+2026-05-01 12:28:45,658 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12358, in on_cell_clicked
+    next_team = self.sorted_sportsmen[self.current_team_index]
+                ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+IndexError: list index out of range
+2026-05-01 12:49:50,426 - ERROR - Необработанное исключение: IndexError: list index out of range
+2026-05-01 12:49:50,427 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12358, in on_cell_clicked
+    next_team = self.sorted_sportsmen[self.current_team_index]
+                ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+IndexError: list index out of range

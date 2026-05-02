@@ -1,0 +1,7 @@
+2026-05-01 17:32:14,992 - ERROR - Необработанное исключение: IndexError: list index out of range
+2026-05-01 17:32:14,993 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 12367, in on_cell_clicked
+    next_team = self.sorted_sportsmen[self.current_team_index]
+                ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+IndexError: list index out of range

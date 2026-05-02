@@ -1,0 +1,20 @@
+2026-05-01 22:23:49,158 - ERROR - Необработанное исключение: AttributeError: module 'manual_choice' has no attribute 'choice_group_manaul'
+2026-05-01 22:23:49,159 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 1027, in choice
+    choice_gr_automat()
+    ~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 9986, in choice_gr_automat
+    posev_manual = manual_choice.choice_group_manaul(player_list)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'manual_choice' has no attribute 'choice_group_manaul'. Did you mean: 'choice_group_manual'?
+2026-05-01 22:24:00,730 - ERROR - Необработанное исключение: AttributeError: module 'manual_choice' has no attribute 'choice_group_manaul'
+2026-05-01 22:24:00,730 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 1027, in choice
+    choice_gr_automat()
+    ~~~~~~~~~~~~~~~~~^^
+  File "c:\Users\Alex\Competitions_TT_team\main.py", line 9986, in choice_gr_automat
+    posev_manual = manual_choice.choice_group_manaul(player_list)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'manual_choice' has no attribute 'choice_group_manaul'. Did you mean: 'choice_group_manual'?
