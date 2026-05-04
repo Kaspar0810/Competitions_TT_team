@@ -1014,31 +1014,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 stage = stage_sys.stage
                 if stage == "Предварительный":
                     fin = stage
-                    check_flag = check_choice(fin)
-                    if check_flag == True:
-                        reply = msg.information(my_win, 'Уведомление',
-                                                        "Жеребъевка была произведена,\nесли хотите сделать "
-                                                        "повторно\nнажмите -ОК-, если нет то - Cancel-",
-                                                        msg.Ok, msg.Cancel)
+                    # check_flag = check_choice(fin)
+                    existing_data = check_choice(fin)
 
-                        if reply == msg.Ok:
-                            my_win.tabWidget.setCurrentIndex(2)
-                            clear_db_before_choice(stage)
-                            choice_gr_automat()
-                            add_open_tab(tab_page="Результаты")
-                            my_win.tabWidget.setCurrentIndex(3)
-                            my_win.ed_etap_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
-                            return
-                        else:
-                            return
-                    else:
-                        my_win.tabWidget.setCurrentIndex(2)
-                        choice_gr_automat()
-                        add_open_tab(tab_page="Результаты")
-                        my_win.tabWidget.setCurrentIndex(3)
-                        my_win.ed_etap_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
-                        enabled_menu_after_choice()
-                        return
+                    # if check_flag == True:
+                    #     reply = msg.information(my_win, 'Уведомление',
+                    #                                     "Жеребъевка была произведена,\nесли хотите сделать "
+                    #                                     "повторно\nнажмите -ОК-, если нет то - Cancel-",
+                    #                                     msg.Ok, msg.Cancel)
+
+                    #     if reply == msg.Ok:
+                    my_win.tabWidget.setCurrentIndex(2)
+                    # clear_db_before_choice(stage)
+                    choice_gr_automat(existing_data)
+                    add_open_tab(tab_page="Результаты")
+                    my_win.tabWidget.setCurrentIndex(3)
+                    my_win.ed_etap_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
+                    return
+                        # else:
+                        #     return
+                    # else:
+                    #     my_win.tabWidget.setCurrentIndex(2)
+                    #     choice_gr_automat()
+                    #     add_open_tab(tab_page="Результаты")
+                    #     my_win.tabWidget.setCurrentIndex(3)
+                    #     my_win.ed_etap_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
+                    #     enabled_menu_after_choice()
+                    #     return
         elif sender == self.choice_pf_Action: # подменю полуфиналы            
             stage = select_choice_semifinal()
             # +++ new
@@ -9818,7 +9820,7 @@ def create_matches_for_semi_final(semi_final_num, sf_groups, stage):
     print(f"Создано {total_matches} встреч для {semi_final_num}-го полуфинала")
 # ============================
 
-def choice_gr_automat():
+def choice_gr_automat(existing_data):
     "новая система жеребьевки групп"
     " current_region_group - словарь (регион - список номеров групп куда можно сеять)"
     " reg_player - словарь регион ид игрока, player_current - список сеящихся игроков, posev - словарь всего посева"
@@ -9976,10 +9978,9 @@ def choice_gr_automat():
             player_list.append(full_player_list)
         # ==== вариант ручной жеребьевки AI =========
         my_win.close()
-        results = choice_group_manual(player_list, group)
+        results = choice_group_manual(player_list, group, existing_data)
         my_win.show()
-        # ============================================
-        msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
+
         choice_save_manual_group(results)
         System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
         fill_table_after_choice()

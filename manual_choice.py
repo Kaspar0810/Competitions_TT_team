@@ -2,9 +2,11 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+import mysql.connector
+from mysql.connector import Error
 
 class ChoiceGroupManual(QDialog):
-    def __init__(self, athletes, num_groups, parent=None):
+    def __init__(self, athletes, num_groups, parent=None, existing_data=None):
         super().__init__(parent)
         self.athletes = athletes
         self.sorted_athletes = []
@@ -16,17 +18,70 @@ class ChoiceGroupManual(QDialog):
         self.current_group_for_seed = None
         self.current_round = 1
         self.max_rows_per_group = 0
+        self.existing_data = existing_data  # Данные из базы для загрузки
         self.initUI()
         self.load_athletes()
         self.calculate_max_rows()
         self.init_groups()
-        self.calculate_initial_group()
+        
+        if self.existing_data:
+            self.load_existing_draw()
+        else:
+            self.calculate_initial_group()
+        
         self.setModal(True)
+        
+    def load_existing_draw(self):
+        """Загрузка существующей жеребьевки из базы данных"""
+        # existing_data: список словарей [{'id_player_choice': id, 'group': group_num, 'posev_group': position}]
+        
+        # Инициализируем группы
+        self.groups = [[] for _ in range(self.num_groups)]
+        
+        # Заполняем группы данными из базы
+        for item in self.existing_data:
+            player_id = item['id_player_choice']
+            group_num = item['group'] - 1  # Приводим к 0-индексации
+            position = item['posev_group'] - 1  # Приводим к 0-индексации
+            
+            # Находим спортсмена по id
+            athlete = None
+            for a in self.athletes:
+                if a[0] == player_id:
+                    athlete = a
+                    break
+            
+            if athlete and group_num < self.num_groups:
+                # Размещаем спортсмена в нужную позицию
+                while len(self.groups[group_num]) <= position:
+                    self.groups[group_num].append(None)
+                self.groups[group_num][position] = athlete
+                
+                # Удаляем из списка неразмещенных
+                if athlete in self.sorted_athletes:
+                    idx = self.sorted_athletes.index(athlete)
+                    if idx >= self.current_athlete_index:
+                        self.sorted_athletes.pop(idx)
+        
+        # Обновляем индекс текущего спортсмена
+        placed_count = sum(1 for group in self.groups for athlete in group if athlete)
+        self.current_athlete_index = placed_count
+        
+        # Определяем начальную группу для продолжения жеребьевки
+        self.current_group_for_seed = self.find_next_group_for_seed()
+        self.update_round_display()
+        
+        # Обновляем отображение
+        self.update_groups_display()
+        self.highlight_current_group()
+        
+        # Если все спортсмены уже размещены
+        if self.current_athlete_index >= len(self.athletes):
+            QMessageBox.information(self, "Информация", "Жеребьевка уже завершена! Все спортсмены распределены.")
         
     def calculate_initial_group(self):
         """Определение начальной группы для посева"""
         if self.num_groups > 0:
-            # После авто-заполнения начинаем с последней группы
             self.current_group_for_seed = self.num_groups - 1
             
     def calculate_max_rows(self):
@@ -38,18 +93,14 @@ class ChoiceGroupManual(QDialog):
             
     def get_current_round(self):
         """Определение текущего раунда на основе количества размещенных спортсменов"""
-        # Количество уже размещенных спортсменов
         placed_count = self.current_athlete_index
         
         if placed_count == 0:
             return 1
         
-        # Раунд вычисляется как целая часть от (размещенные_спортсмены - 1) / количество_групп + 1
-        # Но с учетом что 1-й раунд - это первые num_groups спортсменов
         if placed_count <= self.num_groups:
             return 1
         else:
-            # Для 2-го и последующих раундов
             round_num = (placed_count - 1) // self.num_groups + 1
             return round_num
     
@@ -61,7 +112,7 @@ class ChoiceGroupManual(QDialog):
         
     def initUI(self):
         self.setWindowTitle('Ручная жеребьевка спортсменов')
-        self.setGeometry(100, 100, 1500, 720)
+        self.setGeometry(100, 100, 1400, 720)
         
         main_layout = QVBoxLayout(self)
         
@@ -78,7 +129,7 @@ class ChoiceGroupManual(QDialog):
         left_panel.setMaximumWidth(400)
         left_layout = QVBoxLayout(left_panel)
         
-        # Горизонтальный layout для информации о текущем спортсмене и группе
+        # Горизонтальный layout для информации
         info_layout = QHBoxLayout()
         
         # Информация о текущем спортсмене
@@ -91,8 +142,8 @@ class ChoiceGroupManual(QDialog):
         self.current_athlete_label.setWordWrap(True)
         current_athlete_layout.addWidget(self.current_athlete_label)
         
-        left_layout.addWidget(current_athlete_group)
-
+        info_layout.addWidget(current_athlete_group)
+        
         # Информация о текущей группе
         current_group_group = QGroupBox("Текущая группа для посева")
         current_group_group.setStyleSheet("QGroupBox { font-weight: bold; }")
@@ -186,9 +237,14 @@ class ChoiceGroupManual(QDialog):
         self.btn_result.setStyleSheet("background-color: #4CAF50; color: white; font-weight: bold;")
         dialog_buttons.addWidget(self.btn_result)
         
+        self.btn_save = QPushButton("Сохранить в БД")
+        self.btn_save.clicked.connect(self.save_to_database)
+        self.btn_save.setStyleSheet("background-color: #2196F3; color: white; font-weight: bold;")
+        dialog_buttons.addWidget(self.btn_save)
+        
         self.btn_ok = QPushButton("OK")
         self.btn_ok.clicked.connect(self.accept)
-        self.btn_ok.setStyleSheet("background-color: #2196F3; color: white; font-weight: bold;")
+        self.btn_ok.setStyleSheet("background-color: #4CAF50; color: white; font-weight: bold;")
         dialog_buttons.addWidget(self.btn_ok)
         
         self.btn_cancel = QPushButton("Отмена")
@@ -211,8 +267,7 @@ class ChoiceGroupManual(QDialog):
                               "• Выделение переходит на следующую группу\n"
                               "  только после внесения игрока в выделенную группу\n"
                               "• Следующая группа выбирается с наименьшим\n"
-                              "  количеством игроков, а при равном количестве\n"
-                              "  учитывается направление обхода\n"
+                              "  количеством игроков\n"
                               "• Зеленые ячейки - можно сеять\n"
                               "• Желтые - совпадение региона, можно сеять с подтверждением\n"
                               "• Красные - совпадение региона и тренера\n"
@@ -279,10 +334,7 @@ class ChoiceGroupManual(QDialog):
     
     def move_to_next_group(self):
         """Переход к следующей группе"""
-        # Обновляем текущий раунд на основе количества размещенных спортсменов
         self.update_round_display()
-        
-        # Находим следующую группу для посева
         next_group = self.find_next_group_for_seed()
         self.current_group_for_seed = next_group
         self.highlight_current_group()
@@ -364,7 +416,6 @@ class ChoiceGroupManual(QDialog):
             table.setEditTriggers(QTableWidget.DoubleClicked)
             table.itemDoubleClicked.connect(self.on_item_double_clicked)
             
-            # Устанавливаем всплывающие подсказки для ячеек
             table.setMouseTracking(True)
             table.cellEntered.connect(self.on_cell_entered)
             
@@ -399,7 +450,7 @@ class ChoiceGroupManual(QDialog):
     
     def on_cell_entered(self, row, col):
         """Обработка наведения мыши на ячейку"""
-        if col != 1:  # Только для колонки с участниками
+        if col != 1:
             return
         
         table = self.sender()
@@ -428,7 +479,6 @@ class ChoiceGroupManual(QDialog):
                         item = QTableWidgetItem(display_text)
                         item.setData(Qt.UserRole, id_player)
                         item.setFlags(item.flags() | Qt.ItemIsEditable)
-                        # Сохраняем полную информацию для подсказки
                         item.setToolTip(f"ID: {id_player}\nФИО: {name}\nРейтинг: {rating}\nРегион: {region}\nТренер: {coach}")
                         table.setItem(row, 1, item)
                     else:
@@ -467,7 +517,7 @@ class ChoiceGroupManual(QDialog):
             self.current_athlete_label.setStyleSheet("background-color: #90EE90; padding: 8px; font-size: 12px;")
     
     def check_conflicts(self, athlete, group_idx):
-        """Проверка конфликтов: возвращает (region_conflict, coach_conflict)"""
+        """Проверка конфликтов"""
         if group_idx >= len(self.groups):
             return False, False
             
@@ -508,7 +558,7 @@ class ChoiceGroupManual(QDialog):
                             num_item.setBackground(QBrush(QColor(144, 238, 144)))
     
     def can_place_athlete(self, athlete, group_idx, row):
-        """Проверка возможности размещения (только занятость места)"""
+        """Проверка возможности размещения"""
         if group_idx >= len(self.groups):
             return False
             
@@ -584,13 +634,9 @@ class ChoiceGroupManual(QDialog):
                 item.setToolTip(f"ID: {current_athlete[0]}\nФИО: {current_athlete[1]}\nРейтинг: {current_athlete[2]}\nРегион: {current_athlete[3]}\nТренер: {current_athlete[4]}")
                 table.setItem(row, 1, item)
                 
-                # Переходим к следующему спортсмену
                 self.current_athlete_index += 1
-                
-                # Обновляем текущий раунд
                 self.update_round_display()
                 
-                # Переход к следующей группе ТОЛЬКО если игрок был размещен в выделенную группу
                 if g_idx == self.current_group_for_seed:
                     self.move_to_next_group()
                 else:
@@ -899,6 +945,41 @@ class ChoiceGroupManual(QDialog):
         
         dialog.exec_()
     
+    def save_to_database(self):
+        """Сохранение результатов жеребьевки в базу данных"""
+        try:
+            # Подключение к базе данных
+            connection = mysql.connector.connect(
+                host='localhost',
+                database='your_database',
+                user='your_user',
+                password='your_password'
+            )
+            
+            cursor = connection.cursor()
+            
+            # Очищаем таблицу Choice перед записью (или обновляем)
+            cursor.execute("DELETE FROM Choice")
+            
+            # Записываем результаты
+            for group_idx, group in enumerate(self.groups):
+                for posev_group, athlete in enumerate(group, 1):
+                    if athlete:
+                        id_player = athlete[0]
+                        group_num = group_idx + 1
+                        
+                        query = "INSERT INTO Choice (id_player_choice, `group`, posev_group) VALUES (%s, %s, %s)"
+                        cursor.execute(query, (id_player, group_num, posev_group))
+            
+            connection.commit()
+            cursor.close()
+            connection.close()
+            
+            QMessageBox.information(self, "Успех", "Результаты жеребьевки успешно сохранены в базу данных!")
+            
+        except Error as e:
+            QMessageBox.warning(self, "Ошибка", f"Ошибка при сохранении в базу данных:\n{str(e)}")
+    
     def reset_draw(self):
         """Полный сброс"""
         self.load_athletes()
@@ -1002,21 +1083,44 @@ class ChoiceGroupManual(QDialog):
         """Получить результаты жеребьевки"""
         results = []
         for group_idx, group in enumerate(self.groups):
-            gr = group_idx + 1
+            # gr = group_idx + 1
             for seed_num, athlete in enumerate(group, 1):
                 if athlete:
-                    results.append([
-                        seed_num,
-                        athlete[0],
-                        athlete[1],
-                        athlete[3],
-                        gr
-                    ])
-        results.sort(key=lambda x: x[0])
+                    results.append({
+                        'seed_num': seed_num,
+                        'id_player': athlete[0],
+                        'name': athlete[1],
+                        'region': athlete[3],
+                        # gr
+                    })
         return results
 
 
-def choice_group_manual(athletes, num_groups, parent=None):
+# def load_existing_draw_from_db():
+#     """Загрузка существующей жеребьевки из базы данных"""
+#     try:
+#         connection = mysql.connector.connect(
+#             host='localhost',
+#             database='your_database',
+#             user='your_user',
+#             password='your_password'
+#         )
+        
+#         cursor = connection.cursor(dictionary=True)
+#         cursor.execute("SELECT id_player_choice, `group`, posev_group FROM Choice ORDER BY `group`, posev_group")
+#         results = cursor.fetchall()
+        
+#         cursor.close()
+#         connection.close()
+        
+#         return results if results else None
+        
+#     except Error as e:
+#         print(f"Ошибка при загрузке из базы данных: {e}")
+#         return None
+
+
+def choice_group_manual(athletes, num_groups, existing_data, parent=None):
     """
     Функция для вызова ручной жеребьевки
     
@@ -1031,7 +1135,33 @@ def choice_group_manual(athletes, num_groups, parent=None):
     if num_groups < 2 or num_groups > 32:
         raise ValueError("Количество групп должно быть от 2 до 32")
     
-    dialog = ChoiceGroupManual(athletes, num_groups, parent)
+    # Проверяем, есть ли уже жеребьевка в базе данных
+    # existing_data = check_choice(fin) # проверка на жеребьевку True - значит сделана
+    # existing_data = load_existing_draw_from_db()
+    
+    if existing_data:
+        # Спрашиваем пользователя, что делать
+        reply = QMessageBox.question(parent, 'Жеребьевка',
+            'В базе данных уже есть результаты жеребьевки.\n\n'
+            'Выберите действие:\n'
+            '• "Сбросить" - начать новую жеребьевку с чистого листа\n'
+            '• "Загрузить" - загрузить существующую жеребьевку для редактирования\n'
+            '• "Отмена" - выйти без изменений',
+            QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel,
+            QMessageBox.Cancel)
+        
+        if reply == QMessageBox.Yes:
+            # Сбросить - начать новую жеребьевку
+            existing_data = None
+            QMessageBox.information(parent, "Информация", "Начинаем новую жеребьевку. Предыдущие данные будут перезаписаны при сохранении.")
+        elif reply == QMessageBox.No:
+            # Загрузить существующую
+            pass  # existing_data уже содержит данные
+        else:
+            # Отмена
+            return None
+    
+    dialog = ChoiceGroupManual(athletes, num_groups, parent, existing_data)
     result = dialog.exec_()
     
     if result == QDialog.Accepted:
