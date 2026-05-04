@@ -11,29 +11,57 @@ class ChoiceGroupManual(QDialog):
         self.groups = []
         self.num_groups = num_groups
         self.current_athlete_index = 0
-        self.draw_order = []
         self.group_tables = []
         self.group_headers = []
         self.current_group_for_seed = None
-        self.current_round = 0  # Текущий круг посева (1, 2, 3...)
+        self.current_round = 1
         self.max_rows_per_group = 0
         self.initUI()
         self.load_athletes()
         self.calculate_max_rows()
         self.init_groups()
-        self.calculate_draw_order()
+        self.calculate_initial_group()
         self.setModal(True)
         
+    def calculate_initial_group(self):
+        """Определение начальной группы для посева"""
+        if self.num_groups > 0:
+            # После авто-заполнения начинаем с последней группы
+            self.current_group_for_seed = self.num_groups - 1
+            
     def calculate_max_rows(self):
         """Расчет максимального количества строк в группе"""
         total_athletes = len(self.athletes)
         self.max_rows_per_group = (total_athletes + self.num_groups - 1) // self.num_groups
         if self.max_rows_per_group < 1:
             self.max_rows_per_group = 1
+            
+    def get_current_round(self):
+        """Определение текущего раунда на основе количества размещенных спортсменов"""
+        # Количество уже размещенных спортсменов
+        placed_count = self.current_athlete_index
+        
+        if placed_count == 0:
+            return 1
+        
+        # Раунд вычисляется как целая часть от (размещенные_спортсмены - 1) / количество_групп + 1
+        # Но с учетом что 1-й раунд - это первые num_groups спортсменов
+        if placed_count <= self.num_groups:
+            return 1
+        else:
+            # Для 2-го и последующих раундов
+            round_num = (placed_count - 1) // self.num_groups + 1
+            return round_num
+    
+    def update_round_display(self):
+        """Обновление отображения текущего раунда"""
+        self.current_round = self.get_current_round()
+        direction = "→" if self.current_round % 2 == 1 else "←"
+        self.round_label.setText(f"Круг: {self.current_round}\nНаправление: {direction}")
         
     def initUI(self):
         self.setWindowTitle('Ручная жеребьевка спортсменов')
-        self.setGeometry(100, 100, 1600, 800)
+        self.setGeometry(100, 100, 1500, 720)
         
         main_layout = QVBoxLayout(self)
         
@@ -50,39 +78,44 @@ class ChoiceGroupManual(QDialog):
         left_panel.setMaximumWidth(400)
         left_layout = QVBoxLayout(left_panel)
         
+        # Горизонтальный layout для информации о текущем спортсмене и группе
+        info_layout = QHBoxLayout()
+        
         # Информация о текущем спортсмене
-        current_athlete_group = QGroupBox("Текущий спортсмен для посева")
+        current_athlete_group = QGroupBox("Текущий спортсмен")
         current_athlete_group.setStyleSheet("QGroupBox { font-weight: bold; }")
         current_athlete_layout = QVBoxLayout(current_athlete_group)
         
-        self.current_athlete_label = QLabel("Спортсмен: -")
+        self.current_athlete_label = QLabel("Спортсмен: -\nРейтинг: -\nРегион: -\nТренер: -")
         self.current_athlete_label.setStyleSheet("background-color: #ffe0b3; padding: 8px; font-size: 12px;")
         self.current_athlete_label.setWordWrap(True)
         current_athlete_layout.addWidget(self.current_athlete_label)
         
         left_layout.addWidget(current_athlete_group)
-        
+
         # Информация о текущей группе
         current_group_group = QGroupBox("Текущая группа для посева")
         current_group_group.setStyleSheet("QGroupBox { font-weight: bold; }")
         current_group_layout = QVBoxLayout(current_group_group)
         
-        self.current_group_label = QLabel("Группа: -")
+        self.current_group_label = QLabel("Группа: -\nИгроков: -")
         self.current_group_label.setStyleSheet("background-color: #b3d9ff; padding: 8px; font-size: 12px;")
         current_group_layout.addWidget(self.current_group_label)
         
-        left_layout.addWidget(current_group_group)
+        info_layout.addWidget(current_group_group)
         
         # Информация о текущем круге
-        round_group = QGroupBox("Текущий круг посева")
+        round_group = QGroupBox("Текущий круг")
         round_group.setStyleSheet("QGroupBox { font-weight: bold; }")
         round_layout = QVBoxLayout(round_group)
         
-        self.round_label = QLabel("Круг: 1")
+        self.round_label = QLabel("Круг: 1\nНаправление: →")
         self.round_label.setStyleSheet("background-color: #d4e6f1; padding: 8px; font-size: 12px;")
         round_layout.addWidget(self.round_label)
         
-        left_layout.addWidget(round_group)
+        info_layout.addWidget(round_group)
+        
+        left_layout.addLayout(info_layout)
         
         # Список участников
         athletes_group = QGroupBox("Список участников (по рейтингу ↓)")
@@ -118,6 +151,9 @@ class ChoiceGroupManual(QDialog):
         stats_layout.addWidget(QLabel("Макс. в группе:"), 3, 0)
         self.max_rows_label = QLabel("0")
         stats_layout.addWidget(self.max_rows_label, 3, 1)
+        stats_layout.addWidget(QLabel("Текущий круг:"), 4, 0)
+        self.round_number_label = QLabel("1")
+        stats_layout.addWidget(self.round_number_label, 4, 1)
         control_layout.addLayout(stats_layout)
         
         # Кнопки управления
@@ -169,9 +205,14 @@ class ChoiceGroupManual(QDialog):
                               "• Первые номера групп заполняются автоматически\n"
                               "• Желтая подсветка группы - текущая для посева\n"
                               "• Клик по ЛЮБОЙ зеленой/желтой ячейке для посева\n"
-                              "• После размещения игрока в группу,\n"
-                              "  программа автоматически находит следующую группу\n"
-                              "  с наименьшим количеством игроков\n"
+                              "• Наведите мышь на игрока для просмотра полной информации\n"
+                              "• Если внести игрока в НЕ выделенную группу,\n"
+                              "  выделение остается на прежней группе\n"
+                              "• Выделение переходит на следующую группу\n"
+                              "  только после внесения игрока в выделенную группу\n"
+                              "• Следующая группа выбирается с наименьшим\n"
+                              "  количеством игроков, а при равном количестве\n"
+                              "  учитывается направление обхода\n"
                               "• Зеленые ячейки - можно сеять\n"
                               "• Желтые - совпадение региона, можно сеять с подтверждением\n"
                               "• Красные - совпадение региона и тренера\n"
@@ -214,26 +255,15 @@ class ChoiceGroupManual(QDialog):
         return 0
     
     def find_next_group_for_seed(self):
-        """Найти следующую группу для посева на основе количества игроков"""
-        if self.current_round == 0:
-            self.current_round = 1
-        
-        # Собираем информацию о количестве игроков в каждой группе
+        """Найти следующую группу для посева (с наименьшим количеством игроков)"""
         groups_info = []
         for g in range(self.num_groups):
             count = self.get_group_players_count(g)
             groups_info.append((g, count))
         
-        # Сортируем по количеству игроков (по возрастанию)
-        groups_info.sort(key=lambda x: x[1])
-        
-        # Находим минимальное количество игроков
-        min_count = groups_info[0][1]
-        
-        # Получаем все группы с минимальным количеством
+        min_count = min(count for _, count in groups_info)
         min_groups = [g for g, count in groups_info if count == min_count]
         
-        # Определяем направление обхода в зависимости от круга
         if self.current_round % 2 == 1:
             # Нечетный круг - от первой к последней
             for g in min_groups:
@@ -249,30 +279,14 @@ class ChoiceGroupManual(QDialog):
     
     def move_to_next_group(self):
         """Переход к следующей группе"""
+        # Обновляем текущий раунд на основе количества размещенных спортсменов
+        self.update_round_display()
+        
+        # Находим следующую группу для посева
         next_group = self.find_next_group_for_seed()
-        
-        # Проверяем, не закончился ли круг
-        current_count = self.get_group_players_count(self.current_group_for_seed)
-        next_count = self.get_group_players_count(next_group)
-        
-        # Если переходим к группе с меньшим количеством игроков, значит начался новый круг
-        # if next_count < current_count:
-        self.current_round += 1
-        self.round_label.setText(f"Круг: {self.current_round}")
-        
-        # Определяем направление для нового круга
-        direction = "от 1 к N" if self.current_round % 2 == 1 else "от N к 1"
-        self.round_label.setToolTip(f"Направление: {direction}")
-        
         self.current_group_for_seed = next_group
         self.highlight_current_group()
     
-    def calculate_draw_order(self):
-        """Расчет порядка посева групп (змейкой)"""
-        if self.num_groups > 0:
-            self.current_group_for_seed = 0
-            self.current_round = 1
-            
     def highlight_current_group(self):
         """Подсветка текущей группы для посева"""
         for header in self.group_headers:
@@ -282,7 +296,8 @@ class ChoiceGroupManual(QDialog):
             self.group_headers[self.current_group_for_seed].setStyleSheet(
                 "font-weight: bold; background-color: #FF9800; color: white; padding: 5px; border: 3px solid #FF5722;"
             )
-            self.current_group_label.setText(f"Группа {self.current_group_for_seed + 1} (игроков: {self.get_group_players_count(self.current_group_for_seed)})")
+            players_count = self.get_group_players_count(self.current_group_for_seed)
+            self.current_group_label.setText(f"Группа: {self.current_group_for_seed + 1}\nИгроков: {players_count}")
     
     def load_athletes(self):
         """Загрузка и сортировка спортсменов"""
@@ -331,7 +346,7 @@ class ChoiceGroupManual(QDialog):
             
             table = QTableWidget()
             table.setColumnCount(2)
-            table.setHorizontalHeaderLabels(["№", "Участник (регион) тренер"])
+            table.setHorizontalHeaderLabels(["№", "Участник (регион) рейтинг"])
             
             table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)
             table.setColumnWidth(0, 40)
@@ -348,6 +363,10 @@ class ChoiceGroupManual(QDialog):
             table.cellClicked.connect(self.on_cell_clicked)
             table.setEditTriggers(QTableWidget.DoubleClicked)
             table.itemDoubleClicked.connect(self.on_item_double_clicked)
+            
+            # Устанавливаем всплывающие подсказки для ячеек
+            table.setMouseTracking(True)
+            table.cellEntered.connect(self.on_cell_entered)
             
             for row in range(self.max_rows_per_group):
                 num_item = QTableWidgetItem(str(row + 1))
@@ -377,7 +396,26 @@ class ChoiceGroupManual(QDialog):
         
         self.update_groups_display()
         self.highlight_current_group()
+    
+    def on_cell_entered(self, row, col):
+        """Обработка наведения мыши на ячейку"""
+        if col != 1:  # Только для колонки с участниками
+            return
         
+        table = self.sender()
+        if not table:
+            return
+        
+        for g_idx, t in enumerate(self.group_tables):
+            if t == table:
+                if g_idx < len(self.groups) and row < len(self.groups[g_idx]) and self.groups[g_idx][row]:
+                    athlete = self.groups[g_idx][row]
+                    if athlete:
+                        id_player, name, rating, region, coach = athlete
+                        tooltip_text = f"ID: {id_player}\nФИО: {name}\nРейтинг: {rating}\nРегион: {region}\nТренер: {coach}"
+                        QToolTip.showText(QCursor.pos(), tooltip_text)
+                break
+    
     def update_groups_display(self):
         """Обновление отображения всех групп"""
         for g_idx, table in enumerate(self.group_tables):
@@ -386,13 +424,17 @@ class ChoiceGroupManual(QDialog):
                     athlete = self.groups[g_idx][row]
                     if athlete:
                         id_player, name, rating, region, coach = athlete
-                        display_text = f"{name} ({region}) R:{rating} {coach}"
+                        display_text = f"{name} ({region}) R:{rating}"
                         item = QTableWidgetItem(display_text)
                         item.setData(Qt.UserRole, id_player)
                         item.setFlags(item.flags() | Qt.ItemIsEditable)
+                        # Сохраняем полную информацию для подсказки
+                        item.setToolTip(f"ID: {id_player}\nФИО: {name}\nРейтинг: {rating}\nРегион: {region}\nТренер: {coach}")
                         table.setItem(row, 1, item)
                     else:
-                        table.setItem(row, 1, QTableWidgetItem(""))
+                        empty_item = QTableWidgetItem("")
+                        empty_item.setFlags(empty_item.flags() | Qt.ItemIsEditable)
+                        table.setItem(row, 1, empty_item)
                 else:
                     empty_item = QTableWidgetItem("")
                     empty_item.setFlags(empty_item.flags() | Qt.ItemIsEditable)
@@ -404,12 +446,13 @@ class ChoiceGroupManual(QDialog):
     def update_stats(self):
         """Обновление статистики"""
         total = len(self.athletes)
-        placed = sum(1 for group in self.groups for athlete in group if athlete)
+        placed = self.current_athlete_index
         remaining = total - placed
         self.total_label.setText(str(total))
         self.placed_label.setText(str(placed))
         self.remaining_label.setText(str(remaining))
         self.max_rows_label.setText(str(self.max_rows_per_group))
+        self.round_number_label.setText(str(self.current_round))
         self.update_current_athlete()
         
     def update_current_athlete(self):
@@ -417,10 +460,10 @@ class ChoiceGroupManual(QDialog):
         if self.current_athlete_index < len(self.sorted_athletes):
             athlete = self.sorted_athletes[self.current_athlete_index]
             id_player, name, rating, region, coach = athlete
-            self.current_athlete_label.setText(f"Спортсмен: {name}\nРейтинг: {rating} | Регион: {region}\nТренер: {coach}")
+            self.current_athlete_label.setText(f"Спортсмен: {name}\nРейтинг: {rating}\nРегион: {region}\nТренер: {coach}")
             self.highlight_available_cells(athlete)
         else:
-            self.current_athlete_label.setText("Жеребьевка завершена!")
+            self.current_athlete_label.setText("Жеребьевка завершена!\nВсе спортсмены\nраспределены")
             self.current_athlete_label.setStyleSheet("background-color: #90EE90; padding: 8px; font-size: 12px;")
     
     def check_conflicts(self, athlete, group_idx):
@@ -474,6 +517,22 @@ class ChoiceGroupManual(QDialog):
             
         return True
     
+    def closeEvent(self, event):
+        """Обработка закрытия окна через крестик"""
+        if self.current_athlete_index < len(self.sorted_athletes):
+            reply = QMessageBox.question(self, 'Подтверждение закрытия',
+                f'Не все спортсмены распределены!\n'
+                f'Осталось: {len(self.sorted_athletes) - self.current_athlete_index} спортсменов.\n\n'
+                f'Вы уверены, что хотите закрыть окно жеребьевки?',
+                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            
+            if reply == QMessageBox.Yes:
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.accept()
+    
     def on_cell_clicked(self, row, col):
         """Обработка клика по ячейке"""
         if col != 1:
@@ -518,20 +577,25 @@ class ChoiceGroupManual(QDialog):
                 self.groups[g_idx][row] = current_athlete
                 
                 # Обновляем отображение ячейки
-                display_text = f"{current_athlete[1]} ({current_athlete[3]}) R:{current_athlete[2]} {current_athlete[4]}"
+                display_text = f"{current_athlete[1]} ({current_athlete[3]}) R:{current_athlete[2]}"
                 item = QTableWidgetItem(display_text)
                 item.setData(Qt.UserRole, current_athlete[0])
                 item.setFlags(item.flags() | Qt.ItemIsEditable)
+                item.setToolTip(f"ID: {current_athlete[0]}\nФИО: {current_athlete[1]}\nРейтинг: {current_athlete[2]}\nРегион: {current_athlete[3]}\nТренер: {current_athlete[4]}")
                 table.setItem(row, 1, item)
                 
                 # Переходим к следующему спортсмену
                 self.current_athlete_index += 1
                 
-                # Переход к следующей группе для посева
-                self.move_to_next_group()
+                # Обновляем текущий раунд
+                self.update_round_display()
                 
-                # Обновляем подсветку
-                self.highlight_current_group()
+                # Переход к следующей группе ТОЛЬКО если игрок был размещен в выделенную группу
+                if g_idx == self.current_group_for_seed:
+                    self.move_to_next_group()
+                else:
+                    self.highlight_current_group()
+                
                 if self.current_athlete_index < len(self.sorted_athletes):
                     self.highlight_available_cells(self.sorted_athletes[self.current_athlete_index])
                 
@@ -619,10 +683,11 @@ class ChoiceGroupManual(QDialog):
                         self.groups[group_idx][row] = athlete
                         
                         table = self.group_tables[group_idx]
-                        display_text = f"{athlete[1]} ({athlete[3]}) R:{athlete[2]} {athlete[4]}"
+                        display_text = f"{athlete[1]} ({athlete[3]}) R:{athlete[2]}"
                         item = QTableWidgetItem(display_text)
                         item.setData(Qt.UserRole, athlete[0])
                         item.setFlags(item.flags() | Qt.ItemIsEditable)
+                        item.setToolTip(f"ID: {athlete[0]}\nФИО: {athlete[1]}\nРейтинг: {athlete[2]}\nРегион: {athlete[3]}\nТренер: {athlete[4]}")
                         table.setItem(row, 1, item)
                         
                         if athlete in self.sorted_athletes:
@@ -633,14 +698,9 @@ class ChoiceGroupManual(QDialog):
                                     self.current_athlete_index -= 1
                         
                         if old_athlete:
-                            insert_pos = self.current_athlete_index
-                            for i in range(self.current_athlete_index, len(self.sorted_athletes)):
-                                if self.sorted_athletes[i][2] < old_athlete[2]:
-                                    insert_pos = i
-                                    break
-                                insert_pos = i + 1
-                            self.sorted_athletes.insert(insert_pos, old_athlete)
+                            self.sorted_athletes.insert(self.current_athlete_index, old_athlete)
                         
+                        self.update_athletes_table()
                         self.update_stats()
                         self.update_current_athlete()
                         dialog.accept()
@@ -653,13 +713,8 @@ class ChoiceGroupManual(QDialog):
                         table.setItem(row, 1, QTableWidgetItem(""))
                         
                         if athlete:
-                            insert_pos = self.current_athlete_index
-                            for i in range(self.current_athlete_index, len(self.sorted_athletes)):
-                                if self.sorted_athletes[i][2] < athlete[2]:
-                                    insert_pos = i
-                                    break
-                                insert_pos = i + 1
-                            self.sorted_athletes.insert(insert_pos, athlete)
+                            self.sorted_athletes.insert(self.current_athlete_index, athlete)
+                            self.update_athletes_table()
                             self.update_stats()
                             self.update_current_athlete()
                             dialog.accept()
@@ -747,15 +802,17 @@ class ChoiceGroupManual(QDialog):
                 self.groups[g1][row1], self.groups[g2][row2] = athlete2, athlete1
                 
                 table1 = self.group_tables[g1]
-                display_text1 = f"{athlete2[1]} ({athlete2[3]}) R:{athlete2[2]} {athlete2[4]}"
+                display_text1 = f"{athlete2[1]} ({athlete2[3]}) R:{athlete2[2]}"
                 item1 = QTableWidgetItem(display_text1)
                 item1.setData(Qt.UserRole, athlete2[0])
+                item1.setToolTip(f"ID: {athlete2[0]}\nФИО: {athlete2[1]}\nРейтинг: {athlete2[2]}\nРегион: {athlete2[3]}\nТренер: {athlete2[4]}")
                 table1.setItem(row1, 1, item1)
                 
                 table2 = self.group_tables[g2]
-                display_text2 = f"{athlete1[1]} ({athlete1[3]}) R:{athlete1[2]} {athlete1[4]}"
+                display_text2 = f"{athlete1[1]} ({athlete1[3]}) R:{athlete1[2]}"
                 item2 = QTableWidgetItem(display_text2)
                 item2.setData(Qt.UserRole, athlete1[0])
+                item2.setToolTip(f"ID: {athlete1[0]}\nФИО: {athlete1[1]}\nРейтинг: {athlete1[2]}\nРегион: {athlete1[3]}\nТренер: {athlete1[4]}")
                 table2.setItem(row2, 1, item2)
                 
                 dialog.accept()
@@ -820,9 +877,10 @@ class ChoiceGroupManual(QDialog):
                     self.groups[target_group][target_row] = athlete1
                     
                     new_table = self.group_tables[target_group]
-                    display_text = f"{athlete1[1]} ({athlete1[3]}) R:{athlete1[2]} {athlete1[4]}"
+                    display_text = f"{athlete1[1]} ({athlete1[3]}) R:{athlete1[2]}"
                     item = QTableWidgetItem(display_text)
                     item.setData(Qt.UserRole, athlete1[0])
+                    item.setToolTip(f"ID: {athlete1[0]}\nФИО: {athlete1[1]}\nРейтинг: {athlete1[2]}\nРегион: {athlete1[3]}\nТренер: {athlete1[4]}")
                     new_table.setItem(target_row, 1, item)
                     
                     target_dialog.accept()
@@ -845,11 +903,10 @@ class ChoiceGroupManual(QDialog):
         """Полный сброс"""
         self.load_athletes()
         self.current_athlete_index = 0
-        self.current_round = 1
         self.groups = [[] for _ in range(self.num_groups)]
-        self.calculate_draw_order()
+        self.current_group_for_seed = self.num_groups - 1
         self.init_groups()
-        self.round_label.setText(f"Круг: {self.current_round}")
+        self.update_round_display()
         self.highlight_current_group()
         self.current_athlete_label.setStyleSheet("background-color: #ffe0b3; padding: 8px; font-size: 12px;")
     
@@ -861,14 +918,15 @@ class ChoiceGroupManual(QDialog):
             self.groups[i] = [self.sorted_athletes[i]]
             table = self.group_tables[i]
             athlete = self.sorted_athletes[i]
-            display_text = f"{athlete[1]} ({athlete[3]}) R:{athlete[2]} {athlete[4]}"
+            display_text = f"{athlete[1]} ({athlete[3]}) R:{athlete[2]}"
             item = QTableWidgetItem(display_text)
             item.setData(Qt.UserRole, athlete[0])
+            item.setToolTip(f"ID: {athlete[0]}\nФИО: {athlete[1]}\nРейтинг: {athlete[2]}\nРегион: {athlete[3]}\nТренер: {athlete[4]}")
             table.setItem(0, 1, item)
             self.current_athlete_index += 1
         
-        # После авто-заполнения определяем следующую группу для посева
-        self.move_to_next_group()
+        self.update_round_display()
+        self.current_group_for_seed = self.find_next_group_for_seed()
         self.update_athletes_table()
         self.update_stats()
         self.highlight_current_group()
@@ -885,8 +943,7 @@ class ChoiceGroupManual(QDialog):
         self.sorted_athletes = sorted(all_athletes + self.sorted_athletes[self.current_athlete_index:], 
                                      key=lambda x: x[2], reverse=True)
         self.current_athlete_index = 0
-        self.current_round = 1
-        self.calculate_draw_order()
+        self.current_group_for_seed = self.num_groups - 1
         
         for table in self.group_tables:
             for row in range(self.max_rows_per_group):
@@ -894,7 +951,7 @@ class ChoiceGroupManual(QDialog):
         
         self.update_athletes_table()
         self.update_stats()
-        self.round_label.setText(f"Круг: {self.current_round}")
+        self.update_round_display()
         self.highlight_current_group()
         self.update_current_athlete()
     
