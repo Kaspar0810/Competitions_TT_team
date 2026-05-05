@@ -864,7 +864,7 @@ class ChoiceGroupManual(QDialog):
         dialog = QDialog(self)
         dialog.setWindowTitle("Редактор групп")
         dialog.setModal(True)
-        dialog.setMinimumSize(800, 500)  # Уменьшен размер
+        dialog.setMinimumSize(800, 500)
         dialog.setMaximumSize(1000, 600)
         
         layout = QVBoxLayout(dialog)
@@ -879,7 +879,7 @@ class ChoiceGroupManual(QDialog):
         for g_idx in range(self.num_groups):
             group_frame = QFrame()
             group_frame.setFrameStyle(QFrame.Box)
-            group_frame.setMaximumWidth(250)  # Уменьшена ширина
+            group_frame.setMaximumWidth(250)
             group_layout = QVBoxLayout(group_frame)
             group_layout.setSpacing(5)
             
@@ -894,7 +894,6 @@ class ChoiceGroupManual(QDialog):
             
             for row, athlete in enumerate(self.groups[g_idx]):
                 if athlete:
-                    # Сокращаем отображение для экономии места
                     short_name = athlete[1][:15] + "..." if len(athlete[1]) > 15 else athlete[1]
                     combo.addItem(f"{row+1}. {short_name} ({athlete[3][:10]}) R:{athlete[2]}", (g_idx, row, athlete))
             
@@ -939,6 +938,11 @@ class ChoiceGroupManual(QDialog):
                 g1, (row1, _, athlete1) = selected_athletes[0]
                 g2, (row2, _, athlete2) = selected_athletes[1]
                 
+                # Проверяем, что индексы существуют
+                if row1 >= len(self.groups[g1]) or row2 >= len(self.groups[g2]):
+                    QMessageBox.warning(dialog, "Ошибка", "Ошибка индекса при обмене!")
+                    return
+                
                 # Проверяем конфликты при обмене
                 region_conflict1, coach_conflict1 = self.check_conflicts(athlete2, g1)
                 region_conflict2, coach_conflict2 = self.check_conflicts(athlete1, g2)
@@ -982,6 +986,11 @@ class ChoiceGroupManual(QDialog):
             if len(selected_athletes) == 1:
                 g1, (row1, _, athlete1) = selected_athletes[0]
                 
+                # Проверяем, что индекс существует
+                if row1 >= len(self.groups[g1]):
+                    QMessageBox.warning(dialog, "Ошибка", "Ошибка индекса при перемещении!")
+                    return
+                
                 target_dialog = QDialog(dialog)
                 target_dialog.setWindowTitle("Выберите цель")
                 target_layout = QVBoxLayout(target_dialog)
@@ -992,10 +1001,37 @@ class ChoiceGroupManual(QDialog):
                 target_combo.addItems([f"Группа {i+1}" for i in range(self.num_groups) if i != g1])
                 target_layout.addWidget(target_combo)
                 
-                target_layout.addWidget(QLabel("Выберите строку:"))
+                target_layout.addWidget(QLabel("Выберите строку (номер посева):"))
                 target_row_combo = QComboBox()
-                target_row_combo.addItems([str(i+1) for i in range(self.max_rows_per_group)])
+                # Показываем все возможные строки до максимального количества
+                for i in range(self.max_rows_per_group):
+                    # Проверяем, занято ли место
+                    is_occupied = False
+                    if target_combo.currentIndex() >= 0:
+                        temp_target_group = target_combo.currentIndex()
+                        if temp_target_group >= g1:
+                            temp_target_group += 1
+                        if temp_target_group < len(self.groups) and i < len(self.groups[temp_target_group]):
+                            is_occupied = self.groups[temp_target_group][i] is not None
+                    status = " (занято)" if is_occupied else " (свободно)"
+                    target_row_combo.addItem(f"{i+1}{status}", i)
+                
                 target_layout.addWidget(target_row_combo)
+                
+                # Обновляем статус строк при смене группы
+                def update_row_status():
+                    target_row_combo.clear()
+                    target_group = target_combo.currentIndex()
+                    if target_group >= g1:
+                        target_group += 1
+                    for i in range(self.max_rows_per_group):
+                        is_occupied = False
+                        if target_group < len(self.groups) and i < len(self.groups[target_group]):
+                            is_occupied = self.groups[target_group][i] is not None
+                        status = " (занято)" if is_occupied else " (свободно)"
+                        target_row_combo.addItem(f"{i+1}{status}", i)
+                
+                target_combo.currentIndexChanged.connect(update_row_status)
                 
                 buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
                 target_layout.addWidget(buttons)
@@ -1006,7 +1042,16 @@ class ChoiceGroupManual(QDialog):
                         target_group += 1
                     target_row = target_row_combo.currentIndex()
                     
-                    if target_row < len(self.groups[target_group]) and self.groups[target_group][target_row] is not None:
+                    # Проверяем, что целевая строка существует и не занята
+                    if target_group >= len(self.groups):
+                        QMessageBox.warning(self, "Ошибка", "Целевая группа не существует!")
+                        return
+                    
+                    # Убеждаемся, что список группы имеет достаточную длину
+                    while len(self.groups[target_group]) <= target_row:
+                        self.groups[target_group].append(None)
+                    
+                    if self.groups[target_group][target_row] is not None:
                         QMessageBox.warning(self, "Ошибка", "Это место уже занято!")
                         return
                     
@@ -1033,11 +1078,15 @@ class ChoiceGroupManual(QDialog):
                     old_table = self.group_tables[g1]
                     old_table.setItem(row1, 1, QTableWidgetItem(""))
                     
+                    # Убеждаемся, что целевая позиция существует
                     while len(self.groups[target_group]) <= target_row:
                         self.groups[target_group].append(None)
                     self.groups[target_group][target_row] = athlete1
                     
                     new_table = self.group_tables[target_group]
+                    # Убеждаемся, что таблица имеет достаточное количество строк
+                    while new_table.rowCount() <= target_row:
+                        new_table.insertRow(new_table.rowCount())
                     display_text = f"{athlete1[1]} ({athlete1[3]}) R:{athlete1[2]}"
                     item = QTableWidgetItem(display_text)
                     item.setData(Qt.UserRole, athlete1[0])

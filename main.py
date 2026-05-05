@@ -9988,17 +9988,6 @@ def choice_gr_automat(check_flag):
         player_in_table_group_and_write_Game_list_Result(stage)
         # ============================================
 
-# def load_from_db():
-#     """Загрузка существующей жеребьевки из базы данных через Peewee"""
-#     choices = Choice.select().where(Choice.title_id == title_id()) 
-#     try:
-#         res = choices.select().order_by(Choice.group, Choice.posev_group)
-#         return list(results) if results.exists() else None
-#     except Exception as e:
-#         print(f"Ошибка при загрузке из базы данных: {e}")
-#         return None
-#     manual_choice.load_existing_draw_from_db(res)
-
 def choice_save_manual_group(results):
     """записывает в таблицу -Choice- результаты ручной жеребьевки"""
 
