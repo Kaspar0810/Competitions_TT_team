@@ -2,7 +2,8 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from models import Choice, Title, db  # Импортируем модели из models.py
+from models import *
+from models import db
 
 # ========== ДИАЛОГ ВЫБОРА ДЕЙСТВИЯ ==========
 class ChoiceActionDialog(QDialog):
@@ -14,19 +15,16 @@ class ChoiceActionDialog(QDialog):
         
         layout = QVBoxLayout(self)
         
-        # Заголовок
         title_label = QLabel("Жеребьевка спортсменов")
         title_label.setStyleSheet("font-size: 16px; font-weight: bold; margin: 10px;")
         title_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(title_label)
         
-        # Информационное сообщение
         info_label = QLabel("В базе данных уже есть результаты жеребьевки.\n\nВыберите действие:")
         info_label.setAlignment(Qt.AlignCenter)
         info_label.setWordWrap(True)
         layout.addWidget(info_label)
         
-        # Кнопки
         button_layout = QHBoxLayout()
         
         self.btn_reset = QPushButton("Сбросить")
@@ -82,7 +80,6 @@ class ChoiceActionDialog(QDialog):
         
         layout.addLayout(button_layout)
         
-        # Дополнительная информация
         info_text = QLabel("• Сбросить - начать новую жеребьевку\n• Загрузить - продолжить редактирование существующей\n• Отмена - выйти без изменений")
         info_text.setStyleSheet("color: #666; font-size: 11px; margin-top: 10px;")
         info_text.setAlignment(Qt.AlignCenter)
@@ -90,7 +87,7 @@ class ChoiceActionDialog(QDialog):
 
 # ========== ОСНОВНОЙ КЛАСС ЖЕРЕБЬЕВКИ ==========
 class ChoiceGroupManual(QDialog):
-    def __init__(self, athletes, num_groups, parent=None, existing_data=None):
+    def __init__(self, athletes, num_groups, id_title, parent=None, existing_data=None):
         super().__init__(parent)
         self.athletes = athletes
         self.sorted_athletes = []
@@ -123,7 +120,9 @@ class ChoiceGroupManual(QDialog):
         # Заполняем группы данными из базы
         for item in self.existing_data:
             player_id = item.player_choice_id
-            group_num = item.group - 1
+            mark = item.group.find(" ")
+            gr_num = int(item.group[:mark])
+            group_num = gr_num - 1
             position = item.posev_group - 1
             
             # Находим спортсмена по id
@@ -145,13 +144,14 @@ class ChoiceGroupManual(QDialog):
         
         placed_count = sum(1 for group in self.groups for athlete in group if athlete)
         self.current_athlete_index = placed_count
-        self.current_group_for_seed = self.find_next_group_for_seed()
+        # self.current_group_for_seed = self.find_next_group_for_seed()
         self.update_round_display()
         self.update_groups_display()
         self.highlight_current_group()
         
         if self.current_athlete_index >= len(self.athletes):
             QMessageBox.information(self, "Информация", "Жеребьевка уже завершена! Все спортсмены распределены.")
+
         
     def calculate_initial_group(self):
         """Определение начальной группы для посева"""
@@ -186,7 +186,7 @@ class ChoiceGroupManual(QDialog):
         
     def initUI(self):
         self.setWindowTitle('Ручная жеребьевка спортсменов')
-        self.setGeometry(100, 100, 1500, 720)
+        self.setGeometry(100, 100, 1600, 720)
         
         main_layout = QVBoxLayout(self)
         
@@ -216,7 +216,7 @@ class ChoiceGroupManual(QDialog):
         self.current_athlete_label.setWordWrap(True)
         current_athlete_layout.addWidget(self.current_athlete_label)
         
-        info_layout.addWidget(current_athlete_group)
+        left_layout.addWidget(current_athlete_group)
         
         # Информация о текущей группе
         current_group_group = QGroupBox("Текущая группа для посева")
@@ -656,10 +656,8 @@ class ChoiceGroupManual(QDialog):
     def save_to_database(self):
         """Сохранение результатов жеребьевки в базу данных через Peewee"""
         try:
-            # Очищаем таблицу перед записью
             Choice.delete().execute()
             
-            # Записываем результаты
             for group_idx, group in enumerate(self.groups):
                 for posev_group, athlete in enumerate(group, 1):
                     if athlete:
@@ -738,7 +736,6 @@ class ChoiceGroupManual(QDialog):
                 
                 if self.current_athlete_index >= len(self.sorted_athletes):
                     QMessageBox.information(self, "Поздравляем!", "Жеребьевка успешно завершена!")
-                    # Автоматически сохраняем в БД при завершении
                     self.save_to_database()
                 break
     
@@ -867,7 +864,8 @@ class ChoiceGroupManual(QDialog):
         dialog = QDialog(self)
         dialog.setWindowTitle("Редактор групп")
         dialog.setModal(True)
-        dialog.setMinimumSize(800, 600)
+        dialog.setMinimumSize(800, 500)  # Уменьшен размер
+        dialog.setMaximumSize(1000, 600)
         
         layout = QVBoxLayout(dialog)
         
@@ -881,19 +879,24 @@ class ChoiceGroupManual(QDialog):
         for g_idx in range(self.num_groups):
             group_frame = QFrame()
             group_frame.setFrameStyle(QFrame.Box)
+            group_frame.setMaximumWidth(250)  # Уменьшена ширина
             group_layout = QVBoxLayout(group_frame)
+            group_layout.setSpacing(5)
             
             label = QLabel(f"Группа {g_idx + 1}")
-            label.setStyleSheet("font-weight: bold; background-color: #4CAF50; color: white; padding: 5px;")
+            label.setStyleSheet("font-weight: bold; background-color: #4CAF50; color: white; padding: 3px;")
             label.setAlignment(Qt.AlignCenter)
             group_layout.addWidget(label)
             
             combo = QComboBox()
+            combo.setMaximumWidth(230)
             combo.addItem("--- Выберите спортсмена для перемещения ---")
             
             for row, athlete in enumerate(self.groups[g_idx]):
                 if athlete:
-                    combo.addItem(f"{row+1}. {athlete[1]} ({athlete[3]}) R:{athlete[2]} Тр:{athlete[4]}", (g_idx, row, athlete))
+                    # Сокращаем отображение для экономии места
+                    short_name = athlete[1][:15] + "..." if len(athlete[1]) > 15 else athlete[1]
+                    combo.addItem(f"{row+1}. {short_name} ({athlete[3][:10]}) R:{athlete[2]}", (g_idx, row, athlete))
             
             group_layout.addWidget(combo)
             group_combos.append(combo)
@@ -909,11 +912,11 @@ class ChoiceGroupManual(QDialog):
         btn_layout = QHBoxLayout()
         
         btn_swap = QPushButton("Обменять выбранных")
-        btn_swap.setStyleSheet("background-color: #2196F3; color: white;")
+        btn_swap.setStyleSheet("background-color: #2196F3; color: white; padding: 8px;")
         btn_layout.addWidget(btn_swap)
         
         btn_move = QPushButton("Переместить")
-        btn_move.setStyleSheet("background-color: #FF9800; color: white;")
+        btn_move.setStyleSheet("background-color: #FF9800; color: white; padding: 8px;")
         btn_layout.addWidget(btn_move)
         
         layout.addLayout(btn_layout)
@@ -926,7 +929,7 @@ class ChoiceGroupManual(QDialog):
                 if athlete_data:
                     selected_athletes.append((group_idx, athlete_data))
                     group_combos[group_idx].setEnabled(False)
-                    group_labels[group_idx].setStyleSheet("font-weight: bold; background-color: #FF9800; color: white; padding: 5px;")
+                    group_labels[group_idx].setStyleSheet("font-weight: bold; background-color: #FF9800; color: white; padding: 3px;")
         
         for g_idx, combo in enumerate(group_combos):
             combo.currentIndexChanged.connect(lambda idx, g=g_idx: on_combo_change(idx, g))
@@ -936,6 +939,24 @@ class ChoiceGroupManual(QDialog):
                 g1, (row1, _, athlete1) = selected_athletes[0]
                 g2, (row2, _, athlete2) = selected_athletes[1]
                 
+                # Проверяем конфликты при обмене
+                region_conflict1, coach_conflict1 = self.check_conflicts(athlete2, g1)
+                region_conflict2, coach_conflict2 = self.check_conflicts(athlete1, g2)
+                
+                if coach_conflict1 or coach_conflict2:
+                    QMessageBox.warning(dialog, "Запрещено!",
+                        "Обмен невозможен! Будет нарушено правило совпадения региона и тренера.")
+                    return
+                
+                if region_conflict1 or region_conflict2:
+                    reply = QMessageBox.question(dialog, 'Конфликт регионов',
+                        'При обмене возникнет конфликт регионов.\nВсе равно выполнить обмен?',
+                        QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                    
+                    if reply == QMessageBox.No:
+                        return
+                
+                # Выполняем обмен
                 self.groups[g1][row1], self.groups[g2][row2] = athlete2, athlete1
                 
                 table1 = self.group_tables[g1]
@@ -964,6 +985,7 @@ class ChoiceGroupManual(QDialog):
                 target_dialog = QDialog(dialog)
                 target_dialog.setWindowTitle("Выберите цель")
                 target_layout = QVBoxLayout(target_dialog)
+                target_dialog.setFixedSize(400, 250)
                 
                 target_layout.addWidget(QLabel("Выберите группу:"))
                 target_combo = QComboBox()
@@ -988,6 +1010,7 @@ class ChoiceGroupManual(QDialog):
                         QMessageBox.warning(self, "Ошибка", "Это место уже занято!")
                         return
                     
+                    # Проверяем конфликты при перемещении
                     region_conflict, coach_conflict = self.check_conflicts(athlete1, target_group)
                     
                     if coach_conflict:
@@ -1005,6 +1028,7 @@ class ChoiceGroupManual(QDialog):
                         if reply == QMessageBox.No:
                             return
                     
+                    # Выполняем перемещение
                     self.groups[g1][row1] = None
                     old_table = self.group_tables[g1]
                     old_table.setItem(row1, 1, QTableWidgetItem(""))
@@ -1139,7 +1163,6 @@ class ChoiceGroupManual(QDialog):
         """Получить результаты жеребьевки"""
         results = []
         for group_idx, group in enumerate(self.groups):
-            # gr = group_idx + 1
             for seed_num, athlete in enumerate(group, 1):
                 if athlete:
                     results.append({
@@ -1147,20 +1170,38 @@ class ChoiceGroupManual(QDialog):
                         'id_player': athlete[0],
                         'name': athlete[1],
                         'region': athlete[3]
-                        
                     })
         return results
 
 
-def load_existing_draw_from_db(id_title):
+def load_existing_draw_from_db(self):
     """Загрузка существующей жеребьевки из базы данных через Peewee"""
-    choices = Choice.select().where(Choice.title_id == id_title)
+    choices = Choice.select().where(Choice.title_id == self)
     try:
         results = choices.select().order_by(Choice.group, Choice.posev_group)
         return list(results) if results.exists() else None
     except Exception as e:
         print(f"Ошибка при загрузке из базы данных: {e}")
         return None
+
+
+def clear_db_before_choice(self):
+    """очищает базу данных -Game_list- и -Result- перед повторной жеребьевкой групп"""
+
+    systems = System.select().where((System.stage == "Предварительный") & (System.title_id == self)).get()
+    id_system = systems.id
+
+    gamelist = Game_list.select().where((Game_list.title_id == self) & (Game_list.system_id == id_system))
+    for i in gamelist:
+        gl_d = Game_list.get(Game_list.id == i)
+        gl_d.delete_instance()
+    results = Result.select().where((Result.title_id == self) & (Result.system_id == id_system))
+    for i in results:
+        r_d = Result.get(Result.id == i)
+        r_d.delete_instance()
+    choice = Choice.select().where(Choice.title_id == self)
+    for i in choice:
+        Choice.update(group = None, posev_group=None).where(Choice.id == i).execute()
 
 
 def choice_group_manual(athletes, num_groups, id_title, parent=None):
@@ -1177,9 +1218,11 @@ def choice_group_manual(athletes, num_groups, id_title, parent=None):
     """
     if num_groups < 2 or num_groups > 32:
         raise ValueError("Количество групп должно быть от 2 до 32")
-    
-    # Проверяем, есть ли уже жеребьевка в базе данных
-    existing_data = load_existing_draw_from_db(id_title)
+    system = System.select().where((System.title_id == id_title) & (System.stage == "Предварительный")).get()  # находит system id последнего
+    check_flag = system.choice_flag
+    if check_flag is True:
+        # Проверяем, есть ли уже жеребьевка в базе данных
+        existing_data = load_existing_draw_from_db(id_title)
     
     if existing_data:
         # Создаем диалог выбора действия
@@ -1188,8 +1231,8 @@ def choice_group_manual(athletes, num_groups, id_title, parent=None):
         
         if result == 1:  # Сбросить
             # Очищаем таблицу в БД
+            clear_db_before_choice(id_title)
             try:
-                Choice.delete().execute()
                 existing_data = None
                 QMessageBox.information(parent, "Информация", 
                     "Начинаем новую жеребьевку. Предыдущие данные удалены.")
@@ -1199,11 +1242,10 @@ def choice_group_manual(athletes, num_groups, id_title, parent=None):
         elif result == 2:  # Загрузить
             # Загружаем существующую жеребьевку
             pass
-            # load_existing_draw(self)
         else:  # Отмена
             return None
     
-    dialog = ChoiceGroupManual(athletes, num_groups, parent, existing_data)
+    dialog = ChoiceGroupManual(athletes, num_groups, id_title, parent, existing_data)
     result_code = dialog.exec_()
     
     if result_code == QDialog.Accepted:
