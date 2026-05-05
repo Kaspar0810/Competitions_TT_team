@@ -9992,9 +9992,9 @@ def choice_save_manual_group(results):
     """записывает в таблицу -Choice- результаты ручной жеребьевки"""
 
     for player in results:
-        id_pl = player[1] 
-        posev = player[0]
-        gr = player[4]      
+        id_pl = player['id_player'] 
+        posev = player['seed_num']
+        gr = player['group']      
  
         choice = Choice.select().where((Choice.title_id == title_id()) & (Choice.player_choice_id == id_pl)).get()
         with db:  # запись в таблицу Choice результата жеребъевки                        

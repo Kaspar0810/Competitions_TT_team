@@ -653,24 +653,24 @@ class ChoiceGroupManual(QDialog):
         else:
             event.accept()
     
-    def save_to_database(self):
-        """Сохранение результатов жеребьевки в базу данных через Peewee"""
-        try:
-            Choice.delete().execute()
+    # def save_to_database(self):
+    #     """Сохранение результатов жеребьевки в базу данных через Peewee"""
+    #     try:
+    #         # Choice.delete().execute()
             
-            for group_idx, group in enumerate(self.groups):
-                for posev_group, athlete in enumerate(group, 1):
-                    if athlete:
-                        Choice.create(
-                            id_player_choice=athlete[0],
-                            group=group_idx + 1,
-                            posev_group=posev_group
-                        )
+    #         for group_idx, group in enumerate(self.groups):
+    #             for posev_group, athlete in enumerate(group, 1):
+    #                 if athlete:
+    #                     Choice.create(
+    #                         id_player_choice=athlete[0],
+    #                         group=group_idx + 1,
+    #                         posev_group=posev_group
+    #                     )
             
-            QMessageBox.information(self, "Успех", "Результаты жеребьевки успешно сохранены в базу данных!")
+    #         QMessageBox.information(self, "Успех", "Результаты жеребьевки успешно сохранены в базу данных!")
             
-        except Exception as e:
-            QMessageBox.warning(self, "Ошибка", f"Ошибка при сохранении в базу данных:\n{str(e)}")
+    #     except Exception as e:
+    #         QMessageBox.warning(self, "Ошибка", f"Ошибка при сохранении в базу данных:\n{str(e)}")
     
     def on_cell_clicked(self, row, col):
         """Обработка клика по ячейке"""
@@ -736,7 +736,7 @@ class ChoiceGroupManual(QDialog):
                 
                 if self.current_athlete_index >= len(self.sorted_athletes):
                     QMessageBox.information(self, "Поздравляем!", "Жеребьевка успешно завершена!")
-                    self.save_to_database()
+                    # self.save_to_database()
                 break
     
     def on_item_double_clicked(self, item):
@@ -1169,13 +1169,15 @@ class ChoiceGroupManual(QDialog):
         """Показать результаты"""
         results = []
         for group_idx, group in enumerate(self.groups):
+            gr = group_idx + 1
             for seed_num, athlete in enumerate(group, 1):
                 if athlete:
                     results.append([
                         seed_num,
                         athlete[0],
                         athlete[1],
-                        athlete[3]
+                        athlete[3],
+                        gr
                     ])
         
         results.sort(key=lambda x: x[0])
@@ -1212,13 +1214,15 @@ class ChoiceGroupManual(QDialog):
         """Получить результаты жеребьевки"""
         results = []
         for group_idx, group in enumerate(self.groups):
+            gr = group_idx + 1
             for seed_num, athlete in enumerate(group, 1):
                 if athlete:
                     results.append({
                         'seed_num': seed_num,
                         'id_player': athlete[0],
                         'name': athlete[1],
-                        'region': athlete[3]
+                        'region': athlete[3],
+                        'group': gr
                     })
         return results
 
