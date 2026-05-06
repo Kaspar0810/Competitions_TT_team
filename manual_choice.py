@@ -191,7 +191,7 @@ class ChoiceGroupManual(QDialog):
         main_layout = QVBoxLayout(self)
         
         title_label = QLabel("Ручная жеребьевка спортсменов")
-        title_label.setStyleSheet("font-size: 18px; font-weight: bold; margin: 10px;")
+        title_label.setStyleSheet("font-size: 14px; font-weight: bold; margin: 10px;")
         title_label.setAlignment(Qt.AlignCenter)
         main_layout.addWidget(title_label)
         
@@ -224,7 +224,7 @@ class ChoiceGroupManual(QDialog):
         current_group_layout = QVBoxLayout(current_group_group)
         
         self.current_group_label = QLabel("Группа: -\nИгроков: -")
-        self.current_group_label.setStyleSheet("background-color: #b3d9ff; padding: 8px; font-size: 12px;")
+        self.current_group_label.setStyleSheet("background-color: #b3d9ff; padding: 8px; font-size: 11px;")
         current_group_layout.addWidget(self.current_group_label)
         
         info_layout.addWidget(current_group_group)
@@ -235,7 +235,7 @@ class ChoiceGroupManual(QDialog):
         round_layout = QVBoxLayout(round_group)
         
         self.round_label = QLabel("Круг: 1\nНаправление: →")
-        self.round_label.setStyleSheet("background-color: #d4e6f1; padding: 8px; font-size: 12px;")
+        self.round_label.setStyleSheet("background-color: #d4e6f1; padding: 8px; font-size: 11px;")
         round_layout.addWidget(self.round_label)
         
         info_layout.addWidget(round_group)
@@ -283,24 +283,25 @@ class ChoiceGroupManual(QDialog):
         
         # Кнопки управления
         btn_layout = QGridLayout()
-        
+
         self.btn_reset = QPushButton("Сбросить жеребьевку")
         self.btn_reset.clicked.connect(self.reset_draw)
-        btn_layout.addWidget(self.btn_reset, 0, 0, 1, 2)
+        btn_layout.addWidget(self.btn_reset, 0, 0, 1, 1)
         
         self.btn_auto = QPushButton("Авто-заполнение (1 номера)")
         self.btn_auto.clicked.connect(self.auto_fill_first)
-        btn_layout.addWidget(self.btn_auto, 1, 0, 1, 2)
+        btn_layout.addWidget(self.btn_auto, 1, 0, 1, 1)
         
         self.btn_clear = QPushButton("Очистить все группы")
         self.btn_clear.clicked.connect(self.clear_all_groups)
-        btn_layout.addWidget(self.btn_clear, 2, 0, 1, 2)
+        btn_layout.addWidget(self.btn_clear, 0, 1, 1, 1)
+
         
         self.btn_edit = QPushButton("Редактировать группы")
         self.btn_edit.clicked.connect(self.open_editor)
         self.btn_edit.setStyleSheet("background-color: #FF9800; color: white; font-weight: bold;")
-        btn_layout.addWidget(self.btn_edit, 3, 0, 1, 2)
-        
+        btn_layout.addWidget(self.btn_edit, 1, 1, 1, 1)
+
         control_layout.addLayout(btn_layout)
         
         # Кнопки OK и Cancel
@@ -311,7 +312,7 @@ class ChoiceGroupManual(QDialog):
         self.btn_result.setStyleSheet("background-color: #4CAF50; color: white; font-weight: bold;")
         dialog_buttons.addWidget(self.btn_result)
         
-        self.btn_ok = QPushButton("OK")
+        self.btn_ok = QPushButton("Записать жеребьевку")
         self.btn_ok.clicked.connect(self.accept)
         self.btn_ok.setStyleSheet("background-color: #2196F3; color: white; font-weight: bold;")
         dialog_buttons.addWidget(self.btn_ok)
@@ -852,9 +853,9 @@ class ChoiceGroupManual(QDialog):
         
         group_combos = []
         group_labels = []
-        group_data = []  # Сохраняем копию данных для редактирования
         
         # Создаем копию текущих данных групп для редактирования
+        group_data = []
         for g_idx in range(self.num_groups):
             group_copy = []
             for athlete in self.groups[g_idx]:
@@ -879,11 +880,13 @@ class ChoiceGroupManual(QDialog):
             
             combo = QComboBox()
             combo.setMaximumWidth(230)
+            combo.setProperty("group_idx", g_idx)
             combo.addItem("--- Выберите спортсмена для перемещения ---")
             
             for row, athlete in enumerate(group_data[g_idx]):
                 if athlete:
                     short_name = athlete[1][:15] + "..." if len(athlete[1]) > 15 else athlete[1]
+                    # Сохраняем полную информацию о спортсмене
                     combo.addItem(f"{row+1}. {short_name} ({athlete[3][:10]}) R:{athlete[2]}", (g_idx, row, athlete))
             
             group_layout.addWidget(combo)
@@ -917,28 +920,55 @@ class ChoiceGroupManual(QDialog):
         
         layout.addLayout(btn_layout)
         
-        selected_athletes = []
+        selected_athletes = []  # Список выбранных спортсменов (группа, индекс, спортсмен, комбобокс)
+        
+        def get_current_athlete_position(athlete, group_idx):
+            """Получить актуальную позицию спортсмена в группе"""
+            for idx, a in enumerate(group_data[group_idx]):
+                if a and a[0] == athlete[0]:  # Сравниваем по ID
+                    return idx
+            return -1
         
         def refresh_combos():
             """Обновить все комбобоксы после изменений"""
             for g_idx in range(self.num_groups):
+                current_text = group_combos[g_idx].currentText()
+                current_data = group_combos[g_idx].currentData() if group_combos[g_idx].currentIndex() > 0 else None
+                
                 group_combos[g_idx].clear()
                 group_combos[g_idx].addItem("--- Выберите спортсмена для перемещения ---")
+                
                 for row, athlete in enumerate(group_data[g_idx]):
                     if athlete:
                         short_name = athlete[1][:15] + "..." if len(athlete[1]) > 15 else athlete[1]
                         group_combos[g_idx].addItem(f"{row+1}. {short_name} ({athlete[3][:10]}) R:{athlete[2]}", (g_idx, row, athlete))
+                
                 group_combos[g_idx].setEnabled(True)
                 group_labels[g_idx].setStyleSheet("font-weight: bold; background-color: #4CAF50; color: white; padding: 3px;")
+                
+                # Восстанавливаем выбранный элемент если возможно
+                if current_data:
+                    for i in range(group_combos[g_idx].count()):
+                        data = group_combos[g_idx].itemData(i)
+                        if data and data[2][0] == current_data[2][0]:  # Сравниваем по ID
+                            group_combos[g_idx].setCurrentIndex(i)
+                            break
             
-            # Очищаем выбранных спортсменов
+            # Очищаем список выбранных спортсменов
             selected_athletes.clear()
         
         def on_combo_change(idx, group_idx):
             if idx > 0:
                 athlete_data = group_combos[group_idx].itemData(idx)
                 if athlete_data:
-                    selected_athletes.append((group_idx, athlete_data))
+                    # Проверяем, не выбран ли уже этот спортсмен
+                    for existing in selected_athletes:
+                        if existing[2][0] == athlete_data[2][0]:  # Сравниваем по ID
+                            QMessageBox.warning(dialog, "Ошибка", "Этот спортсмен уже выбран!")
+                            group_combos[group_idx].setCurrentIndex(0)
+                            return
+                    
+                    selected_athletes.append((group_idx, athlete_data[1], athlete_data[2], group_combos[group_idx]))
                     group_combos[group_idx].setEnabled(False)
                     group_labels[group_idx].setStyleSheet("font-weight: bold; background-color: #FF9800; color: white; padding: 3px;")
         
@@ -947,34 +977,33 @@ class ChoiceGroupManual(QDialog):
         
         def swap_athletes():
             if len(selected_athletes) == 2:
-                g1, (row1, _, athlete1) = selected_athletes[0]
-                g2, (row2, _, athlete2) = selected_athletes[1]
+                g1, row1, athlete1, combo1 = selected_athletes[0]
+                g2, row2, athlete2, combo2 = selected_athletes[1]
                 
-                # Проверяем, что индексы существуют
-                if row1 >= len(group_data[g1]) or row2 >= len(group_data[g2]):
-                    QMessageBox.warning(dialog, "Ошибка", "Ошибка индекса при обмене!")
+                # Получаем актуальные позиции спортсменов
+                actual_row1 = get_current_athlete_position(athlete1, g1)
+                actual_row2 = get_current_athlete_position(athlete2, g2)
+                
+                if actual_row1 == -1 or actual_row2 == -1:
+                    QMessageBox.warning(dialog, "Ошибка", "Спортсмен не найден в группе!")
+                    refresh_combos()
                     return
-                
-                # Временно выполняем обмен для проверки конфликтов
-                temp_athlete1 = group_data[g1][row1]
-                temp_athlete2 = group_data[g2][row2]
                 
                 # Проверяем конфликты при обмене
                 conflict1 = False
                 conflict2 = False
                 
                 # Проверяем для группы 1 с athlete2
-                group1_regions = [a[3] for a in group_data[g1] if a and a != temp_athlete1]
+                group1_regions = [a[3] for a in group_data[g1] if a and a[0] != athlete1[0]]
                 if athlete2[3] in group1_regions:
-                    # Проверяем тренера
-                    group1_coaches = [a[4] for a in group_data[g1] if a and a != temp_athlete1]
+                    group1_coaches = [a[4] for a in group_data[g1] if a and a[0] != athlete1[0]]
                     if athlete2[4] in group1_coaches:
                         conflict1 = True
                 
                 # Проверяем для группы 2 с athlete1
-                group2_regions = [a[3] for a in group_data[g2] if a and a != temp_athlete2]
+                group2_regions = [a[3] for a in group_data[g2] if a and a[0] != athlete2[0]]
                 if athlete1[3] in group2_regions:
-                    group2_coaches = [a[4] for a in group_data[g2] if a and a != temp_athlete2]
+                    group2_coaches = [a[4] for a in group_data[g2] if a and a[0] != athlete2[0]]
                     if athlete1[4] in group2_coaches:
                         conflict2 = True
                 
@@ -984,7 +1013,7 @@ class ChoiceGroupManual(QDialog):
                     return
                 
                 # Выполняем обмен
-                group_data[g1][row1], group_data[g2][row2] = athlete2, athlete1
+                group_data[g1][actual_row1], group_data[g2][actual_row2] = athlete2, athlete1
                 
                 refresh_combos()
                 QMessageBox.information(dialog, "Успех", "Спортсмены успешно обменяны!")
@@ -993,11 +1022,14 @@ class ChoiceGroupManual(QDialog):
         
         def move_athlete():
             if len(selected_athletes) == 1:
-                g1, (row1, _, athlete1) = selected_athletes[0]
+                g1, row1, athlete1, combo1 = selected_athletes[0]
                 
-                # Проверяем, что индекс существует
-                if row1 >= len(group_data[g1]):
-                    QMessageBox.warning(dialog, "Ошибка", "Ошибка индекса при перемещении!")
+                # Получаем актуальную позицию спортсмена
+                actual_row1 = get_current_athlete_position(athlete1, g1)
+                
+                if actual_row1 == -1:
+                    QMessageBox.warning(dialog, "Ошибка", "Спортсмен не найден в группе!")
+                    refresh_combos()
                     return
                 
                 # Создаем диалог выбора цели
@@ -1008,22 +1040,21 @@ class ChoiceGroupManual(QDialog):
                 
                 target_layout.addWidget(QLabel("Выберите группу:"))
                 target_combo = QComboBox()
-                target_combo.addItems([f"Группа {i+1}" for i in range(self.num_groups) if i != g1])
+                available_groups = [f"Группа {i+1}" for i in range(self.num_groups) if i != g1]
+                target_combo.addItems(available_groups)
                 target_layout.addWidget(target_combo)
                 
                 target_layout.addWidget(QLabel("Выберите строку (номер посева):"))
                 target_row_combo = QComboBox()
                 target_layout.addWidget(target_row_combo)
                 
-                # Функция обновления доступных строк
                 def update_row_status():
                     target_row_combo.clear()
-                    target_group = target_combo.currentIndex()
-                    if target_group >= g1:
-                        target_group += 1
+                    target_group_name = target_combo.currentText()
+                    target_group = int(target_group_name.split()[1]) - 1
                     
                     # Определяем максимальное количество строк
-                    max_rows = max(self.max_rows_per_group, len(group_data[target_group]) + 1)
+                    max_rows = max(self.max_rows_per_group, len(group_data[target_group]) + 5)
                     
                     for i in range(max_rows):
                         # Проверяем, занято ли место
@@ -1040,9 +1071,8 @@ class ChoiceGroupManual(QDialog):
                 target_layout.addWidget(buttons)
                 
                 def do_move():
-                    target_group = target_combo.currentIndex()
-                    if target_group >= g1:
-                        target_group += 1
+                    target_group_name = target_combo.currentText()
+                    target_group = int(target_group_name.split()[1]) - 1
                     target_row = target_row_combo.currentData()
                     
                     # Проверяем, что целевая строка существует и не занята
@@ -1081,7 +1111,7 @@ class ChoiceGroupManual(QDialog):
                             return
                     
                     # Выполняем перемещение
-                    group_data[g1][row1] = None
+                    group_data[g1][actual_row1] = None
                     group_data[target_group][target_row] = athlete1
                     
                     target_dialog.accept()
@@ -1096,14 +1126,14 @@ class ChoiceGroupManual(QDialog):
         
         def save_changes():
             """Сохранить изменения и обновить основное отображение"""
-            # Обновляем основные данные групп
+            # Обновляем основные данные групп, удаляя None значения
             self.groups = []
             for g_idx in range(self.num_groups):
-                group_copy = []
+                group = []
                 for athlete in group_data[g_idx]:
                     if athlete:
-                        group_copy.append(athlete)
-                self.groups.append(group_copy)
+                        group.append(athlete)
+                self.groups.append(group)
             
             # Обновляем индекс текущего спортсмена
             placed_count = sum(1 for group in self.groups for athlete in group if athlete)
@@ -1185,7 +1215,7 @@ class ChoiceGroupManual(QDialog):
         self.highlight_current_group()
         self.update_current_athlete()
     
-    def show_results(self):
+    def _show_results(self):
         """Показать результаты"""
         results = []
         for group_idx, group in enumerate(self.groups):
@@ -1230,6 +1260,10 @@ class ChoiceGroupManual(QDialog):
         
         dialog.exec_()
     
+    def show_results(self):
+        """показать результаты жереьевки в pdf"""
+        pass
+
     def get_results(self):
         """Получить результаты жеребьевки"""
         results = []
