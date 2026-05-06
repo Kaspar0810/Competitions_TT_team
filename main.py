@@ -1202,7 +1202,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def edit_etap(self):
         """редактирование жеребьевки этапов соревнования"""
-        my_win.tabWidget.setCurrentIndex(6)
+        my_win.tabWidget.setCurrentIndex(7)
         my_win.tabWidget_2.setCurrentIndex(1)
         my_win.comboBox_first_group.clear()
         my_win.comboBox_second_group.clear()
