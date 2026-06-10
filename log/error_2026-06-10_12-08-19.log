@@ -1,0 +1,14 @@
+2026-06-10 12:09:09,001 - ERROR - Необработанное исключение: ValueError: time data '17.01.2014' does not match format '%Y-%m-%d'
+2026-06-10 12:09:09,003 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 3978, in dclick_in_listwidget
+    check_age_player(znak, bd)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 3896, in check_age_player
+    date_object = datetime.strptime(dr,"%Y-%m-%d")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Alex_SSHOR13\AppData\Local\Programs\Python\Python312\Lib\_strptime.py", line 554, in _strptime_datetime
+    tt, fraction, gmtoff_fraction = _strptime(data_string, format)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Alex_SSHOR13\AppData\Local\Programs\Python\Python312\Lib\_strptime.py", line 333, in _strptime
+    raise ValueError("time data %r does not match format %r" %
+ValueError: time data '17.01.2014' does not match format '%Y-%m-%d'

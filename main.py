@@ -3868,9 +3868,14 @@ def check_age_player(znak, dr):
     vozrast_text = title.vozrast 
 
     if isinstance(dr, str):
-        birth_date = datetime.strptime(dr, '%d.%m.%Y').date()
+        # dr = format_date_for_db(dr)
+        if znak > 0:
+            birth_date = datetime.strptime(dr, '%d.%m.%Y').date()
+        else:
+            birth_date = datetime.strptime(dr, '%Y-%m-%d').date()
+
+        age = calculate_age_on_date(birth_date)
     
-    age = calculate_age_on_date(birth_date)
     
     if age < 8:
         QMessageBox.warning(my_win, "Ошибка", "Возраст спортсмена менее 8 лет\nучаствовать в соревнованиях не может!")

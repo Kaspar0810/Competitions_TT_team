@@ -1,0 +1,12 @@
+2026-06-10 11:17:44,122 - ERROR - Необработанное исключение: AttributeError: 'str' object has no attribute 'year'
+2026-06-10 11:17:44,122 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 3977, in dclick_in_listwidget
+    check_age_player(znak, bd)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 3873, in check_age_player
+    age = calculate_age_on_date(birth_date)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 3855, in calculate_age_on_date
+    age = target_date.year - birth_date.year
+                             ^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'year'

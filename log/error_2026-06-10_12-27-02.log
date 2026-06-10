@@ -1,0 +1,15 @@
+2026-06-10 12:27:18,628 - ERROR - Необработанное исключение: ValueError: time data '14..2.17.0' does not match format '%d.%m.%Y'
+2026-06-10 12:27:18,628 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 3431, in add_player
+    flag = check_age_player(znak, bd)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 3872, in check_age_player
+    birth_date = datetime.strptime(dr, '%d.%m.%Y').date()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Alex_SSHOR13\AppData\Local\Programs\Python\Python312\Lib\_strptime.py", line 554, in _strptime_datetime
+    tt, fraction, gmtoff_fraction = _strptime(data_string, format)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Alex_SSHOR13\AppData\Local\Programs\Python\Python312\Lib\_strptime.py", line 333, in _strptime
+    raise ValueError("time data %r does not match format %r" %
+ValueError: time data '14..2.17.0' does not match format '%d.%m.%Y'
