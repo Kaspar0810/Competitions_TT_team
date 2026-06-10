@@ -186,12 +186,12 @@ class ChoiceGroupManual(QDialog):
         
     def initUI(self):
         self.setWindowTitle('Ручная жеребьевка спортсменов')
-        self.setGeometry(100, 100, 1600, 720)
+        self.setGeometry(30, 30, 1400, 720)
         
         main_layout = QVBoxLayout(self)
         
         title_label = QLabel("Ручная жеребьевка спортсменов")
-        title_label.setStyleSheet("font-size: 14px; font-weight: bold; margin: 10px;")
+        title_label.setStyleSheet("font-size: 12px; font-weight: bold; margin: 10px;")
         title_label.setAlignment(Qt.AlignCenter)
         main_layout.addWidget(title_label)
         
@@ -200,7 +200,7 @@ class ChoiceGroupManual(QDialog):
         # ========== ЛЕВАЯ ПАНЕЛЬ ==========
         left_panel = QFrame()
         left_panel.setFrameStyle(QFrame.StyledPanel)
-        left_panel.setMaximumWidth(400)
+        left_panel.setMaximumWidth(250)
         left_layout = QVBoxLayout(left_panel)
         
         # Горизонтальный layout для информации
@@ -212,7 +212,7 @@ class ChoiceGroupManual(QDialog):
         current_athlete_layout = QVBoxLayout(current_athlete_group)
         
         self.current_athlete_label = QLabel("Спортсмен: -\nРейтинг: -\nРегион: -\nТренер: -")
-        self.current_athlete_label.setStyleSheet("background-color: #ffe0b3; padding: 8px; font-size: 12px;")
+        self.current_athlete_label.setStyleSheet("background-color: #ffe0b3; padding: 8px; font-size: 10px;")
         self.current_athlete_label.setWordWrap(True)
         current_athlete_layout.addWidget(self.current_athlete_label)
         
@@ -273,31 +273,31 @@ class ChoiceGroupManual(QDialog):
         stats_layout.addWidget(QLabel("Осталось:"), 2, 0)
         self.remaining_label = QLabel("0")
         stats_layout.addWidget(self.remaining_label, 2, 1)
-        stats_layout.addWidget(QLabel("Макс. в группе:"), 3, 0)
-        self.max_rows_label = QLabel("0")
-        stats_layout.addWidget(self.max_rows_label, 3, 1)
-        stats_layout.addWidget(QLabel("Текущий круг:"), 4, 0)
-        self.round_number_label = QLabel("1")
-        stats_layout.addWidget(self.round_number_label, 4, 1)
+        # stats_layout.addWidget(QLabel("Макс. в группе:"), 3, 0)
+        # self.max_rows_label = QLabel("0")
+        # stats_layout.addWidget(self.max_rows_label, 3, 1)
+        # stats_layout.addWidget(QLabel("Текущий круг:"), 4, 0)
+        # self.round_number_label = QLabel("1")
+        # stats_layout.addWidget(self.round_number_label, 4, 1)
         control_layout.addLayout(stats_layout)
         
         # Кнопки управления
         btn_layout = QGridLayout()
 
-        self.btn_reset = QPushButton("Сбросить жеребьевку")
+        self.btn_reset = QPushButton("Сброс")
         self.btn_reset.clicked.connect(self.reset_draw)
         btn_layout.addWidget(self.btn_reset, 0, 0, 1, 1)
         
-        self.btn_auto = QPushButton("Авто-заполнение (1 номера)")
+        self.btn_auto = QPushButton("Авто (1 номера)")
         self.btn_auto.clicked.connect(self.auto_fill_first)
         btn_layout.addWidget(self.btn_auto, 1, 0, 1, 1)
         
-        self.btn_clear = QPushButton("Очистить все группы")
+        self.btn_clear = QPushButton("Очистить")
         self.btn_clear.clicked.connect(self.clear_all_groups)
         btn_layout.addWidget(self.btn_clear, 0, 1, 1, 1)
 
         
-        self.btn_edit = QPushButton("Редактировать группы")
+        self.btn_edit = QPushButton("Редактор")
         self.btn_edit.clicked.connect(self.open_editor)
         self.btn_edit.setStyleSheet("background-color: #FF9800; color: white; font-weight: bold;")
         btn_layout.addWidget(self.btn_edit, 1, 1, 1, 1)
@@ -307,12 +307,12 @@ class ChoiceGroupManual(QDialog):
         # Кнопки OK и Cancel
         dialog_buttons = QHBoxLayout()
         
-        self.btn_result = QPushButton("Показать результат")
+        self.btn_result = QPushButton("Показать")
         self.btn_result.clicked.connect(self.show_results)
         self.btn_result.setStyleSheet("background-color: #4CAF50; color: white; font-weight: bold;")
         dialog_buttons.addWidget(self.btn_result)
         
-        self.btn_ok = QPushButton("Записать жеребьевку")
+        self.btn_ok = QPushButton("Записать")
         self.btn_ok.clicked.connect(self.accept)
         self.btn_ok.setStyleSheet("background-color: #2196F3; color: white; font-weight: bold;")
         dialog_buttons.addWidget(self.btn_ok)
@@ -457,8 +457,8 @@ class ChoiceGroupManual(QDialog):
         for g in range(self.num_groups):
             group_frame = QFrame()
             group_frame.setFrameStyle(QFrame.Box)
-            group_frame.setMinimumWidth(300)
-            group_frame.setMaximumWidth(400)
+            group_frame.setMinimumWidth(200)
+            group_frame.setMaximumWidth(250)
             group_layout = QVBoxLayout(group_frame)
             group_layout.setSpacing(5)
             
@@ -572,8 +572,8 @@ class ChoiceGroupManual(QDialog):
         self.total_label.setText(str(total))
         self.placed_label.setText(str(placed))
         self.remaining_label.setText(str(remaining))
-        self.max_rows_label.setText(str(self.max_rows_per_group))
-        self.round_number_label.setText(str(self.current_round))
+        # self.max_rows_label.setText(str(self.max_rows_per_group))
+        # self.round_number_label.setText(str(self.current_round))
         self.update_current_athlete()
         
     def update_current_athlete(self):
