@@ -1,0 +1,11 @@
+2026-06-16 10:19:59,978 - ERROR - Необработанное исключение: ValueError: 'Дополнительно' is not in list
+2026-06-16 10:19:59,994 - ERROR - Трассировка стека:
+Traceback (most recent call last):
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 1687, in open
+    go_to()
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 2587, in go_to
+    tab_enabled(id_title)
+  File "c:\Users\Alex_SSHOR13\Competitions_TT_team\main.py", line 2363, in tab_enabled
+    ind = tab_index.index(k)
+          ^^^^^^^^^^^^^^^^^^
+ValueError: 'Дополнительно' is not in list
